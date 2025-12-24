@@ -1,0 +1,17 @@
+# Node
+**/node_modules/
+**/dist/
+**/build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python
+.venv/
+__pycache__/
+
+# macOS
+.DS_Store
+
+**/.env

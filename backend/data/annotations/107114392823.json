@@ -1,0 +1,18 @@
+{
+  "source": "lianjia",
+  "source_house_id": "107114392823",
+  "features": {
+    "area_sqm": 71.88,
+    "bedrooms": 2,
+    "age_years": 21,
+    "distance_to_metro_km": 1
+  },
+  "label": {
+    "price": 2820000
+  },
+  "meta": {
+    "annotated_at": "2025-12-23T05:58:06.417637",
+    "annotated_by": "manual",
+    "confidence": 1.0
+  }
+}

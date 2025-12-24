@@ -1,0 +1,69 @@
+/* src/index.css */
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+/* 让所有元素的尺寸计算更顺手 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 全局背景色 */
+body {
+  background-color: #020617;
+  color: #e5e7eb;
+}
+
+/* 去掉 Vite 模板默认给 #root 的居中和 padding */
+#root {
+  display: block;
+}
+
+/* Antd 布局的统一背景 */
+.ant-layout {
+  background: #020617;
+}
+
+/* 卡片暗色样式：有边框，有层次 */
+.ant-card {
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid #111827;
+}
+
+/* 卡片标题更明显一点 */
+.ant-card-head {
+  border-bottom: 1px solid #111827;
+}
+
+/* 表格暗色 */
+.ant-table {
+  background: #020617;
+}
+
+.ant-table-thead > tr > th {
+  background: #020617 !important;
+  border-bottom: 1px solid #111827 !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid #111827;
+}
+
+/* 表单 label 颜色 */
+.ant-form-item-label > label {
+  color: #e5e7eb !important;
+}

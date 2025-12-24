@@ -1,0 +1,193 @@
+/* 整体背景：深色；中间卡片：白色 */
+body {
+  margin: 0;
+  padding: 0;
+  background: #0f172a;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 12px;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 16px;
+  padding: 24px 20px 32px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+/* 表单卡片和布局 */
+.form-card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 16px 16px 18px;
+  margin-bottom: 16px;
+  background: #f9fafb;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.form-row label {
+  font-size: 14px;
+  color: #374151;
+}
+
+.form-row input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.form-row input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* 按钮 */
+.submit-btn {
+  margin-top: 4px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.secondary-btn {
+  margin-top: 4px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #9ca3af;
+  background: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #f3f4f6;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 提示条 */
+.result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.result.success {
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.result.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.result.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+/* CRUD 区块 */
+.crud-section {
+  margin-top: 24px;
+}
+
+.list-title {
+  margin-top: 16px;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+/* 表格样式 */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.house-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.house-table thead {
+  background: #f3f4f6;
+}
+
+.house-table th,
+.house-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.house-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.house-table tbody tr:hover {
+  background: #e5f0ff;
+}
+
+/* 表格里的链接按钮 */
+.link-btn {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 4px;
+}
+
+.link-btn.danger {
+  color: #dc2626;
+}
