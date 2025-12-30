@@ -153,28 +153,28 @@ h1 {
   overflow-x: auto;
 }
 
-.house-table {
+.vehicle-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.house-table thead {
+.vehicle-table thead {
   background: #f3f4f6;
 }
 
-.house-table th,
-.house-table td {
+.vehicle-table th,
+.vehicle-table td {
   border: 1px solid #e5e7eb;
   padding: 6px 8px;
   text-align: center;
 }
 
-.house-table tbody tr:nth-child(even) {
+.vehicle-table tbody tr:nth-child(even) {
   background: #f9fafb;
 }
 
-.house-table tbody tr:hover {
+.vehicle-table tbody tr:hover {
   background: #e5f0ff;
 }
 

@@ -24,7 +24,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PredictPage from "./pages/PredictPage";
-import HouseCrudPage from "./pages/HouseCrudPage";
+import VehicleCrudPage from "./pages/VehicleCrudPage";
 import AccountPage from "./pages/AccountPage";
 import VisualizationPage from "./pages/VisualizationPage";
 import CrawlerTaskPage from "./pages/CrawlerTaskPage";
@@ -45,7 +45,7 @@ function AppLayout() {
 
   const pathKeyMap: Record<string, string> = {
     "/predict": "predict",
-    "/houses": "houses",
+    "/vehicles": "vehicles",
     "/visualization": "visualization",
     "/account": "account",
     "/ai_chat": "ai_chat",
@@ -90,7 +90,7 @@ function AppLayout() {
           borderBottom: "1px solid #111827",
         }}
       >
-        🏠 房价预测系统
+        🚗 车辆价格预测系统
       </div>
 
       {/* 主菜单 */}
@@ -100,7 +100,7 @@ function AppLayout() {
         selectedKeys={[selectedKey]}
         onClick={({ key }) => {
           if (key === "predict") navigate("/predict");
-          if (key === "houses") navigate("/houses");
+          if (key === "vehicles") navigate("/vehicles");
           if (key === "visualization") navigate("/visualization");
           if (key === "account") navigate("/account");
           if (key === "ai_chat") navigate("/ai_chat");
@@ -109,7 +109,7 @@ function AppLayout() {
           if (key === "metadata") navigate("/metadata");
           if (key === "intro") navigate("/intro");
           if (key === "github") {
-            window.open("https://github.com/Zhiyu-gao/Housepredict-fastapi-react", "_blank");
+            window.open("https://github.com/Zhiyu-gao/Vehicle-Intelligence-Platform", "_blank");
           }
         }}
         style={{
@@ -126,7 +126,7 @@ function AppLayout() {
         {
           key: "predict",
           icon: <HomeOutlined />,
-          label: "房价预测",
+          label: "车辆价格预测",
         },
         {
           key: "visualization",
@@ -197,11 +197,11 @@ function AppLayout() {
           }}
         >
           <Text style={{ color: "#e5e7eb", fontSize: 16 }}>
-            房价预测 & 房源管理后台
+            车辆价格预测 & 车辆管理后台
           </Text>
           <Space size={16}>
             <a
-              href="https://github.com/Zhiyu-gao/Housepredict-fastapi-react" 
+              href="https://github.com/Zhiyu-gao/Vehicle-Intelligence-Platform" 
               target="_blank"
               rel="noreferrer"
               style={{ color: "#e5e7eb", fontSize: 20 }}
@@ -253,7 +253,7 @@ function App() {
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route path="/intro" element={<ProjectIntroPage />} />
           <Route path="/predict" element={<PredictPage />} />
-          <Route path="/houses" element={<HouseCrudPage />} />
+          <Route path="/vehicles" element={<VehicleCrudPage />} />
           <Route path="/visualization" element={<VisualizationPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/ai_chat" element={<AiChatPage />} />

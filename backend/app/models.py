@@ -2,15 +2,15 @@
 from sqlalchemy import Column, Integer, Float, String, DateTime, JSON,func
 from .db import Base
 from datetime import datetime
-# 爬虫房源（原始数据）
+# 爬虫车辆（原始数据）
 
-class CrawlHouse(Base):
-    __tablename__ = "crawl_houses"
+class CrawlVehicle(Base):
+    __tablename__ = "crawl_vehicles"
 
     id = Column(Integer, primary_key=True, index=True)
 
     # 核心标识
-    house_id = Column(String(32), unique=True, index=True, nullable=False)
+    vehicle_id = Column(String(32), unique=True, index=True, nullable=False)
 
     title = Column(String(255))
     detail_url = Column(String(512))
@@ -43,14 +43,14 @@ class CrawlHouse(Base):
     is_annotated = Column(Integer, default=0)  # 0 = 未标注，1 = 已标注
 
 
-# 训练用房源（干净样本）
-class House(Base):
-    __tablename__ = "houses"
+# 训练用车辆（干净样本）
+class Vehicle(Base):
+    __tablename__ = "vehicles"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # 🔥 关键字段：用于和爬虫房源关联
-    source_house_id = Column(String(64), unique=True, index=True)
+    # 🔥 关键字段：用于和爬虫车辆关联
+    source_vehicle_id = Column(String(64), unique=True, index=True)
 
     area_sqm = Column(Float, nullable=False)
     bedrooms = Column(Integer, nullable=False)

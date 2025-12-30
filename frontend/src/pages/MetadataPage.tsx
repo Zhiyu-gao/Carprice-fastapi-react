@@ -21,8 +21,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
    类型定义
 ===================== */
 
-interface CrawlHouse {
-  house_id: string;
+interface CrawlVehicle {
+  vehicle_id: string;
   title: string;
   area_sqm: number;
   layout: string;
@@ -59,11 +59,11 @@ function calcAge(buildYear: number): number {
 ===================== */
 
 const MetadataPage: React.FC = () => {
-  const [houses, setHouses] = useState<CrawlHouse[]>([]);
+  const [vehicles, setVehicles] = useState<CrawlVehicle[]>([]);
   const [annotatedIds, setAnnotatedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
-  const [selected, setSelected] = useState<CrawlHouse | null>(null);
+  const [selected, setSelected] = useState<CrawlVehicle | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [form] = Form.useForm<AnnotationForm>();
@@ -73,16 +73,16 @@ const MetadataPage: React.FC = () => {
      数据加载
   ===================== */
 
-  const fetchHouses = async () => {
+  const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/crawl-houses`);
+      const res = await fetch(`${API_BASE_URL}/crawl-vehicles`);
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setHouses(Array.isArray(data) ? data : []);
+      setVehicles(Array.isArray(data) ? data : []);
     } catch {
-      messageApi.error("获取爬虫房源失败");
-      setHouses([]);
+      messageApi.error("获取爬虫车辆失败");
+      setVehicles([]);
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ const MetadataPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchHouses();
+    fetchVehicles();
     fetchAnnotatedIds();
   }, []);
 
@@ -108,15 +108,15 @@ const MetadataPage: React.FC = () => {
      标注流程
   ===================== */
 
-  const openAnnotate = (house: CrawlHouse) => {
-    setSelected(house);
+  const openAnnotate = (vehicle: CrawlVehicle) => {
+    setSelected(vehicle);
     setDrawerOpen(true);
 
     form.setFieldsValue({
-      area_sqm: house.area_sqm,
-      bedrooms: parseBedrooms(house.layout),
-      age_years: calcAge(house.build_year),
-      price: house.total_price_wan * 10000,
+      area_sqm: vehicle.area_sqm,
+      bedrooms: parseBedrooms(vehicle.layout),
+      age_years: calcAge(vehicle.build_year),
+      price: vehicle.total_price_wan * 10000,
     });
   };
 
@@ -125,7 +125,7 @@ const MetadataPage: React.FC = () => {
 
     try {
       const payload = {
-        source_house_id: selected.house_id,
+        source_vehicle_id: selected.vehicle_id,
         features: {
           area_sqm: values.area_sqm,
           bedrooms: values.bedrooms,
@@ -165,17 +165,17 @@ const MetadataPage: React.FC = () => {
     <>
       {contextHolder}
 
-      <Title level={3}>爬虫房源 · 数据标注</Title>
+      <Title level={3}>爬虫车辆 · 数据标注</Title>
       <Text type="secondary">
-        将真实爬虫房源转化为模型可训练的数据样本（只读原始数据）
+        将真实爬虫车辆转化为模型可训练的数据样本（只读原始数据）
       </Text>
 
       <List
         loading={loading}
         style={{ marginTop: 16 }}
-        dataSource={houses}
+        dataSource={vehicles}
         renderItem={(item) => {
-          const annotated = annotatedIds.has(item.house_id);
+          const annotated = annotatedIds.has(item.vehicle_id);
 
           return (
             <List.Item
@@ -215,7 +215,7 @@ const MetadataPage: React.FC = () => {
       />
 
       <Drawer
-        title="房源标注（生成训练样本）"
+        title="车辆标注（生成训练样本）"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         size="large"

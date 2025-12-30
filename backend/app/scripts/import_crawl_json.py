@@ -7,10 +7,10 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, Base, engine
-from app.models import CrawlHouse
+from app.models import CrawlVehicle
 
 # 🔧 改成你的真实路径
-CRAWL_FOLDER = Path("/Users/zhiyu/Documents/house-price/backend/app/spider/lianjia/lianjia_json")
+CRAWL_FOLDER = Path("/Users/zhiyu/Documents/Vehicle-Intelligence-Platform/backend/app/spider/lianjia/lianjia_json")
 
 def main():
     # 确保表存在
@@ -28,24 +28,25 @@ def main():
         try:
             data = json.loads(json_path.read_text(encoding="utf-8"))
 
-            house_id = data.get("house_id")
-            if not house_id:
-                print(f"⚠️ 缺少 house_id，跳过：{json_path.name}")
+            # 兼容house_id和vehicle_id字段
+            vehicle_id = data.get("vehicle_id") or data.get("house_id")
+            if not vehicle_id:
+                print(f"⚠️ 缺少 vehicle_id/house_id，跳过：{json_path.name}")
                 skipped += 1
                 continue
 
             # 防止重复导入
             exists = (
-                db.query(CrawlHouse)
-                .filter(CrawlHouse.house_id == house_id)
+                db.query(CrawlVehicle)
+                .filter(CrawlVehicle.vehicle_id == vehicle_id)
                 .first()
             )
             if exists:
                 skipped += 1
                 continue
 
-            house = CrawlHouse(
-                house_id=house_id,
+            vehicle = CrawlVehicle(
+                vehicle_id=vehicle_id,
                 title=data.get("title"),
                 area_sqm=data.get("area_sqm"),
                 layout=data.get("layout"),
@@ -60,7 +61,7 @@ def main():
                 else None,
             )
 
-            db.add(house)
+            db.add(vehicle)
             inserted += 1
 
         except Exception as e:

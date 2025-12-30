@@ -3,7 +3,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class HouseFeatures(BaseModel):
+class VehicleFeatures(BaseModel):
     area_sqm: float
     bedrooms: int
     age_years: int
@@ -18,7 +18,7 @@ class AiProvider(str, Enum):
 
 class PriceAnalysisRequest(BaseModel):
     provider: AiProvider
-    features: HouseFeatures
+    features: VehicleFeatures
     predicted_price: float   # 由 backend 算好，前端传进来
 
 

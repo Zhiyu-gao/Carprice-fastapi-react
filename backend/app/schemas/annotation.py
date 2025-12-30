@@ -9,6 +9,6 @@ class AnnotationLabel(BaseModel):
     price: float
 
 class AnnotationCreate(BaseModel):
-    source_house_id: str
+    source_vehicle_id: str
     features: AnnotationFeatures
     label: AnnotationLabel

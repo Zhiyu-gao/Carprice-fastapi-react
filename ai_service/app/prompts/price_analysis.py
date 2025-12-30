@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 
 SYSTEM_PROMPT = """
-你是一名专业的房产价格分析顾问，善于结合结构化特征数据，
+你是一名专业的车辆价格分析顾问，善于结合结构化特征数据，
 给出通俗易懂的价格解释和买卖建议。
 
 要求：
@@ -18,14 +18,14 @@ def build_price_analysis_user_prompt(
     predicted_price: float,
 ) -> str:
     return f"""
-以下是某套房源的基础信息：
+以下是某辆车的基础信息：
 
 - 面积：{features.get("area_sqm")} ㎡
 - 卧室数：{features.get("bedrooms")} 个
 - 房龄：{features.get("age_years")} 年
 - 距离地铁：{features.get("distance_to_metro_km")} 公里
 
-已有机器学习模型预测该房源总价约为：{round(predicted_price):,} 元。
+已有机器学习模型预测该车辆总价约为：{round(predicted_price):,} 元。
 
 请你从以下几个方面进行分析，并用 Markdown 结构化输出：
 

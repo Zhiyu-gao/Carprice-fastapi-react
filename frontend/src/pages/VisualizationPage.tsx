@@ -30,8 +30,8 @@ import { getToken } from "../auth/token";
 const { Title, Text } = Typography;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface House {
-  house_id: string;
+interface Vehicle {
+  vehicle_id: string;
   area_sqm: number;
   layout: string;
   build_year: number;
@@ -56,20 +56,20 @@ const cardStyle: React.CSSProperties = {
 };
 
 const VisualizationPage: React.FC = () => {
-  const [houses, setHouses] = useState<House[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const fetchHouses = async () => {
+  const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/crawl-houses`, {
+      const res = await fetch(`${API_BASE_URL}/crawl-vehicles`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
       });
-      if (!res.ok) throw new Error("获取房源失败");
-      setHouses(await res.json());
+      if (!res.ok) throw new Error("获取车辆失败");
+      setVehicles(await res.json());
     } catch (e: any) {
       messageApi.error(e.message);
     } finally {
@@ -78,13 +78,13 @@ const VisualizationPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchHouses();
+    fetchVehicles();
   }, []);
 
   /* ===== 派生字段 ===== */
   const parsed = useMemo(() => {
     const year = new Date().getFullYear();
-    return houses.map((h) => {
+    return vehicles.map((h) => {
       const match = h.layout.match(/(\d+)室/);
       const bedrooms = match ? Number(match[1]) : 0;
       return {
@@ -94,7 +94,7 @@ const VisualizationPage: React.FC = () => {
         total_price_yuan: h.total_price_wan * 10000,
       };
     });
-  }, [houses]);
+  }, [vehicles]);
 
   /* ===== 统计 ===== */
   const stats = useMemo(() => {
@@ -149,10 +149,10 @@ const VisualizationPage: React.FC = () => {
       {contextHolder}
 
       <Title level={3} style={{ color: "#e5e7eb" }}>
-        房源数据可视化 <Tag color="blue">Analytics</Tag>
+        车辆数据可视化 <Tag color="blue">Analytics</Tag>
       </Title>
       <Text style={{ color: "#9ca3af" }}>
-        基于真实成交与结构字段的统计分析
+        基于真实数据与结构字段的统计分析
       </Text>
 
       <Divider style={{ borderColor: "#1f2937" }} />
@@ -165,7 +165,7 @@ const VisualizationPage: React.FC = () => {
             <Col span={8}>
               <Card style={cardStyle}>
                 <Statistic
-                  title={<span style={{ color: "#9ca3af" }}>房源数量</span>}
+                  title={<span style={{ color: "#9ca3af" }}>车辆数量</span>}
                   value={stats.total}
                   valueStyle={{ color: "#e5e7eb" }}
                 />

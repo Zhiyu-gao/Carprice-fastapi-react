@@ -46,8 +46,8 @@ class TokenData(BaseModel):
     email: Optional[EmailStr] = None
 
 # ========== 爬虫 ==========
-class CrawlHouseOut(BaseModel):
-    house_id: str
+class CrawlVehicleOut(BaseModel):
+    vehicle_id: str
     title: str
     area_sqm: float
     layout: str
@@ -70,20 +70,20 @@ class AnnotationLabel(BaseModel):
     price: float
 
 class AnnotationCreate(BaseModel):
-    source_house_id: str
+    source_vehicle_id: str
     features: AnnotationFeatures
     label: AnnotationLabel
 
 
 # ========== 训练 / 预测 ==========
-class HouseCreate(BaseModel):
+class VehicleCreate(BaseModel):
     area_sqm: float
     bedrooms: int
     age_years: int
     price: float
 
 
-class HouseOut(HouseCreate):
+class VehicleOut(VehicleCreate):
     id: int
 
     class Config:

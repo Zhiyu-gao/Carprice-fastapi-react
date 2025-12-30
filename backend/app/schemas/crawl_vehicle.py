@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-class CrawlHouseOut(BaseModel):
-    house_id: str
+class CrawlVehicleOut(BaseModel):
+    vehicle_id: str
     title: str
     area_sqm: float
     layout: str

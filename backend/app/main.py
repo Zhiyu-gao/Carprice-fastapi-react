@@ -5,19 +5,19 @@ load_dotenv()
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, annotations, crawl_house, predict
+from app.routers import auth, annotations, crawl_vehicle, predict
 from app.routers.auth import get_current_user
 from app.schemas import UserOut
 from app import models
 
-app = FastAPI(title="House Price API")
+app = FastAPI(title="Vehicle Price API")
 
 # ======================
 # 路由注册
 # ======================
 app.include_router(auth.router)
 app.include_router(annotations.router)
-app.include_router(crawl_house.router)
+app.include_router(crawl_vehicle.router)
 app.include_router(predict.router)
 
 # ======================

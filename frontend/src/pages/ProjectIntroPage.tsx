@@ -13,7 +13,7 @@ export default function ProjectIntroPage() {
     >
       {/* 标题 */}
       <Title level={2} style={{ color: "#e5e7eb" }}>
-        🏠 House Price Prediction System
+        🚗 Vehicle Price Prediction System
       </Title>
 
       <Paragraph style={{ color: "#9ca3af" }}>
@@ -28,8 +28,8 @@ export default function ProjectIntroPage() {
       </Title>
 
       <Paragraph style={{ color: "#d1d5db" }}>
-        这是一个<strong>工程级全栈房价预测与分析系统</strong>，融合了
-        <Text strong> 真实房源数据采集 </Text>、
+        这是一个<strong>工程级全栈车辆价格预测与分析系统</strong>，融合了
+        <Text strong> 真实车辆数据采集 </Text>、
         <Text strong> 传统机器学习建模 </Text>、
         <Text strong> 大模型 AI 分析 </Text>
         以及
@@ -37,15 +37,15 @@ export default function ProjectIntroPage() {
       </Paragraph>
 
       <Paragraph style={{ color: "#d1d5db" }}>
-        项目并非基于虚拟数据或简单 Demo，而是通过<strong>链家真实二手房爬虫</strong>
+        项目并非基于虚拟数据或简单 Demo，而是通过<strong>链家真实车辆爬虫</strong>
         获取数据，构建完整的数据 → 预测 → AI 推理 → 前端展示闭环。
       </Paragraph>
 
       <ul style={{ color: "#d1d5db", lineHeight: 1.8 }}>
-        <li>真实二手房数据爬取（有头浏览器 + Cookie 复用）</li>
-        <li>房源 CRUD 管理 + MySQL 持久化</li>
-        <li>传统机器学习房价预测（scikit-learn）</li>
-        <li>多大模型 AI 房价分析（Kimi / Qwen / DeepSeek）</li>
+        <li>真实车辆数据爬取（有头浏览器 + Cookie 复用）</li>
+        <li>车辆 CRUD 管理 + MySQL 持久化</li>
+        <li>传统机器学习车辆价格预测（scikit-learn）</li>
+        <li>多大模型 AI 车辆价格分析（Kimi / Qwen / DeepSeek）</li>
         <li>LangGraph 驱动的多步骤智能分析 Agent</li>
         <li>前后端分离 + 微服务架构</li>
       </ul>
@@ -64,7 +64,7 @@ export default function ProjectIntroPage() {
         </li>
         <li>
           <Text strong>业务后端（8000）</Text>：FastAPI + SQLAlchemy + Alembic  
-          <Text type="secondary">（房源 CRUD / 用户系统 / ML 预测）</Text>
+          <Text type="secondary">（车辆 CRUD / 用户系统 / ML 预测）</Text>
         </li>
         <li>
           <Text strong>AI 服务（8080）</Text>：独立 FastAPI  
@@ -72,7 +72,7 @@ export default function ProjectIntroPage() {
         </li>
         <li>
           <Text strong>爬虫系统</Text>：Playwright（有头）  
-          <Text type="secondary">（链家真实二手房数据采集）</Text>
+          <Text type="secondary">（链家真实车辆数据采集）</Text>
         </li>
         <li>
           <Text strong>数据库</Text>：MySQL 8.x（Alembic 迁移管理）
@@ -98,7 +98,7 @@ export default function ProjectIntroPage() {
       </ul>
 
       <Paragraph style={{ color: "#9ca3af" }}>
-        输出结果为 <Text strong>Markdown 格式</Text> 的房价分析报告，
+        输出结果为 <Text strong>Markdown 格式</Text> 的车辆价格分析报告，
         包含价格合理性判断、风险提示与买卖建议。
       </Paragraph>
 

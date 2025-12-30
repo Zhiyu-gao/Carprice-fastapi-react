@@ -3,7 +3,7 @@ import axios from "axios";
 
 export type AiProvider = "kimi" | "qwen" | "deepseek";
 
-export interface HouseFeatures {
+export interface VehicleFeatures {
   area_sqm: number;
   bedrooms: number;
   age_years: number;
@@ -27,7 +27,7 @@ export default aiClient;
 export const aiAPI = {
   priceAnalysis: (data: {
     provider: AiProvider;
-    features: HouseFeatures;
+    features: VehicleFeatures;
     predicted_price: number;
   }) => aiClient.post<PriceAnalysisResponse>("/price-analysis", data),
 };

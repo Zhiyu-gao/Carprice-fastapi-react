@@ -62,12 +62,12 @@ def detect_human_verify(page) -> bool:
 # 解析函数
 # ======================
 
-def parse_house(li):
+def parse_vehicle(li):
     def text(selector):
         el = li.query_selector(selector)
         return el.inner_text().strip() if el else None
 
-    house_id = li.get_attribute("data-lj_action_housedel_id")
+    vehicle_id = li.get_attribute("data-lj_action_housedel_id")
 
     title_el = li.query_selector(".title a")
     title = title_el.inner_text().strip() if title_el else None
@@ -80,8 +80,8 @@ def parse_house(li):
     district_els = li.query_selector_all(".positionInfo a")
     district = district_els[1].inner_text().strip() if len(district_els) > 1 else None
 
-    house_info = text(".houseInfo") or ""
-    parts = [p.strip() for p in house_info.split("|")]
+    vehicle_info = text(".vehicleInfo") or ""
+    parts = [p.strip() for p in vehicle_info.split("|")]
 
     layout = parts[0] if len(parts) > 0 else None
 
@@ -127,7 +127,7 @@ def parse_house(li):
     )
 
     return {
-        "house_id": house_id,
+        "vehicle_id": vehicle_id,
         "title": title,
         "detail_url": detail_url,
         "community_name": community_name,
@@ -182,11 +182,11 @@ def main():
 
             items = page.query_selector_all("li.clear.LOGCLICKDATA")
             for li in items:
-                data = parse_house(li)
-                if not data["house_id"]:
+                data = parse_vehicle(li)
+                if not data["vehicle_id"]:
                     continue
 
-                fname = f"{data['house_id']}_{safe_filename(data['title'])}.json"
+                fname = f"{data['vehicle_id']}_{safe_filename(data['title'])}.json"
                 out_path = OUT_DIR / fname
                 if out_path.exists():
                     continue
