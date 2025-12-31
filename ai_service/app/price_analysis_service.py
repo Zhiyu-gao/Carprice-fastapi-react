@@ -33,7 +33,6 @@ def analyze_price_with_ai(
         "area_sqm": features.area_sqm,
         "bedrooms": features.bedrooms,
         "age_years": features.age_years,
-        "distance_to_metro_km": features.distance_to_metro_km,
     }
 
     user_prompt = build_price_analysis_user_prompt(

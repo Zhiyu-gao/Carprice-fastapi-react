@@ -3,11 +3,11 @@ version: '3.9'
 services:
   mysql:
     image: mysql:8
-    container_name: house_mysql
+    container_name: vehicle_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: house_price_db
+      MYSQL_DATABASE: vehicle_price_db
     ports:
       - "3306:3306"
     volumes:
@@ -15,7 +15,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: house_backend
+    container_name: vehicle_backend
     restart: always
     depends_on:
       - mysql
@@ -24,7 +24,7 @@ services:
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: 123456
-      DB_NAME: house_price_db
+      DB_NAME: vehicle_price_db
     ports:
       - "8000:8000"
     command: >
@@ -38,7 +38,7 @@ services:
 
   ai_service:
     build: ./ai_service
-    container_name: house_ai_service
+    container_name: vehicle_ai_service
     restart: always
     env_file:
       - ./ai_service/.env
@@ -52,7 +52,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: house_frontend
+    container_name: vehicle_frontend
     restart: always
     ports:
       - "80:80"

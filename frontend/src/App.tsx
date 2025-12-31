@@ -24,7 +24,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PredictPage from "./pages/PredictPage";
-import VehicleCrudPage from "./pages/VehicleCrudPage";
+// import VehicleCrudPage from "./pages/VehicleCrudPage";
 import AccountPage from "./pages/AccountPage";
 import VisualizationPage from "./pages/VisualizationPage";
 import CrawlerTaskPage from "./pages/CrawlerTaskPage";
@@ -253,7 +253,7 @@ function App() {
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route path="/intro" element={<ProjectIntroPage />} />
           <Route path="/predict" element={<PredictPage />} />
-          <Route path="/vehicles" element={<VehicleCrudPage />} />
+          {/* <Route path="/vehicles" element={<VehicleCrudPage />} /> */}
           <Route path="/visualization" element={<VisualizationPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/ai_chat" element={<AiChatPage />} />

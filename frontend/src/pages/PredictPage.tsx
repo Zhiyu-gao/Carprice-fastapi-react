@@ -20,6 +20,19 @@ import type { AiProvider } from "../api/ai";
 const { Option } = Select;
 const { Text, Title } = Typography;
 
+// 小工具组件：左右对齐
+const SpaceBetween: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    {children}
+  </div>
+);
+
 interface PredictFormValues {
   area_sqm: number;
   bedrooms: number;
@@ -120,7 +133,7 @@ const PredictPage: React.FC = () => {
     <>
       {contextHolder}
       <Title level={3} style={{ color: "#e5e7eb", marginBottom: 8 }}>
-        房价预测
+        车辆价格预测
       </Title>
       <Text type="secondary" style={{ fontSize: 13 }}>
         输入基本信息，调用后端模型快速给出一个参考价格，再用大模型做专业分析。
@@ -150,18 +163,18 @@ const PredictPage: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="面积（㎡）"
+                label="内部空间面积（㎡）"
                 name="area_sqm"
-                rules={[{ required: true, message: "请输入面积" }]}
+                rules={[{ required: true, message: "请输入内部空间面积" }]}
               >
                 <InputNumber min={1} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                label="卧室数"
+                label="座位数"
                 name="bedrooms"
-                rules={[{ required: true, message: "请输入卧室数" }]}
+                rules={[{ required: true, message: "请输入座位数" }]}
               >
                 <InputNumber min={0} max={20} style={{ width: "100%" }} />
               </Form.Item>
@@ -171,9 +184,9 @@ const PredictPage: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="房龄（年）"
+                label="使用年限（年）"
                 name="age_years"
-                rules={[{ required: true, message: "请输入房龄" }]}
+                rules={[{ required: true, message: "请输入使用年限" }]}
               >
                 <InputNumber min={0} style={{ width: "100%" }} />
               </Form.Item>
@@ -184,7 +197,7 @@ const PredictPage: React.FC = () => {
             <Space wrap>
               {/* 普通预测按钮 */}
               <Button type="primary" htmlType="submit" loading={predicting}>
-                {predicting ? "预测中..." : "预测房价"}
+                {predicting ? "预测中..." : "预测车辆价格"}
               </Button>
 
               {/* 选择 AI 提供方 */}
@@ -249,18 +262,5 @@ const PredictPage: React.FC = () => {
     </>
   );
 };
-
-// 小工具组件：左右对齐
-const SpaceBetween: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    {children}
-  </div>
-);
 
 export default PredictPage;

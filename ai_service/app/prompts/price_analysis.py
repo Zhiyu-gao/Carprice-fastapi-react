@@ -20,10 +20,9 @@ def build_price_analysis_user_prompt(
     return f"""
 以下是某辆车的基础信息：
 
-- 面积：{features.get("area_sqm")} ㎡
-- 卧室数：{features.get("bedrooms")} 个
-- 房龄：{features.get("age_years")} 年
-- 距离地铁：{features.get("distance_to_metro_km")} 公里
+- 内部空间面积：{features.get("area_sqm")} ㎡
+- 座位数：{features.get("bedrooms")} 个
+- 使用年限：{features.get("age_years")} 年
 
 已有机器学习模型预测该车辆总价约为：{round(predicted_price):,} 元。
 
@@ -34,13 +33,12 @@ def build_price_analysis_user_prompt(
 
 ## 2. 各特征对价格的影响
 - 分别说明下面这些因素对价格的影响方向与大致强度：
-  - 面积
-  - 卧室数
-  - 房龄
-  - 距离地铁
+  - 内部空间面积
+  - 座位数
+  - 使用年限
 
 ## 3. 风险提示
-- 列出需要注意的风险点（如房龄过大、通勤成本、未来流通性等）
+- 列出需要注意的风险点（如使用年限过长、维护成本、未来流通性等）
 
 ## 4. 买方视角建议
 - 如果我是买方，建议的出价区间和谈判策略
