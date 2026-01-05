@@ -1,8 +1,8 @@
-/* 整体背景：深色；中间卡片：白色 */
+/* 整体背景：使用 CSS 变量 */
 body {
   margin: 0;
   padding: 0;
-  background: #0f172a;
+  background: var(--background-primary);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -17,31 +17,36 @@ body {
 .app-container {
   width: 100%;
   max-width: 900px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--background-secondary);
+  color: var(--text-primary);
   border-radius: 16px;
   padding: 24px 20px 32px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
 }
 
 h1 {
   text-align: center;
   margin-bottom: 20px;
   font-size: 24px;
+  color: var(--text-primary);
 }
 
 .section-title {
   margin: 0 0 12px;
   font-size: 18px;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* 表单卡片和布局 */
 .form-card {
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 16px 16px 18px;
   margin-bottom: 16px;
-  background: #f9fafb;
+  background: var(--background-secondary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .form-row {
@@ -53,35 +58,43 @@ h1 {
 
 .form-row label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .form-row input {
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   font-size: 14px;
-  background: #ffffff;
-  color: #111827;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
 
 .form-row input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 /* 按钮 */
 .submit-btn {
   margin-top: 4px;
   padding: 9px 16px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: none;
-  background: #2563eb;
+  background: var(--primary-color);
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .submit-btn:disabled {
@@ -92,22 +105,25 @@ h1 {
 .secondary-btn {
   margin-top: 4px;
   padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid #9ca3af;
-  background: #ffffff;
-  color: #374151;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--background-primary);
+  color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .secondary-btn:hover {
-  background: #f3f4f6;
+  background: var(--background-tertiary);
+  border-color: var(--primary-color);
 }
 
 .button-row {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 /* 提示条 */
@@ -116,24 +132,25 @@ h1 {
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 14px;
+  border: 1px solid transparent;
 }
 
 .result.success {
-  background: #ecfdf3;
-  border: 1px solid #bbf7d0;
-  color: #166534;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--success-color);
 }
 
 .result.error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--error-color);
 }
 
 .result.info {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--info-color);
 }
 
 /* CRUD 区块 */
@@ -145,49 +162,70 @@ h1 {
   margin-top: 16px;
   margin-bottom: 6px;
   font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* 表格样式 */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
 }
 
 .vehicle-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  background: var(--background-secondary);
 }
 
 .vehicle-table thead {
-  background: #f3f4f6;
+  background: var(--background-tertiary);
 }
 
 .vehicle-table th,
 .vehicle-table td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 6px 8px;
   text-align: center;
+  color: var(--text-secondary);
+}
+
+.vehicle-table th {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .vehicle-table tbody tr:nth-child(even) {
-  background: #f9fafb;
+  background: var(--background-primary);
 }
 
 .vehicle-table tbody tr:hover {
-  background: #e5f0ff;
+  background: var(--background-tertiary);
 }
 
 /* 表格里的链接按钮 */
 .link-btn {
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: var(--primary-color);
   cursor: pointer;
   font-size: 13px;
   padding: 0 4px;
+  transition: color 0.3s ease;
+}
+
+.link-btn:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 
 .link-btn.danger {
+  color: var(--error-color);
+}
+
+.link-btn.danger:hover {
   color: #dc2626;
 }

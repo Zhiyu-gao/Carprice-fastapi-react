@@ -68,29 +68,34 @@ function AppLayout() {
     <Layout style={{ minHeight: "100vh" }}>
       {/* 左侧 Sider */}
     <Sider
-      width={230}
+      width={240}
       style={{
-        background: "#020617",
-        borderRight: "1px solid #111827",
+        background: "var(--background-secondary)",
+        borderRight: "1px solid var(--border-color)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
       }}
     >
       {/* 顶部 logo */}
       <div
         style={{
-          height: 64,
+          height: 70,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontWeight: 600,
+          fontWeight: 700,
           fontSize: 18,
-          color: "#e5e7eb",
-          borderBottom: "1px solid #111827",
+          color: "var(--text-primary)",
+          borderBottom: "1px solid var(--border-color)",
+          padding: "0 16px",
         }}
       >
-        🚗 车辆价格预测系统
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '24px' }}>🚗</span>
+          <span>车辆智能平台</span>
+        </div>
       </div>
 
       {/* 主菜单 */}
@@ -104,7 +109,6 @@ function AppLayout() {
           if (key === "visualization") navigate("/visualization");
           if (key === "account") navigate("/account");
           if (key === "ai_chat") navigate("/ai_chat");
-          // 新增路由（你之后需要在 Routes 中补上页面）
           if (key === "crawler") navigate("/crawler");
           if (key === "metadata") navigate("/metadata");
           if (key === "intro") navigate("/intro");
@@ -113,8 +117,8 @@ function AppLayout() {
           }
         }}
         style={{
-          paddingTop: 12,
-          background: "#020617",
+          paddingTop: 20,
+          background: "transparent",
           flex: 1,
         }}
         items={[
@@ -151,11 +155,6 @@ function AppLayout() {
           icon: <DatabaseOutlined />,
           label: "元数据标注后台",
         },
-        // {
-        //   key: "crawler",
-        //   icon: <CloudDownloadOutlined />,
-        //   label: "爬虫任务管理",
-        // },
         {
           key: "github",
           icon: <GithubOutlined />,
@@ -168,8 +167,8 @@ function AppLayout() {
       {/* 底部退出按钮 */}
       <div
         style={{
-          borderTop: "1px solid #111827",
-          padding: 12,
+          borderTop: "1px solid var(--border-color)",
+          padding: 16,
         }}
       >
         <Button
@@ -177,6 +176,9 @@ function AppLayout() {
           danger
           icon={<LogoutOutlined />}
           onClick={handleLogout}
+          style={{
+            borderRadius: '8px',
+          }}
         >
           退出登录
         </Button>
@@ -185,36 +187,43 @@ function AppLayout() {
 
 
       <Layout>
-        {/* 顶部细白条 */}
+        {/* 顶部导航栏 */}
         <Header
           style={{
-            background: "#020617",
-            borderBottom: "1px solid #111827",
+            background: "var(--background-secondary)",
+            borderBottom: "1px solid var(--border-color)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 20px",
+            padding: "0 32px",
+            height: 70,
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <Text style={{ color: "#e5e7eb", fontSize: 16 }}>
-            车辆价格预测 & 车辆管理后台
-          </Text>
-          <Space size={16}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Text style={{ color: "var(--text-primary)", fontSize: 18, fontWeight: 600 }}>
+              车辆智能平台管理系统
+            </Text>
+          </div>
+          <Space size={24}>
             <a
-              href="https://github.com/Zhiyu-gao/Vehicle-Intelligence-Platform" 
+              href="https://github.com/Zhiyu-gao/Carprice-fastapi-react" 
               target="_blank"
               rel="noreferrer"
-              style={{ color: "#e5e7eb", fontSize: 20 }}
+              style={{ color: "var(--text-secondary)", fontSize: 20 }}
             >
               <GithubOutlined />
             </a>
-            <Text type="secondary" style={{ fontSize: 13 }}>
+            <Text type="secondary" style={{ fontSize: 13, color: "var(--text-muted)" }}>
               已登录
             </Text>
             <Button
-              size="small"
+              size="middle"
               icon={<LogoutOutlined />}
               onClick={handleLogout}
+              style={{
+                borderRadius: '8px',
+              }}
             >
               退出登录
             </Button>
@@ -223,13 +232,14 @@ function AppLayout() {
 
         <Content
           style={{
-            background: "#020617",
-            padding: 24,
+            background: "var(--background-primary)",
+            padding: 32,
+            minHeight: 'calc(100vh - 70px)',
           }}
         >
           <div
             style={{
-              maxWidth: 1120,
+              maxWidth: 1200,
               margin: "0 auto",
             }}
           >

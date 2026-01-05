@@ -18,10 +18,10 @@ createRoot(document.getElementById("root")!).render(
         algorithm: darkAlgorithm,
         token: {
           colorBgBase: "#020617",          // 整体背景
-          colorBgContainer: "#020617",     // Card/Table 背景
-          colorBorder: "#1f2937",
-          colorTextBase: "#e5e7eb",
-          colorTextSecondary: "#9ca3af",
+          colorBgContainer: "#1f2937",     // Card/Table 背景
+          colorBorder: "#374151",
+          colorTextBase: "#f9fafb",
+          colorTextSecondary: "#d1d5db",
           borderRadiusLG: 12,
         },
       }}
