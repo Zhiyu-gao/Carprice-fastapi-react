@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 
-class PredictRequest(BaseModel):
-    area_sqm: float
-    bedrooms: int
-    age_years: int
+class CarPredictIn(BaseModel):
+    brand: str
+    age_years: float
+    engine: float
+    gearbox: str
+    transfer_cnt: int
+    price_new: float

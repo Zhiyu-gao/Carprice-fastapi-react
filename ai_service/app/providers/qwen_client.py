@@ -8,14 +8,30 @@ client = OpenAI(
 )
 
 
-def qwen_chat(messages: list[dict[str, str]]) -> str:
+def qwen_chat(prompt: str) -> str:
     completion = client.chat.completions.create(
         model=QWEN_CONFIG.model,
-        messages=messages,   # 👈 直接传完整 messages
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
         temperature=0.7,
     )
     return completion.choices[0].message.content
 
+def qwen_chat_messages(messages: list[dict]) -> str:
+    if not isinstance(messages, list):
+        raise TypeError("messages must be list")
+
+    for i, m in enumerate(messages):
+        assert isinstance(m, dict)
+        assert isinstance(m.get("content"), str)
+
+    completion = client.chat.completions.create(
+        model=QWEN_CONFIG.model,
+        messages=messages,
+        temperature=0.7,
+    )
+    return completion.choices[0].message.content
 
 def qwen_chat_stream(prompt: str):
     stream = client.chat.completions.create(

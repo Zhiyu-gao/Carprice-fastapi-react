@@ -5,7 +5,7 @@ from .auth import Token, TokenData
 
 from .annotation import CarAnnotationCreate
 from .crawl_vehicle import CrawlVehicleOut
-from .predict import PredictRequest
+from .predict import CarPredictIn
 
 __all__ = [
     "UserCreate",
@@ -17,5 +17,5 @@ __all__ = [
     "TokenData",
     "CarAnnotationCreate",
     "CrawlVehicleOut",
-    "PredictRequest",
+    "CarPredictIn",
 ]

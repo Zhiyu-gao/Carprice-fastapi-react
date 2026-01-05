@@ -1,9 +1,9 @@
-// src/pages/PredictPage.tsx
 import React, { useState } from "react";
 import {
   Card,
   Form,
   InputNumber,
+  Input,
   Button,
   Tag,
   Typography,
@@ -11,56 +11,54 @@ import {
   Row,
   Col,
   Space,
+  Select,
 } from "antd";
-import { Select } from "antd";
 import { getToken } from "../auth/token";
 import { aiAPI } from "../api/ai";
 import type { AiProvider } from "../api/ai";
 
-const { Option } = Select;
 const { Text, Title } = Typography;
+const { Option } = Select;
 
-// 小工具组件：左右对齐
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// ========== 表单类型 ==========
+interface PredictFormValues {
+  brand: string;          // 品牌
+  age_years: number;      // 车龄（年）
+  engine: number;         // 排量（2.0）
+  gearbox: string;        // 变速箱
+  transfer_cnt: number;   // 过户次数
+  price_new: number;      // 新车指导价（万）
+}
+
+// ========== 布局小组件 ==========
 const SpaceBetween: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
     {children}
   </div>
 );
 
-interface PredictFormValues {
-  area_sqm: number;
-  bedrooms: number;
-  age_years: number;
-}
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const PredictPage: React.FC = () => {
-  const [predictForm] = Form.useForm<PredictFormValues>();
+  const [form] = Form.useForm<PredictFormValues>();
   const [predicting, setPredicting] = useState(false);
   const [predictedPrice, setPredictedPrice] = useState<number | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
 
-  // AI 相关状态
+  // AI 分析
   const [aiProvider, setAiProvider] = useState<AiProvider>("qwen");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
 
-  // ======== 普通预测 ========
-  const handlePredictFinish = async (values: PredictFormValues) => {
+  // ===== 普通预测 =====
+  const handlePredict = async (values: PredictFormValues) => {
     setPredictedPrice(null);
-    setAiAnalysis(null); // 每次重新预测把旧的 AI 分析清掉
+    setAiAnalysis(null);
 
     try {
       setPredicting(true);
-
       const token = getToken();
+
       const res = await fetch(`${API_BASE_URL}/predict`, {
         method: "POST",
         headers: {
@@ -70,28 +68,28 @@ const PredictPage: React.FC = () => {
         body: JSON.stringify(values),
       });
 
-      if (!res.ok) throw new Error(`预测接口请求失败：${res.status}`);
+      if (!res.ok) {
+        throw new Error(`预测失败：${res.status}`);
+      }
 
       const data = await res.json();
       setPredictedPrice(data.predicted_price);
-      messageApi.success("预测成功");
+      messageApi.success("车辆价格预测成功");
     } catch (err: any) {
       console.error(err);
-      messageApi.error(err.message || "预测失败，请检查后端是否已启动");
+      messageApi.error(err.message || "预测失败");
     } finally {
       setPredicting(false);
     }
   };
 
-  // ======== AI 分析 ========
+  // ===== AI 分析 =====
   const handleAiAnalyze = async () => {
     try {
-      // 1. 验证并获取表单里的特征
-      const values = await predictForm.validateFields();
+      const values = await form.validateFields();
 
-      // 2. 如果还没预测过，就先调一次 /predict
-      let finalPredictedPrice = predictedPrice;
-      if (finalPredictedPrice == null) {
+      let finalPrice = predictedPrice;
+      if (finalPrice == null) {
         const token = getToken();
         const res = await fetch(`${API_BASE_URL}/predict`, {
           method: "POST",
@@ -102,21 +100,19 @@ const PredictPage: React.FC = () => {
           body: JSON.stringify(values),
         });
 
-        if (!res.ok) throw new Error(`预测接口失败：${res.status}`);
-
+        if (!res.ok) throw new Error("预测接口调用失败");
         const data = await res.json();
-        finalPredictedPrice = data.predicted_price;
-        setPredictedPrice(finalPredictedPrice);
+        finalPrice = data.predicted_price;
+        setPredictedPrice(finalPrice);
       }
 
       setAiLoading(true);
       setAiAnalysis(null);
 
-      // 3. 调用 ai_service（通过 aiAPI，指向 8090 端口）
       const resp = await aiAPI.priceAnalysis({
         provider: aiProvider,
         features: values,
-        predicted_price: finalPredictedPrice!,
+        predicted_price: finalPrice!,
       });
 
       setAiAnalysis(resp.data.analysis_markdown);
@@ -132,11 +128,12 @@ const PredictPage: React.FC = () => {
   return (
     <>
       {contextHolder}
+
       <Title level={3} style={{ color: "#e5e7eb", marginBottom: 8 }}>
         车辆价格预测
       </Title>
       <Text type="secondary" style={{ fontSize: 13 }}>
-        输入基本信息，调用后端模型快速给出一个参考价格，再用大模型做专业分析。
+        基于历史二手车数据训练的模型，给出一个参考价格，并由大模型进行专业解读。
       </Text>
 
       <Card
@@ -145,74 +142,111 @@ const PredictPage: React.FC = () => {
         bodyStyle={{ paddingBottom: 16 }}
         title={
           <SpaceBetween>
-            <span>基础特征输入</span>
+            <span>车辆基础信息</span>
             <Tag color="blue">POST /predict</Tag>
           </SpaceBetween>
         }
       >
         <Form
-          form={predictForm}
+          form={form}
           layout="vertical"
-          onFinish={handlePredictFinish}
+          onFinish={handlePredict}
           initialValues={{
-            area_sqm: 80,
-            bedrooms: 3,
-            age_years: 5,
+            brand: "传祺",
+            gearbox: "自动",
+            transfer_cnt: 1,
+            age_years: 2,
+            engine: 2.0,
+            price_new: 25,
           }}
         >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="内部空间面积（㎡）"
-                name="area_sqm"
-                rules={[{ required: true, message: "请输入内部空间面积" }]}
+                label="品牌"
+                name="brand"
+                rules={[{ required: true, message: "请输入车辆品牌" }]}
               >
-                <InputNumber min={1} style={{ width: "100%" }} />
+                <Input placeholder="如：传祺 / 宝马 / 丰田" />
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
-                label="座位数"
-                name="bedrooms"
-                rules={[{ required: true, message: "请输入座位数" }]}
+                label="新车指导价（万）"
+                name="price_new"
+                rules={[{ required: true, message: "请输入新车指导价" }]}
               >
-                <InputNumber min={0} max={20} style={{ width: "100%" }} />
+                <InputNumber min={1} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
-                label="使用年限（年）"
+                label="车龄（年）"
                 name="age_years"
-                rules={[{ required: true, message: "请输入使用年限" }]}
+                rules={[{ required: true }]}
+              >
+                <InputNumber min={0} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="排量（L）"
+                name="engine"
+                rules={[{ required: true }]}
+              >
+                <InputNumber min={0.5} step={0.1} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="过户次数"
+                name="transfer_cnt"
+                rules={[{ required: true }]}
               >
                 <InputNumber min={0} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
 
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="变速箱"
+                name="gearbox"
+                rules={[{ required: true }]}
+              >
+                <Select>
+                  <Option value="自动">自动</Option>
+                  <Option value="手动">手动</Option>
+                  <Option value="无级变速">无级变速</Option>
+                  <Option value="其他">其他</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
           <Form.Item>
             <Space wrap>
-              {/* 普通预测按钮 */}
               <Button type="primary" htmlType="submit" loading={predicting}>
                 {predicting ? "预测中..." : "预测车辆价格"}
               </Button>
 
-              {/* 选择 AI 提供方 */}
               <Select
                 value={aiProvider}
-                onChange={(v) => setAiProvider(v)}
+                onChange={setAiProvider}
                 style={{ width: 160 }}
-                size="middle"
               >
                 <Option value="kimi">Kimi</Option>
                 <Option value="qwen">Qwen</Option>
                 <Option value="deepseek">DeepSeek</Option>
               </Select>
 
-              {/* AI 分析按钮 */}
               <Button onClick={handleAiAnalyze} loading={aiLoading}>
                 {aiLoading ? "AI 分析中..." : "AI 分析"}
               </Button>
@@ -220,7 +254,6 @@ const PredictPage: React.FC = () => {
           </Form.Item>
         </Form>
 
-        {/* 数值预测结果 */}
         {predictedPrice !== null && (
           <div
             style={{
@@ -231,14 +264,13 @@ const PredictPage: React.FC = () => {
               border: "1px solid #1f2937",
             }}
           >
-            <Text type="secondary">模型预测价格约为：</Text>
+            <Text type="secondary">模型预测二手车价格约为：</Text>
             <Text strong style={{ fontSize: 18, marginLeft: 6 }}>
-              {Math.round(predictedPrice).toLocaleString()} 元
+              {predictedPrice.toFixed(2)} 万
             </Text>
           </div>
         )}
 
-        {/* AI 分析结果 */}
         {aiAnalysis && (
           <div
             style={{
@@ -255,7 +287,9 @@ const PredictPage: React.FC = () => {
             <div style={{ marginBottom: 8 }}>
               <Tag color="purple">AI 分析 · {aiProvider}</Tag>
             </div>
-            <Text style={{ fontSize: 13, color: "#e5e7eb" }}>{aiAnalysis}</Text>
+            <Text style={{ fontSize: 13, color: "#e5e7eb" }}>
+              {aiAnalysis}
+            </Text>
           </div>
         )}
       </Card>

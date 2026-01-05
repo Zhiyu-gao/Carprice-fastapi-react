@@ -7,7 +7,7 @@ from app.prompts.price_analysis import (
     build_price_analysis_user_prompt,
 )
 from app.providers.kimi_client import kimi_chat
-from app.providers.qwen_client import qwen_chat
+from app.providers.qwen_client import qwen_chat_messages
 from app.providers.deepseek_client import deepseek_chat
 
 
@@ -15,7 +15,7 @@ def _call_provider(provider: AiProvider, messages: list[dict[str, str]]) -> str:
     if provider == AiProvider.kimi:
         return kimi_chat(messages)
     if provider == AiProvider.qwen:
-        return qwen_chat(messages)
+        return qwen_chat_messages(messages)
     if provider == AiProvider.deepseek:
         return deepseek_chat(messages)
     raise ValueError(f"unsupported provider: {provider}")
