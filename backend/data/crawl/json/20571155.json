@@ -1,0 +1,32 @@
+{
+  "car_id": "20571155",
+  "title": "Cayenne 2015款 Cayenne Turbo 4.8T",
+  "tags": [
+    "检测报告",
+    "过户2次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/84e73780cb5143199250c824487893a8~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=eLh8j41YC3P0tmyt%2BBJe83r1v7Y%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "2次",
+    "上牌时间": "2015年05月",
+    "排量": "4.8T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "浅色",
+    "新车指导价": 221.4,
+    "比新车省": 184.42,
+    "当前售价": 36.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 221.4,
+  "price_discount": 184.42,
+  "price_after_discount": 36.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/20571155",
+  "crawl_time": "2026-01-05 09:33:59",
+  "image_path": "crawl/images/20571155.jpg",
+  "page_no": 1
+}

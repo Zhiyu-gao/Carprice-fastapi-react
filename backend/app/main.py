@@ -11,6 +11,18 @@ from app.schemas import UserOut
 from app import models
 
 app = FastAPI(title="Vehicle Price API")
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+
+# 把 data 目录暴露成 /files
+app.mount(
+    "/files",
+    StaticFiles(directory=DATA_DIR),
+    name="files",
+)
 
 # ======================
 # 路由注册
@@ -19,7 +31,7 @@ app.include_router(auth.router)
 app.include_router(annotations.router)
 app.include_router(crawl_vehicle.router)
 app.include_router(predict.router)
-app.include_router(vehicle.router)
+# app.include_router(vehicle.router)
 
 # ======================
 # CORS

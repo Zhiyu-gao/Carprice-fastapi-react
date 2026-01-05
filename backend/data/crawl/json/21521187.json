@@ -1,0 +1,32 @@
+{
+  "car_id": "21521187",
+  "title": "沃尔沃XC60(进口) 2013款 T5 智雅版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/0b31e74a607c438d9279c0c9218a98f0~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=YkhAfF7l5RRzMOFiOHrS9PCV0Oo%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2013年05月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "红色",
+    "内饰颜色": "深色",
+    "新车指导价": 47.49,
+    "比新车省": 43.81,
+    "当前售价": 3.68,
+    "价格单位": "万"
+  },
+  "price_new_car": 47.49,
+  "price_discount": 43.81,
+  "price_after_discount": 3.68,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21521187",
+  "crawl_time": "2026-01-05 09:39:43",
+  "image_path": "crawl/images/21521187.jpg",
+  "page_no": 2
+}

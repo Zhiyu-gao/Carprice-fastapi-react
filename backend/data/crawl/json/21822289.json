@@ -1,0 +1,32 @@
+{
+  "car_id": "21822289",
+  "title": "江淮iEVS4 2019款 豪华智联型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/8b1a14ccdf0e4dddaeb7b08cfec7fb10~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=6YZ9nlrH6ZM6azf4j03%2BLWg4snQ%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2019年12月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 14.95,
+    "比新车省": 11.87,
+    "当前售价": 3.08,
+    "价格单位": "万"
+  },
+  "price_new_car": 14.95,
+  "price_discount": 11.87,
+  "price_after_discount": 3.08,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21822289",
+  "crawl_time": "2026-01-05 09:39:46",
+  "image_path": "crawl/images/21822289.jpg",
+  "page_no": 2
+}

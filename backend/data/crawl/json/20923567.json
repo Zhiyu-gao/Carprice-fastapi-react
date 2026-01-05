@@ -1,0 +1,31 @@
+{
+  "car_id": "20923567",
+  "title": "总裁 2018款 3.0T 350Hp 标准版",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/51e363e9e0d8431493ac4954967659dd~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=E5btQiatICTIdxlaz6jDI17VVaE%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2018年08月",
+    "排量": "3.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 140.58,
+    "比新车省": 98.6,
+    "当前售价": 41.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 140.58,
+  "price_discount": 98.6,
+  "price_after_discount": 41.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/20923567",
+  "crawl_time": "2026-01-05 09:35:34",
+  "image_path": "crawl/images/20923567.jpg",
+  "page_no": 1
+}

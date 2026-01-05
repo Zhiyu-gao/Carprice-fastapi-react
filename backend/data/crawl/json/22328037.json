@@ -1,0 +1,32 @@
+{
+  "car_id": "22328037",
+  "title": "发现神行 2019款 240PS SE版 国VI",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/e1d991cff2c9414e9d4eff7bc6099c4f~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786624&x-signature=kKyzkDeBUAgPwh4rxM4V7jun%2FhI%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "东莞",
+    "车源地": "东莞",
+    "过户次数": "0次",
+    "上牌时间": "2019年07月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 39.48,
+    "比新车省": 29.68,
+    "当前售价": 9.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 39.48,
+  "price_discount": 29.68,
+  "price_after_discount": 9.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22328037",
+  "crawl_time": "2026-01-05 09:37:07",
+  "image_path": "crawl/images/22328037.jpg",
+  "page_no": 1
+}

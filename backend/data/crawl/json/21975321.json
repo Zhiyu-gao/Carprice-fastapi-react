@@ -1,0 +1,32 @@
+{
+  "car_id": "21975321",
+  "title": "宝马X7 2019款 xDrive40i (美规)",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/924d7f7fc0104567b59cc79a4c4b9040~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=c9CcNVtRFhzsCwPauEOTvi3Z%2FNs%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2020年01月",
+    "排量": "3.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": null,
+    "比新车省": null,
+    "当前售价": null,
+    "价格单位": "万"
+  },
+  "price_new_car": null,
+  "price_discount": null,
+  "price_after_discount": null,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21975321",
+  "crawl_time": "2026-01-05 09:39:24",
+  "image_path": "crawl/images/21975321.jpg",
+  "page_no": 2
+}

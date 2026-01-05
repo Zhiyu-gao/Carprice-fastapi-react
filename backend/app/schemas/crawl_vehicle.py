@@ -1,14 +1,20 @@
-from pydantic import BaseModel
+# app/schemas/crawl_vehicle.py
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
+from datetime import datetime
 
 class CrawlVehicleOut(BaseModel):
-    vehicle_id: str
-    title: str
-    area_sqm: float
-    layout: str
-    build_year: int
-    total_price_wan: float
-    unit_price: float
-    district: str
+    car_id: str = Field(alias="source_car_id")
+    title: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+    # 🔥 关键修复点
+    info: Optional[Dict[str, Any]] = None
+
+    image_url: Optional[str] = None
+    image_path: Optional[str] = None
+    crawl_time: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+        populate_by_name = True

@@ -1,0 +1,31 @@
+{
+  "car_id": "22164627",
+  "title": "揽胜极光 2020款 249PS R-DYNAMIC SE 运动科技版",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/4cfe3b52a43a43a09042f5cf14f9fed8~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=ce8KwPe3rGXgACq6jkux28ofs7k%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2020年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 41.78,
+    "比新车省": 25.92,
+    "当前售价": 15.86,
+    "价格单位": "万"
+  },
+  "price_new_car": 41.78,
+  "price_discount": 25.92,
+  "price_after_discount": 15.86,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22164627",
+  "crawl_time": "2026-01-05 09:35:31",
+  "image_path": "crawl/images/22164627.jpg",
+  "page_no": 1
+}

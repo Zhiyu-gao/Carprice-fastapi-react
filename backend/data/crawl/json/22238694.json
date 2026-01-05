@@ -1,0 +1,32 @@
+{
+  "car_id": "22238694",
+  "title": "问界M9 2024款 增程 Ultra 六座版",
+  "tags": [
+    "准新车",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/91259350103e4838bd45ceb463fea9c4~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=W8Awvj9OejKmExdel9TX717wDuY%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2024年10月",
+    "排量": "1.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "绿色",
+    "内饰颜色": "浅色",
+    "新车指导价": 52.98,
+    "比新车省": 13.0,
+    "当前售价": 39.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 52.98,
+  "price_discount": 13.0,
+  "price_after_discount": 39.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22238694",
+  "crawl_time": "2026-01-05 09:38:46",
+  "image_path": "crawl/images/22238694.jpg",
+  "page_no": 2
+}

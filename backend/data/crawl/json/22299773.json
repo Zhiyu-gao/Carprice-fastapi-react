@@ -1,0 +1,32 @@
+{
+  "car_id": "22299773",
+  "title": "宝马1系 2021款 改款 120i M运动曜夜版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/c1a33029f6f44decbb692552c4a28bd2~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=VeH50eJL6w6PVYbOTgvaarAJh5Q%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2021年10月",
+    "排量": "1.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 22.68,
+    "比新车省": 14.43,
+    "当前售价": 8.25,
+    "价格单位": "万"
+  },
+  "price_new_car": 22.68,
+  "price_discount": 14.43,
+  "price_after_discount": 8.25,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22299773",
+  "crawl_time": "2026-01-05 09:40:47",
+  "image_path": "crawl/images/22299773.jpg",
+  "page_no": 2
+}

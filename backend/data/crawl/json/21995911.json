@@ -1,0 +1,32 @@
+{
+  "car_id": "21995911",
+  "title": "奥迪e-tron GT 2023款 基本型",
+  "tags": [
+    "准新车",
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/988860f5c9ab497db736b874e239d360~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=I9pmVWnB3s8bOrx69DFvRHzs%2BAA%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2024年10月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "深灰色",
+    "内饰颜色": "深色",
+    "新车指导价": 99.98,
+    "比新车省": 53.4,
+    "当前售价": 46.58,
+    "价格单位": "万"
+  },
+  "price_new_car": 99.98,
+  "price_discount": 53.4,
+  "price_after_discount": 46.58,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21995911",
+  "crawl_time": "2026-01-05 09:36:42",
+  "image_path": "crawl/images/21995911.jpg",
+  "page_no": 1
+}

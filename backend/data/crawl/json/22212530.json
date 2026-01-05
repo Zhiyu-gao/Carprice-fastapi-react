@@ -1,0 +1,31 @@
+{
+  "car_id": "22212530",
+  "title": "沃尔沃XC60 2024款 B5 四驱智远豪华版",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/518ceaf070b54fbfbae356a6258d165f~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=JSyAroRcCfYWHwtywkTDdu5xyYU%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2023年08月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "香槟色",
+    "内饰颜色": "深色",
+    "新车指导价": 42.59,
+    "比新车省": 23.01,
+    "当前售价": 19.58,
+    "价格单位": "万"
+  },
+  "price_new_car": 42.59,
+  "price_discount": 23.01,
+  "price_after_discount": 19.58,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22212530",
+  "crawl_time": "2026-01-05 09:35:08",
+  "image_path": "crawl/images/22212530.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,31 @@
+{
+  "car_id": "18945000",
+  "title": "启辰D60 2019款 十万荣耀 1.6L XL CVT辰酷版 国VI",
+  "tags": [
+    "过户2次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/86c28903e420408ca1c84a7e592d3dd4~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=gPyr8c2sf8yIQt5u64JMHj26LLU%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "吉林",
+    "车源地": "北京",
+    "过户次数": "2次",
+    "上牌时间": "2019年05月",
+    "排量": "1.6L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 9.18,
+    "比新车省": 6.63,
+    "当前售价": 2.55,
+    "价格单位": "万"
+  },
+  "price_new_car": 9.18,
+  "price_discount": 6.63,
+  "price_after_discount": 2.55,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/18945000",
+  "crawl_time": "2026-01-05 09:36:53",
+  "image_path": "crawl/images/18945000.jpg",
+  "page_no": 1
+}

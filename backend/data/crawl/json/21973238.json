@@ -1,0 +1,32 @@
+{
+  "car_id": "21973238",
+  "title": "别克GL8 2022款 改款 陆上公务舱 2.0T 尊贵型",
+  "tags": [
+    "准新车",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/70fc59b5f0c44f1599e2e2bab345dee2~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=x9w%2FDiUt2Pd4GJwJ7WFzhHehd4M%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2025年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "咖啡色",
+    "内饰颜色": "浅色",
+    "新车指导价": 27.99,
+    "比新车省": 0.9,
+    "当前售价": 27.09,
+    "价格单位": "万"
+  },
+  "price_new_car": 27.99,
+  "price_discount": 0.9,
+  "price_after_discount": 27.09,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21973238",
+  "crawl_time": "2026-01-05 09:39:03",
+  "image_path": "crawl/images/21973238.jpg",
+  "page_no": 2
+}

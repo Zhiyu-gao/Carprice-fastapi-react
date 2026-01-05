@@ -1,0 +1,32 @@
+{
+  "car_id": "22047458",
+  "title": "福克斯 2012款 两厢 2.0L 自动豪华运动型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/73f481305ec948788c22db956b586141~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786665&x-signature=XCThXX%2FSzDPc%2BYVgC3vea6tKl8U%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "沈阳",
+    "车源地": "沈阳",
+    "过户次数": "0次",
+    "上牌时间": "2013年01月",
+    "排量": "2.0L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "红色",
+    "内饰颜色": "深色",
+    "新车指导价": 16.29,
+    "比新车省": 14.31,
+    "当前售价": 1.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 16.29,
+  "price_discount": 14.31,
+  "price_after_discount": 1.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22047458",
+  "crawl_time": "2026-01-05 09:37:49",
+  "image_path": "crawl/images/22047458.jpg",
+  "page_no": 1
+}

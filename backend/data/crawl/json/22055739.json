@@ -1,0 +1,31 @@
+{
+  "car_id": "22055739",
+  "title": "探界者 2022款 535T 领界版",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/22546cfe2ba34b4cb8973ec411826b53~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=mdj8owVFgy%2BOzyENZDcJ7wLtya0%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2022年05月",
+    "排量": "1.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 16.99,
+    "比新车省": 9.44,
+    "当前售价": 7.55,
+    "价格单位": "万"
+  },
+  "price_new_car": 16.99,
+  "price_discount": 9.44,
+  "price_after_discount": 7.55,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22055739",
+  "crawl_time": "2026-01-05 09:38:21",
+  "image_path": "crawl/images/22055739.jpg",
+  "page_no": 2
+}

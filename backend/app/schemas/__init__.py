@@ -1,7 +1,9 @@
+# app/schemas/__init__.py
+
 from .user import UserCreate, UserRead, UserOut, UserUpdate, PasswordUpdate
 from .auth import Token, TokenData
-from .annotation import AnnotationCreate
-from .vehicle import VehicleCreate, VehicleOut
+
+from .annotation import CarAnnotationCreate
 from .crawl_vehicle import CrawlVehicleOut
 from .predict import PredictRequest
 
@@ -13,9 +15,7 @@ __all__ = [
     "PasswordUpdate",
     "Token",
     "TokenData",
-    "AnnotationCreate",
-    "VehicleCreate",
-    "VehicleOut",
+    "CarAnnotationCreate",
     "CrawlVehicleOut",
     "PredictRequest",
 ]

@@ -1,0 +1,32 @@
+{
+  "car_id": "19731324",
+  "title": "奔驰E级 2015款 E 260 L 运动型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/de2087f6aea74e768f9cf41f8148f03c~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=WLo%2BAh976YETVHqPHQv6I2JdrGI%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2015年02月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 46.8,
+    "比新车省": 37.0,
+    "当前售价": 9.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 46.8,
+  "price_discount": 37.0,
+  "price_after_discount": 9.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/19731324",
+  "crawl_time": "2026-01-05 09:34:43",
+  "image_path": "crawl/images/19731324.jpg",
+  "page_no": 1
+}

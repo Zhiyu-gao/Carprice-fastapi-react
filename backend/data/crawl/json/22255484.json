@@ -1,0 +1,32 @@
+{
+  "car_id": "22255484",
+  "title": "捷豹XF 2015款 XF 2.0T 风华版",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/9b61b657d79e472d9a6b143f1a8c64b4~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=iO6D%2F91JUCXeU16r3P6Rm6esrko%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2014年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "绿色",
+    "内饰颜色": "深色",
+    "新车指导价": 55.0,
+    "比新车省": 48.2,
+    "当前售价": 6.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 55.0,
+  "price_discount": 48.2,
+  "price_after_discount": 6.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22255484",
+  "crawl_time": "2026-01-05 09:41:05",
+  "image_path": "crawl/images/22255484.jpg",
+  "page_no": 2
+}

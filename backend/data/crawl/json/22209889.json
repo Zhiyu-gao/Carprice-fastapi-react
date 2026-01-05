@@ -1,0 +1,31 @@
+{
+  "car_id": "22209889",
+  "title": "嘉年华 2011款 两厢 1.5L 自动时尚型",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/8ea3227e08774856b0c067e3a020855c~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=aZT%2FHebRnTj8CXZxxWorahF0Q24%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2012年03月",
+    "排量": "1.5L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "浅色",
+    "新车指导价": 9.79,
+    "比新车省": 8.4,
+    "当前售价": 1.39,
+    "价格单位": "万"
+  },
+  "price_new_car": 9.79,
+  "price_discount": 8.4,
+  "price_after_discount": 1.39,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22209889",
+  "crawl_time": "2026-01-05 09:34:50",
+  "image_path": "crawl/images/22209889.jpg",
+  "page_no": 1
+}

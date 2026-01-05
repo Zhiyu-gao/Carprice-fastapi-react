@@ -1,0 +1,31 @@
+{
+  "car_id": "21630180",
+  "title": "宝马7系 2013款 740Li 领先型",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/d34919382d14442b90fe69ff45bf5cb5~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=PxCgM%2FMvpM7Rw1XGgMdGOq0%2F2JM%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2015年07月",
+    "排量": "3.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 122.35,
+    "比新车省": 107.75,
+    "当前售价": 14.6,
+    "价格单位": "万"
+  },
+  "price_new_car": 122.35,
+  "price_discount": 107.75,
+  "price_after_discount": 14.6,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21630180",
+  "crawl_time": "2026-01-05 09:36:30",
+  "image_path": "crawl/images/21630180.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,35 @@
+{
+  "car_id": "22191677",
+  "title": "蔚来ES7 2022款 75kWh",
+  "tags": [
+    "送整备保养",
+    "深度质检",
+    "纯电动",
+    "原厂质保",
+    "低配"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/98845f142d744cee8e279b2293dd13d9~tplv-f042mdwyw7-auto-webp:500:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=6XCsW7mtLV41vHr1ZJhD5Y8q7sw%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2022年12月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": null,
+    "比新车省": null,
+    "当前售价": null,
+    "价格单位": "万"
+  },
+  "price_new_car": null,
+  "price_discount": null,
+  "price_after_discount": null,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22191677",
+  "crawl_time": "2026-01-05 09:40:43",
+  "image_path": "crawl/images/22191677.jpg",
+  "page_no": 2
+}

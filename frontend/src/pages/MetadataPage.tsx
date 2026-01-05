@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
   List,
   Button,
   Drawer,
@@ -9,61 +8,68 @@ import {
   Typography,
   Tag,
   message,
-  Divider,
   Space,
+  Card,
+  Divider,
+  Descriptions,
 } from "antd";
 
 const { Title, Text } = Typography;
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* =====================
    类型定义
 ===================== */
 
-interface CrawlVehicle {
-  vehicle_id: string;
+interface CrawlCar {
+  car_id: string;
   title: string;
-  area_sqm: number;
-  layout: string;
-  build_year: number;
-  total_price_wan: number;
-  unit_price: number;
-  district: string;
-  cover_image: string;
-  crawl_time: string;
+  tags?: string[];
+  info?: Record<string, string | number | null>;
+  image_path?: string;
+  crawl_time?: string;
 }
 
 interface AnnotationForm {
-  area_sqm: number;
-  bedrooms: number;
-  age_years: number;
-  price: number;
+  price_wan: number;
 }
 
 /* =====================
    工具函数
 ===================== */
 
-function parseBedrooms(layout: string): number {
-  const match = layout.match(/(\d+)室/);
-  return match ? Number(match[1]) : 0;
-}
+/** 从 info 中提取“建议标注价” */
+function getSuggestedPrice(
+  info?: Record<string, string | number | null>
+): number | undefined {
+  if (!info) return undefined;
 
-function calcAge(buildYear: number): number {
-  return new Date().getFullYear() - buildYear;
+  if (typeof info["当前售价"] === "number") {
+    return info["当前售价"];
+  }
+
+  if (
+    typeof info["新车指导价"] === "number" &&
+    typeof info["比新车省"] === "number"
+  ) {
+    return Number(
+      (info["新车指导价"] - info["比新车省"]).toFixed(2)
+    );
+  }
+
+  return undefined;
 }
 
 /* =====================
    主组件
 ===================== */
 
-const MetadataPage: React.FC = () => {
-  const [vehicles, setVehicles] = useState<CrawlVehicle[]>([]);
+const CarAnnotationPage: React.FC = () => {
+  const [cars, setCars] = useState<CrawlCar[]>([]);
   const [annotatedIds, setAnnotatedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
-  const [selected, setSelected] = useState<CrawlVehicle | null>(null);
+  const [selected, setSelected] = useState<CrawlCar | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [form] = Form.useForm<AnnotationForm>();
@@ -73,16 +79,16 @@ const MetadataPage: React.FC = () => {
      数据加载
   ===================== */
 
-  const fetchVehicles = async () => {
+  const fetchCars = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/crawl-vehicles`);
+      const res = await fetch(`${API_BASE_URL}/crawl-cars`);
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setVehicles(Array.isArray(data) ? data : []);
+      setCars(Array.isArray(data) ? data : []);
     } catch {
       messageApi.error("获取爬虫车辆失败");
-      setVehicles([]);
+      setCars([]);
     } finally {
       setLoading(false);
     }
@@ -95,12 +101,12 @@ const MetadataPage: React.FC = () => {
       const ids: string[] = await res.json();
       setAnnotatedIds(new Set(ids));
     } catch {
-      console.warn("获取标注状态失败");
+      console.warn("获取已标注车辆失败");
     }
   };
 
   useEffect(() => {
-    fetchVehicles();
+    fetchCars();
     fetchAnnotatedIds();
   }, []);
 
@@ -108,15 +114,14 @@ const MetadataPage: React.FC = () => {
      标注流程
   ===================== */
 
-  const openAnnotate = (vehicle: CrawlVehicle) => {
-    setSelected(vehicle);
+  const openAnnotate = (car: CrawlCar) => {
+    setSelected(car);
     setDrawerOpen(true);
 
+    const suggested = getSuggestedPrice(car.info);
+
     form.setFieldsValue({
-      area_sqm: vehicle.area_sqm,
-      bedrooms: parseBedrooms(vehicle.layout),
-      age_years: calcAge(vehicle.build_year),
-      price: vehicle.total_price_wan * 10000,
+      price_wan: suggested,
     });
   };
 
@@ -125,15 +130,8 @@ const MetadataPage: React.FC = () => {
 
     try {
       const payload = {
-        source_vehicle_id: selected.vehicle_id,
-        features: {
-          area_sqm: values.area_sqm,
-          bedrooms: values.bedrooms,
-          age_years: values.age_years,
-        },
-        label: {
-          price: values.price,
-        },
+        source_car_id: selected.car_id,
+        price_wan: values.price_wan,
       };
 
       const res = await fetch(`${API_BASE_URL}/annotations`, {
@@ -142,18 +140,19 @@ const MetadataPage: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "标注失败");
+      }
 
-      messageApi.success("已标注并加入训练集");
+      messageApi.success("标注成功");
 
       setDrawerOpen(false);
       setSelected(null);
       form.resetFields();
-
-      // 🔥 关键：刷新标注状态
       fetchAnnotatedIds();
-    } catch {
-      messageApi.error("标注失败");
+    } catch (e: any) {
+      messageApi.error(e.message || "标注失败");
     }
   };
 
@@ -165,17 +164,18 @@ const MetadataPage: React.FC = () => {
     <>
       {contextHolder}
 
-      <Title level={3}>爬虫车辆 · 数据标注</Title>
+      <Title level={3}>车辆价格标注</Title>
       <Text type="secondary">
-        将真实爬虫车辆转化为模型可训练的数据样本（只读原始数据）
+        爬虫已给出网页参考价，人工仅需确认或微调
       </Text>
 
       <List
         loading={loading}
         style={{ marginTop: 16 }}
-        dataSource={vehicles}
+        dataSource={cars}
+        rowKey="car_id"
         renderItem={(item) => {
-          const annotated = annotatedIds.has(item.vehicle_id);
+          const annotated = annotatedIds.has(item.car_id);
 
           return (
             <List.Item
@@ -197,16 +197,13 @@ const MetadataPage: React.FC = () => {
                   </Space>
                 }
                 description={
-                  <>
-                    <Text>
-                      {item.area_sqm}㎡ · {item.layout}
-                    </Text>
-                    <br />
-                    <Tag>{item.district}</Tag>
-                    <Text type="secondary">
-                      总价 {item.total_price_wan} 万
-                    </Text>
-                  </>
+                  item.tags && (
+                    <Space wrap>
+                      {item.tags.map((t) => (
+                        <Tag key={t}>{t}</Tag>
+                      ))}
+                    </Space>
+                  )
                 }
               />
             </List.Item>
@@ -215,23 +212,47 @@ const MetadataPage: React.FC = () => {
       />
 
       <Drawer
-        title="车辆标注（生成训练样本）"
+        title="车辆价格标注（确认 / 微调）"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         size="large"
       >
         {selected && (
           <>
-            <Card size="small" bordered={false}>
-              <Text strong>{selected.title}</Text>
-              <Divider />
-              <Text>面积：{selected.area_sqm}㎡</Text>
-              <br />
-              <Text>户型：{selected.layout}</Text>
-              <br />
-              <Text>建成年份：{selected.build_year}</Text>
-              <br />
-              <Text>挂牌价：{selected.total_price_wan} 万</Text>
+            <Card bordered={false}>
+              <Title level={5}>{selected.title}</Title>
+
+              {selected.image_path && (
+                <>
+                  <Divider />
+                  <img
+                    src={`${API_BASE_URL}/files/${selected.image_path}`}
+                    alt="car"
+                    style={{
+                      width: "100%",
+                      maxHeight: 320,
+                      objectFit: "contain",
+                    }}
+                  />
+                </>
+              )}
+
+              {selected.info && (
+                <>
+                  <Divider />
+                  <Descriptions
+                    size="small"
+                    column={2}
+                    bordered
+                  >
+                    {Object.entries(selected.info).map(([k, v]) => (
+                      <Descriptions.Item key={k} label={k}>
+                        {v ?? "-"}
+                      </Descriptions.Item>
+                    ))}
+                  </Descriptions>
+                </>
+              )}
             </Card>
 
             <Divider />
@@ -241,24 +262,20 @@ const MetadataPage: React.FC = () => {
               layout="vertical"
               onFinish={submitAnnotation}
             >
-              <Form.Item name="area_sqm" label="面积（㎡）" required>
-                <InputNumber style={{ width: "100%" }} />
-              </Form.Item>
-
-              <Form.Item name="bedrooms" label="卧室数" required>
-                <InputNumber min={0} />
-              </Form.Item>
-
-              <Form.Item name="age_years" label="房龄（年）" required>
-                <InputNumber min={0} />
-              </Form.Item>
-
-              <Form.Item name="price" label="真实成交价格（元）" required>
-                <InputNumber style={{ width: "100%" }} />
+              <Form.Item
+                name="price_wan"
+                label="成交价（万元，已填网页参考价）"
+                rules={[{ required: true, message: "请输入成交价（万元）" }]}
+              >
+                <InputNumber
+                  min={0}
+                  precision={2}
+                  style={{ width: "100%" }}
+                />
               </Form.Item>
 
               <Button type="primary" htmlType="submit" block>
-                确认标注并加入训练集
+                确认标注
               </Button>
             </Form>
           </>
@@ -268,4 +285,4 @@ const MetadataPage: React.FC = () => {
   );
 };
 
-export default MetadataPage;
+export default CarAnnotationPage;

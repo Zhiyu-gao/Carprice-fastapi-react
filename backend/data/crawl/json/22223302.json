@@ -1,0 +1,32 @@
+{
+  "car_id": "22223302",
+  "title": "大捷龙PHEV(进口) 2019款 3.6L 插电混动版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/0861640cd1154e5598a7b6db90110488~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=ydUhOZZJ1y%2FZYlTkTm47bjhfMqA%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2021年07月",
+    "排量": "3.6L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "浅色",
+    "新车指导价": 49.69,
+    "比新车省": 33.79,
+    "当前售价": 15.9,
+    "价格单位": "万"
+  },
+  "price_new_car": 49.69,
+  "price_discount": 33.79,
+  "price_after_discount": 15.9,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22223302",
+  "crawl_time": "2026-01-05 09:40:39",
+  "image_path": "crawl/images/22223302.jpg",
+  "page_no": 2
+}

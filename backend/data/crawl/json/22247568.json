@@ -1,0 +1,32 @@
+{
+  "car_id": "22247568",
+  "title": "秦Pro EV 2019款 超能版 高功率智联领耀型",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/b0484c79329f4357ac021daebe4c08ae~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=wiysxbBomOWmRmAMnuqjF1tESdw%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2019年03月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 18.99,
+    "比新车省": 14.61,
+    "当前售价": 4.38,
+    "价格单位": "万"
+  },
+  "price_new_car": 18.99,
+  "price_discount": 14.61,
+  "price_after_discount": 4.38,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22247568",
+  "crawl_time": "2026-01-05 09:40:24",
+  "image_path": "crawl/images/22247568.jpg",
+  "page_no": 2
+}

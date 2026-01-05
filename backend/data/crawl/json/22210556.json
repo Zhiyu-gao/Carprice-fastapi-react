@@ -1,0 +1,31 @@
+{
+  "car_id": "22210556",
+  "title": "天籁 2022款 2.0L XL-Upr 优享版",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/1becff1c36d14288914347df36d0af28~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=yZ4Siu3tGzmXIGs5LFZ%2BBmaNDsU%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2023年06月",
+    "排量": "2.0L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 19.98,
+    "比新车省": 9.1,
+    "当前售价": 10.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 19.98,
+  "price_discount": 9.1,
+  "price_after_discount": 10.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22210556",
+  "crawl_time": "2026-01-05 09:36:10",
+  "image_path": "crawl/images/22210556.jpg",
+  "page_no": 1
+}

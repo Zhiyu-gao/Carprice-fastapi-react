@@ -1,0 +1,31 @@
+{
+  "car_id": "19716196",
+  "title": "别克GL8 2014款 2.4L 经典版",
+  "tags": [
+    "过户5次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/a3c78509023a4a4a91ecd3f9ea007df3~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=%2FW4ttb1nyS%2FlDxgQRFoFqHN69Lk%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "大同",
+    "车源地": "北京",
+    "过户次数": "5次",
+    "上牌时间": "2015年09月",
+    "排量": "2.4L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "浅色",
+    "新车指导价": 20.9,
+    "比新车省": 18.55,
+    "当前售价": 2.35,
+    "价格单位": "万"
+  },
+  "price_new_car": 20.9,
+  "price_discount": 18.55,
+  "price_after_discount": 2.35,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/19716196",
+  "crawl_time": "2026-01-05 09:36:20",
+  "image_path": "crawl/images/19716196.jpg",
+  "page_no": 1
+}

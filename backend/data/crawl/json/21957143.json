@@ -1,0 +1,32 @@
+{
+  "car_id": "21957143",
+  "title": "别克GL8 2023款 ES陆尊 2.0T 尊享型和悦版",
+  "tags": [
+    "准新车",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/0ae01c8c15524a23ad79c38e41fa5f3e~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=t%2FM5%2FiAQ1toczOSyChEI2gXshd8%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2024年08月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "香槟色",
+    "内饰颜色": "浅色",
+    "新车指导价": 35.69,
+    "比新车省": 11.01,
+    "当前售价": 24.68,
+    "价格单位": "万"
+  },
+  "price_new_car": 35.69,
+  "price_discount": 11.01,
+  "price_after_discount": 24.68,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21957143",
+  "crawl_time": "2026-01-05 09:39:20",
+  "image_path": "crawl/images/21957143.jpg",
+  "page_no": 2
+}

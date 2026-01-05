@@ -1,0 +1,32 @@
+{
+  "car_id": "22336410",
+  "title": "凯迪拉克CT6 2016款 28T 豪华型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/ae1a6973337f42d8ada392ac9aef50b0~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786635&x-signature=Z8%2BK3bWGsPzHNoIzWuzkf0kdvfk%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "东莞",
+    "车源地": "东莞",
+    "过户次数": "0次",
+    "上牌时间": "2017年01月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 48.99,
+    "比新车省": 40.1,
+    "当前售价": 8.89,
+    "价格单位": "万"
+  },
+  "price_new_car": 48.99,
+  "price_discount": 40.1,
+  "price_after_discount": 8.89,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22336410",
+  "crawl_time": "2026-01-05 09:37:17",
+  "image_path": "crawl/images/22336410.jpg",
+  "page_no": 1
+}

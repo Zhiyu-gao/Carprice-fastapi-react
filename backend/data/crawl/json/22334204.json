@@ -1,0 +1,32 @@
+{
+  "car_id": "22334204",
+  "title": "宝马X1 2019款 sDrive20Li 领先型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/0f5aa44069a041b9866f8b75284efafe~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786669&x-signature=Es%2FF2ge30NmWda%2Bk1uZotTmxcZo%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "东莞",
+    "车源地": "东莞",
+    "过户次数": "0次",
+    "上牌时间": "2019年08月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 30.98,
+    "比新车省": 20.6,
+    "当前售价": 10.38,
+    "价格单位": "万"
+  },
+  "price_new_car": 30.98,
+  "price_discount": 20.6,
+  "price_after_discount": 10.38,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22334204",
+  "crawl_time": "2026-01-05 09:37:52",
+  "image_path": "crawl/images/22334204.jpg",
+  "page_no": 1
+}

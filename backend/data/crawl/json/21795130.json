@@ -1,0 +1,32 @@
+{
+  "car_id": "21795130",
+  "title": "蔚来ES8 2020款 580KM 基准版 六座",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/9697a59e749a421aa5de934573f4e060~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=prByRgmvxGdkvUZ2q81%2F5mx9DCc%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2022年02月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "咖啡色",
+    "内饰颜色": "深色",
+    "新车指导价": 54.4,
+    "比新车省": 42.82,
+    "当前售价": 11.58,
+    "价格单位": "万"
+  },
+  "price_new_car": 54.4,
+  "price_discount": 42.82,
+  "price_after_discount": 11.58,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21795130",
+  "crawl_time": "2026-01-05 09:39:32",
+  "image_path": "crawl/images/21795130.jpg",
+  "page_no": 2
+}

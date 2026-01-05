@@ -1,79 +1,36 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import json
 from pathlib import Path
-from datetime import datetime
-from sqlalchemy.orm import Session
+from app.db import SessionLocal
+from app.services.crawl_car_service import save_crawl_car
 
-from app.db import SessionLocal, Base, engine
-from app.models import CrawlVehicle
 
-# 🔧 改成你的真实路径
-CRAWL_FOLDER = Path("/Users/zhiyu/Documents/Vehicle-Intelligence-Platform/backend/app/spider/lianjia/lianjia_json")
-
-def main():
-    # 确保表存在
-    Base.metadata.create_all(bind=engine)
-
-    db: Session = SessionLocal()
-
-    json_files = list(CRAWL_FOLDER.glob("*.json"))
-    print(f"📂 发现 {len(json_files)} 个 JSON 文件")
-
-    inserted = 0
+def import_json_folder(folder: str):
+    db = SessionLocal()
+    success = 0
     skipped = 0
 
-    for json_path in json_files:
-        try:
-            data = json.loads(json_path.read_text(encoding="utf-8"))
+    try:
+        for path in Path(folder).rglob("*.json"):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                ok = save_crawl_car(db, data)
+                if ok:
+                    success += 1
+                else:
+                    skipped += 1
 
-            # 兼容house_id和vehicle_id字段
-            vehicle_id = data.get("vehicle_id") or data.get("house_id")
-            if not vehicle_id:
-                print(f"⚠️ 缺少 vehicle_id/house_id，跳过：{json_path.name}")
-                skipped += 1
-                continue
+            except Exception as e:
+                print(f"[ERROR] {path}: {e}")
 
-            # 防止重复导入
-            exists = (
-                db.query(CrawlVehicle)
-                .filter(CrawlVehicle.vehicle_id == vehicle_id)
-                .first()
-            )
-            if exists:
-                skipped += 1
-                continue
+        db.commit()   # 🔥🔥🔥 关键就在这
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
-            vehicle = CrawlVehicle(
-                vehicle_id=vehicle_id,
-                title=data.get("title"),
-                area_sqm=data.get("area_sqm"),
-                layout=data.get("layout"),
-                build_year=data.get("build_year"),
-                total_price_wan=data.get("total_price_wan"),
-                unit_price=data.get("unit_price"),
-                district=data.get("district"),
-                crawl_time=datetime.strptime(
-                    data["crawl_time"], "%Y-%m-%d %H:%M:%S"
-                )
-                if data.get("crawl_time")
-                else None,
-            )
+    print(f"✅ 成功插入 {success} 条，跳过 {skipped} 条")
 
-            db.add(vehicle)
-            inserted += 1
-
-        except Exception as e:
-            print(f"❌ 导入失败 {json_path.name}: {e}")
-            skipped += 1
-
-    db.commit()
-    db.close()
-
-    print("✅ 导入完成")
-    print(f"   新增：{inserted}")
-    print(f"   跳过：{skipped}")
 
 if __name__ == "__main__":
-    main()
+    import_json_folder("/Users/zhiyu/Documents/Vehicle-Intelligence-Platform/backend/data/crawl/json")

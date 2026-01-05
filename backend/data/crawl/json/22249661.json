@@ -1,0 +1,32 @@
+{
+  "car_id": "22249661",
+  "title": "摩卡 2021款 2.0T 两驱特醇版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/a5a61ce755124dc5a423c67c6ea642b6~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786638&x-signature=oAWqKWvC5LW3UJ9lYO4KTBjt%2B64%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "温州",
+    "车源地": "温州",
+    "过户次数": "0次",
+    "上牌时间": "2021年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "深色",
+    "新车指导价": 20.88,
+    "比新车省": 12.78,
+    "当前售价": 8.1,
+    "价格单位": "万"
+  },
+  "price_new_car": 20.88,
+  "price_discount": 12.78,
+  "price_after_discount": 8.1,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22249661",
+  "crawl_time": "2026-01-05 09:37:21",
+  "image_path": "crawl/images/22249661.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,32 @@
+{
+  "car_id": "20068069",
+  "title": "捷豹XFL 2017款 XFL 2.0T 240PS 尊享版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/1abb59e6f81040849ccb407b4877ba9b~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786904&x-signature=KUYHWgKEwQ2gb3Nyw0JjVu7sK7Q%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "廊坊",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2017年03月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "浅色",
+    "新车指导价": 48.8,
+    "比新车省": 39.62,
+    "当前售价": 9.18,
+    "价格单位": "万"
+  },
+  "price_new_car": 48.8,
+  "price_discount": 39.62,
+  "price_after_discount": 9.18,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/20068069",
+  "crawl_time": "2026-01-05 09:41:47",
+  "image_path": "crawl/images/20068069.jpg",
+  "page_no": 2
+}

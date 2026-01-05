@@ -1,0 +1,32 @@
+{
+  "car_id": "21209881",
+  "title": "Panamera 2017款 Panamera 3.0T",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/af6ccad3493b449aafae407869fa96ee~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=3WXe3shPtm8kJW6kYFFefVeycyw%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2018年04月",
+    "排量": "3.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 97.3,
+    "比新车省": 38.32,
+    "当前售价": 58.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 97.3,
+  "price_discount": 38.32,
+  "price_after_discount": 58.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21209881",
+  "crawl_time": "2026-01-05 09:34:57",
+  "image_path": "crawl/images/21209881.jpg",
+  "page_no": 1
+}

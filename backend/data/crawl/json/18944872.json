@@ -1,0 +1,31 @@
+{
+  "car_id": "18944872",
+  "title": "别克GL6 2019款 18T 5座互联豪华型 国V",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/89169d881c464f428378183b4ac10995~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=dRh67qlPq2GalZ9mRAbzOLTjsNc%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2019年01月",
+    "排量": "1.3T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "香槟色",
+    "内饰颜色": "深色",
+    "新车指导价": 15.29,
+    "比新车省": 11.04,
+    "当前售价": 4.25,
+    "价格单位": "万"
+  },
+  "price_new_car": 15.29,
+  "price_discount": 11.04,
+  "price_after_discount": 4.25,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/18944872",
+  "crawl_time": "2026-01-05 09:36:56",
+  "image_path": "crawl/images/18944872.jpg",
+  "page_no": 1
+}

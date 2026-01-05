@@ -1,0 +1,32 @@
+{
+  "car_id": "22161074",
+  "title": "高尔夫 2018款 230TSI 自动舒适型",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/5524f32a773949108b11b0984cd8d29f~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=ca8Af0ALZB7TA4WCM6NLyfnsNjs%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2018年03月",
+    "排量": "1.4T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 15.49,
+    "比新车省": 9.81,
+    "当前售价": 5.68,
+    "价格单位": "万"
+  },
+  "price_new_car": 15.49,
+  "price_discount": 9.81,
+  "price_after_discount": 5.68,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22161074",
+  "crawl_time": "2026-01-05 09:34:40",
+  "image_path": "crawl/images/22161074.jpg",
+  "page_no": 1
+}

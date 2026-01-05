@@ -1,0 +1,32 @@
+{
+  "car_id": "21919800",
+  "title": "揽胜极光 2015款 2.0T 五门智耀版",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/3e69f955ed384199b0bc814c674f6b42~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786641&x-signature=5eCeQWQLpfDQ0mlXbTZnUqq918w%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "东莞",
+    "车源地": "东莞",
+    "过户次数": "1次",
+    "上牌时间": "2016年03月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 46.8,
+    "比新车省": 40.0,
+    "当前售价": 6.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 46.8,
+  "price_discount": 40.0,
+  "price_after_discount": 6.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21919800",
+  "crawl_time": "2026-01-05 09:37:24",
+  "image_path": "crawl/images/21919800.jpg",
+  "page_no": 1
+}

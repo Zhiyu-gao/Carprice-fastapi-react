@@ -1,0 +1,33 @@
+{
+  "car_id": "22200704",
+  "title": "昂科拉 2013款 1.4T 自动两驱精英型",
+  "tags": [
+    "送整备保养",
+    "深度质检",
+    "中配"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/205787d6dac2485ba7d140b04e2f3b1c~tplv-f042mdwyw7-auto-webp:500:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=bJxD9HvANwPdSKwXnKA%2B0fB1m5E%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2013年05月",
+    "排量": "1.4T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": null,
+    "比新车省": null,
+    "当前售价": null,
+    "价格单位": "万"
+  },
+  "price_new_car": null,
+  "price_discount": null,
+  "price_after_discount": null,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22200704",
+  "crawl_time": "2026-01-05 09:40:28",
+  "image_path": "crawl/images/22200704.jpg",
+  "page_no": 2
+}

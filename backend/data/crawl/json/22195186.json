@@ -1,0 +1,32 @@
+{
+  "car_id": "22195186",
+  "title": "英菲尼迪Q70 2013款 Q70L 2.5L 雅致版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/54630dec217044edbdc983f37f9d1f34~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=qM9%2FwCy4aTzxQShYOOAvjASqOHQ%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2014年01月",
+    "排量": "2.5L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 44.88,
+    "比新车省": 36.9,
+    "当前售价": 7.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 44.88,
+  "price_discount": 36.9,
+  "price_after_discount": 7.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22195186",
+  "crawl_time": "2026-01-05 09:33:52",
+  "image_path": "crawl/images/22195186.jpg",
+  "page_no": 1
+}

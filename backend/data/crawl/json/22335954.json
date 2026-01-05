@@ -1,0 +1,32 @@
+{
+  "car_id": "22335954",
+  "title": "楼兰 2021款 2.5L XL 两驱智联豪华版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/885abf26e8f248c0b3af25960582e66b~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786658&x-signature=JIhwOYZX8o3h0Yg0v3U77m17o3s%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "西安",
+    "车源地": "西安",
+    "过户次数": "0次",
+    "上牌时间": "2021年12月",
+    "排量": "2.5L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 27.13,
+    "比新车省": 17.33,
+    "当前售价": 9.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 27.13,
+  "price_discount": 17.33,
+  "price_after_discount": 9.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22335954",
+  "crawl_time": "2026-01-05 09:37:41",
+  "image_path": "crawl/images/22335954.jpg",
+  "page_no": 1
+}

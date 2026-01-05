@@ -1,0 +1,32 @@
+{
+  "car_id": "22212586",
+  "title": "迈巴赫S级 2016款 S 400 4MATIC",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/bf0aa69287ee4e54a3481b27be1bd0a0~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=MdlUuSwvGj7daj%2F5frCnWmSvtNU%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2016年09月",
+    "排量": "3.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "浅色",
+    "新车指导价": 146.8,
+    "比新车省": 105.0,
+    "当前售价": 41.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 146.8,
+  "price_discount": 105.0,
+  "price_after_discount": 41.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22212586",
+  "crawl_time": "2026-01-05 09:34:03",
+  "image_path": "crawl/images/22212586.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,31 @@
+{
+  "car_id": "22234523",
+  "title": "别克GL8 2022款 ES陆尊 653T 尊享型",
+  "tags": [
+    "过户2次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/b88de41875194e75bb15e77a1afefb2d~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=CAa2t%2FnfNfgZ0uQezI%2F8EA7TXoI%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "2次",
+    "上牌时间": "2021年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "浅色",
+    "新车指导价": 34.39,
+    "比新车省": 14.59,
+    "当前售价": 19.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 34.39,
+  "price_discount": 14.59,
+  "price_after_discount": 19.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22234523",
+  "crawl_time": "2026-01-05 09:36:06",
+  "image_path": "crawl/images/22234523.jpg",
+  "page_no": 1
+}

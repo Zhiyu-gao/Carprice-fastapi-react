@@ -1,0 +1,32 @@
+{
+  "car_id": "20729989",
+  "title": "奔驰GLE 2024款 GLE 450 4MATIC 时尚型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/1379f1642b9c498c85bce9ef8fa4e87e~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=ylvdS4cQRzSH3la6DOWx3ofkKhM%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2024年01月",
+    "排量": "2.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 83.98,
+    "比新车省": 20.0,
+    "当前售价": 63.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 83.98,
+  "price_discount": 20.0,
+  "price_after_discount": 63.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/20729989",
+  "crawl_time": "2026-01-05 09:34:25",
+  "image_path": "crawl/images/20729989.jpg",
+  "page_no": 1
+}

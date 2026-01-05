@@ -1,0 +1,31 @@
+{
+  "car_id": "22323079",
+  "title": "奔驰E级 2016款 E 300 L 时尚型",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/dda7e7d5d0044103afda2d09114ba6c8~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=MLRdeLu3VQaQbKp7peJsByAkpIY%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2017年08月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 47.48,
+    "比新车省": 29.88,
+    "当前售价": 17.6,
+    "价格单位": "万"
+  },
+  "price_new_car": 47.48,
+  "price_discount": 29.88,
+  "price_after_discount": 17.6,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22323079",
+  "crawl_time": "2026-01-05 09:36:03",
+  "image_path": "crawl/images/22323079.jpg",
+  "page_no": 1
+}

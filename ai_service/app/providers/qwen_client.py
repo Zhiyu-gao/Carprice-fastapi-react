@@ -8,16 +8,14 @@ client = OpenAI(
 )
 
 
-def qwen_chat(prompt: str) -> str:
-    """
-    非流式（保持不变）
-    """
+def qwen_chat(messages: list[dict[str, str]]) -> str:
     completion = client.chat.completions.create(
         model=QWEN_CONFIG.model,
-        messages=[{"role": "user", "content": prompt}],
+        messages=messages,   # 👈 直接传完整 messages
         temperature=0.7,
     )
     return completion.choices[0].message.content
+
 
 def qwen_chat_stream(prompt: str):
     stream = client.chat.completions.create(

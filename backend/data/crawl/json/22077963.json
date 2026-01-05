@@ -1,0 +1,32 @@
+{
+  "car_id": "22077963",
+  "title": "荣威Ei5 2018款 互联网旗舰版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/ad4df6d4bde849f5a27b504a512b2384~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=i7LZU9rIhrC6sDHSNRqQ2AeLawQ%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2018年12月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "其他",
+    "内饰颜色": "深色",
+    "新车指导价": 22.38,
+    "比新车省": 18.8,
+    "当前售价": 3.58,
+    "价格单位": "万"
+  },
+  "price_new_car": 22.38,
+  "price_discount": 18.8,
+  "price_after_discount": 3.58,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22077963",
+  "crawl_time": "2026-01-05 09:41:01",
+  "image_path": "crawl/images/22077963.jpg",
+  "page_no": 2
+}

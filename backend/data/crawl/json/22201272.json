@@ -1,0 +1,31 @@
+{
+  "car_id": "22201272",
+  "title": "沃兰多 2020款 轻混530T 劲享版（5+2款）",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/408aea2260cb418dac48b1273467956d~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=1apTjbn2ACnev7FkqfMEGZakYto%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2023年07月",
+    "排量": "1.3T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "深灰色",
+    "内饰颜色": "深色",
+    "新车指导价": 14.19,
+    "比新车省": 6.54,
+    "当前售价": 7.65,
+    "价格单位": "万"
+  },
+  "price_new_car": 14.19,
+  "price_discount": 6.54,
+  "price_after_discount": 7.65,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22201272",
+  "crawl_time": "2026-01-05 09:35:49",
+  "image_path": "crawl/images/22201272.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,33 @@
+{
+  "car_id": "22189103",
+  "title": "航海家 2023款 2.0T 四驱 尊逸版",
+  "tags": [
+    "检测报告",
+    "准新车",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/0c661573c40a46a9a747ef8c0c4d8e14~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=0NoQlOouRYyDXSXZv6oW2CPNuL0%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2024年01月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "深灰色",
+    "内饰颜色": "深色",
+    "新车指导价": 34.88,
+    "比新车省": 11.9,
+    "当前售价": 22.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 34.88,
+  "price_discount": 11.9,
+  "price_after_discount": 22.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22189103",
+  "crawl_time": "2026-01-05 09:35:28",
+  "image_path": "crawl/images/22189103.jpg",
+  "page_no": 1
+}

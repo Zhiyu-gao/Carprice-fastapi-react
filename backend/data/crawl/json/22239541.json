@@ -1,0 +1,32 @@
+{
+  "car_id": "22239541",
+  "title": "发现运动PHEV 2020款 P300e 性能科技版",
+  "tags": [
+    "检测报告",
+    "过户2次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/32a4b440715747deb68984be4efe0f2d~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=Zml2YGKtRBnCg91ih4HY357TrxA%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "2次",
+    "上牌时间": "2021年07月",
+    "排量": "1.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "深色",
+    "新车指导价": 42.28,
+    "比新车省": 29.3,
+    "当前售价": 12.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 42.28,
+  "price_discount": 29.3,
+  "price_after_discount": 12.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22239541",
+  "crawl_time": "2026-01-05 09:40:02",
+  "image_path": "crawl/images/22239541.jpg",
+  "page_no": 2
+}

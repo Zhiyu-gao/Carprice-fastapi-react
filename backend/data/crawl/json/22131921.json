@@ -1,0 +1,32 @@
+{
+  "car_id": "22131921",
+  "title": "奔驰GLK级 2015款 GLK 300 4MATIC 时尚型 极致版",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/4a965b8e9959419aa17e4b5526e1df13~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=ciPgM40bHEwKxWMSnTbRdxkEH%2BM%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2015年01月",
+    "排量": "3.0L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "咖啡色",
+    "内饰颜色": "深色",
+    "新车指导价": 48.5,
+    "比新车省": 41.62,
+    "当前售价": 6.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 48.5,
+  "price_discount": 41.62,
+  "price_after_discount": 6.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22131921",
+  "crawl_time": "2026-01-05 09:34:06",
+  "image_path": "crawl/images/22131921.jpg",
+  "page_no": 1
+}

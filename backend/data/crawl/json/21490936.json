@@ -1,0 +1,31 @@
+{
+  "car_id": "21490936",
+  "title": "奥拓 2015款 1.0L 自动限定型",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/80d9a905f9b140ada4454d1d47ca6274~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=D2FiCDM36WQyH4mFvN5YS%2BeA%2FpI%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2016年02月",
+    "排量": "1.0L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "浅色",
+    "新车指导价": 6.19,
+    "比新车省": 9.4,
+    "当前售价": -3.21,
+    "价格单位": "万"
+  },
+  "price_new_car": 6.19,
+  "price_discount": 9.4,
+  "price_after_discount": -3.21,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21490936",
+  "crawl_time": "2026-01-05 09:35:59",
+  "image_path": "crawl/images/21490936.jpg",
+  "page_no": 1
+}

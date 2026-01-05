@@ -1,0 +1,32 @@
+{
+  "car_id": "18371110",
+  "title": "传祺M8 2024款 大师系列 2.0TGDI 至尊版",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/c895fe14f1bd49d6a8a7649f7d05c3aa~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=GdnEbLYpHTFDhQ4lqxlSFa9VLqE%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2023年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 24.98,
+    "比新车省": 6.7,
+    "当前售价": 18.28,
+    "价格单位": "万"
+  },
+  "price_new_car": 24.98,
+  "price_discount": 6.7,
+  "price_after_discount": 18.28,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/18371110",
+  "crawl_time": "2026-01-05 09:34:19",
+  "image_path": "crawl/images/18371110.jpg",
+  "page_no": 1
+}

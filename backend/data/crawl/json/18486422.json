@@ -1,0 +1,32 @@
+{
+  "car_id": "18486422",
+  "title": "标致3008 2015款 1.6THP 自动至尚版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/67dd84bff4e147c4ad1f6b3e7e0f03f5~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=mPOvZjcf6ly3KwLL4jn2WUEsVvY%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2015年08月",
+    "排量": "1.6T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "深灰色",
+    "内饰颜色": "深色",
+    "新车指导价": 22.07,
+    "比新车省": 19.19,
+    "当前售价": 2.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 22.07,
+  "price_discount": 19.19,
+  "price_after_discount": 2.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/18486422",
+  "crawl_time": "2026-01-05 09:39:58",
+  "image_path": "crawl/images/18486422.jpg",
+  "page_no": 2
+}

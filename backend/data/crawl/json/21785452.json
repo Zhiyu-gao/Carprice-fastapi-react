@@ -1,0 +1,31 @@
+{
+  "car_id": "21785452",
+  "title": "揽境 2023款 530TSI 四驱旗舰胜境版Pro 7座",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/ee0a2884198544158080e2b4786a6b08~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=tJPixSm3e%2BqKx67wIMJvClfBYRo%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2024年03月",
+    "排量": "2.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "黑色",
+    "内饰颜色": "深色",
+    "新车指导价": 39.99,
+    "比新车省": 18.19,
+    "当前售价": 21.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 39.99,
+  "price_discount": 18.19,
+  "price_after_discount": 21.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21785452",
+  "crawl_time": "2026-01-05 09:39:10",
+  "image_path": "crawl/images/21785452.jpg",
+  "page_no": 2
+}

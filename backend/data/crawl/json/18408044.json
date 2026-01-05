@@ -1,0 +1,31 @@
+{
+  "car_id": "18408044",
+  "title": "荣威i5 2021款 1.5L CVT星耀版",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/b0c59be967ca43789ecb70676af6693b~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=Ye4fmCEfoR9OsVTLT1MQgTfhH%2B8%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2021年12月",
+    "排量": "1.5L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 8.99,
+    "比新车省": 5.74,
+    "当前售价": 3.25,
+    "价格单位": "万"
+  },
+  "price_new_car": 8.99,
+  "price_discount": 5.74,
+  "price_after_discount": 3.25,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/18408044",
+  "crawl_time": "2026-01-05 09:36:23",
+  "image_path": "crawl/images/18408044.jpg",
+  "page_no": 1
+}

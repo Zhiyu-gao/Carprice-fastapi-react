@@ -1,0 +1,31 @@
+{
+  "car_id": "22196835",
+  "title": "RAV4荣放 2010款 2.4L 自动豪华升级版",
+  "tags": [
+    "过户1次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/d04625d4717c44f9be74144d9bccad29~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=c75BhBRvAJTr9N3mUCHGM4zpW%2BY%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2010年06月",
+    "排量": "2.4L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "红色",
+    "内饰颜色": "浅色",
+    "新车指导价": 25.68,
+    "比新车省": 21.8,
+    "当前售价": 3.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 25.68,
+  "price_discount": 21.8,
+  "price_after_discount": 3.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22196835",
+  "crawl_time": "2026-01-05 09:35:21",
+  "image_path": "crawl/images/22196835.jpg",
+  "page_no": 1
+}

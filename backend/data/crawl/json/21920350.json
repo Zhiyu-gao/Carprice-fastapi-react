@@ -1,0 +1,32 @@
+{
+  "car_id": "21920350",
+  "title": "揽胜运动 2013款 5.0 V8 SC HSE",
+  "tags": [
+    "检测报告",
+    "过户3次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/b5d2586547804a7b9076626f229e5e8b~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=GGcBSedKboE3oIin3aoJJqzxH7U%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "德州",
+    "车源地": "北京",
+    "过户次数": "3次",
+    "上牌时间": "2013年07月",
+    "排量": "5.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 169.1,
+    "比新车省": 156.3,
+    "当前售价": 12.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 169.1,
+  "price_discount": 156.3,
+  "price_after_discount": 12.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21920350",
+  "crawl_time": "2026-01-05 09:40:50",
+  "image_path": "crawl/images/21920350.jpg",
+  "page_no": 2
+}

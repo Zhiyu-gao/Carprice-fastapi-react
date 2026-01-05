@@ -1,0 +1,32 @@
+{
+  "car_id": "22309023",
+  "title": "宝马7系 2016款 750Li xDrive四座版",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/61a78ce1ae96417c805524c19370f7dc~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=roY29qSoI3ofLMuwzPWXloEAoIo%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2016年07月",
+    "排量": "4.4T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "香槟色",
+    "内饰颜色": "深色",
+    "新车指导价": 198.8,
+    "比新车省": 172.92,
+    "当前售价": 25.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 198.8,
+  "price_discount": 172.92,
+  "price_after_discount": 25.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22309023",
+  "crawl_time": "2026-01-05 09:41:44",
+  "image_path": "crawl/images/22309023.jpg",
+  "page_no": 2
+}

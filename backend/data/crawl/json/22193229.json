@@ -1,0 +1,31 @@
+{
+  "car_id": "22193229",
+  "title": "大通D90 2017款 2.0T 自动四驱 北极星",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/c6aa1bf3dcfa45f480c17570f2d2abcb~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=Eu7FMwa1MhxVXs8p0DCXdqcVmNs%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2017年12月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "蓝色",
+    "内饰颜色": "深色",
+    "新车指导价": 24.9,
+    "比新车省": 19.91,
+    "当前售价": 4.99,
+    "价格单位": "万"
+  },
+  "price_new_car": 24.9,
+  "price_discount": 19.91,
+  "price_after_discount": 4.99,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22193229",
+  "crawl_time": "2026-01-05 09:34:35",
+  "image_path": "crawl/images/22193229.jpg",
+  "page_no": 1
+}

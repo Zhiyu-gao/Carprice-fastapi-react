@@ -109,7 +109,7 @@ function AppLayout() {
           if (key === "metadata") navigate("/metadata");
           if (key === "intro") navigate("/intro");
           if (key === "github") {
-            window.open("https://github.com/Zhiyu-gao/Vehicle-Intelligence-Platform", "_blank");
+            window.open("https://github.com/Zhiyu-gao/Carprice-fastapi-react", "_blank");
           }
         }}
         style={{

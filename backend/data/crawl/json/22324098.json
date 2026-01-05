@@ -1,0 +1,32 @@
+{
+  "car_id": "22324098",
+  "title": "蒙迪欧 2020款 EcoBoost 180 时尚型",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/267c056a904a4c0ab248a361479c3200~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786645&x-signature=aI4WEtDD8LXA6y5qjPVyMlOU%2FAE%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "东莞",
+    "车源地": "东莞",
+    "过户次数": "0次",
+    "上牌时间": "2021年12月",
+    "排量": "1.5T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 19.28,
+    "比新车省": 12.48,
+    "当前售价": 6.8,
+    "价格单位": "万"
+  },
+  "price_new_car": 19.28,
+  "price_discount": 12.48,
+  "price_after_discount": 6.8,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22324098",
+  "crawl_time": "2026-01-05 09:37:27",
+  "image_path": "crawl/images/22324098.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,31 @@
+{
+  "car_id": "20560550",
+  "title": "北京越野BJ40 2021款 2.3T 自动四驱刀锋英雄版至尊型",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/cb5bf610829d445faa9ea4e223050289~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=epEHg9jO%2BCRzIObTRX7N4anwj7w%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2022年10月",
+    "排量": "2.3T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "红色",
+    "内饰颜色": "深色",
+    "新车指导价": 19.49,
+    "比新车省": 10.61,
+    "当前售价": 8.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 19.49,
+  "price_discount": 10.61,
+  "price_after_discount": 8.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/20560550",
+  "crawl_time": "2026-01-05 09:36:17",
+  "image_path": "crawl/images/20560550.jpg",
+  "page_no": 1
+}

@@ -1,0 +1,31 @@
+{
+  "car_id": "22198465",
+  "title": "普拉多 2016款 3.5L 自动TX-L",
+  "tags": [
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/6b84f976998749baac468be48cf64bec~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=ukyh1qADRtfF8HmMD4MidwvL7s0%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2017年07月",
+    "排量": "3.5L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 51.98,
+    "比新车省": 22.38,
+    "当前售价": 29.6,
+    "价格单位": "万"
+  },
+  "price_new_car": 51.98,
+  "price_discount": 22.38,
+  "price_after_discount": 29.6,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22198465",
+  "crawl_time": "2026-01-05 09:36:59",
+  "image_path": "crawl/images/22198465.jpg",
+  "page_no": 1
+}

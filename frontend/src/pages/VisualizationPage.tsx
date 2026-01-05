@@ -13,146 +13,200 @@ import {
 import {
   ScatterChart,
   Scatter,
-  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
   Cell,
-  Legend,
 } from "recharts";
 import { getToken } from "../auth/token";
 
 const { Title, Text } = Typography;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface Vehicle {
-  vehicle_id: string;
-  area_sqm: number;
-  layout: string;
-  build_year: number;
-  total_price_wan: number;
-  unit_price: number;
+/* ================= 数据结构（真实对齐） ================= */
+
+interface Car {
+  source_car_id: string;
+  title: string;
+  tags: string[];
+  info: {
+    上牌时间?: string;      // 2018年04月
+    上牌地?: string;
+    当前售价?: number;      // 万
+    新车指导价?: number;    // 万
+    比新车省?: number;      // 万
+    过户次数?: string;      // "0次"
+  };
 }
 
-const BEDROOM_COLORS = [
-  "#60a5fa",
-  "#34d399",
-  "#a78bfa",
-  "#fbbf24",
-  "#f472b6",
-  "#38bdf8",
-];
+/* ================= 工具函数 ================= */
 
-const formatWan = (v: number) => `${(v / 10000).toFixed(0)}万`;
+const formatWan = (v: number) => `${v.toFixed(1)}万`;
+
+const parseAgeMonths = (time?: string) => {
+  if (!time) return null;
+  const m = time.match(/(\d{4})年(\d{1,2})月/);
+  if (!m) return null;
+
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const now = new Date();
+  return (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - mo);
+};
+
+const binHistogram = (data: number[], binCount = 8) => {
+  if (!data.length) return [];
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const step = (max - min) / binCount || 1;
+
+  return Array.from({ length: binCount }, (_, i) => {
+    const low = min + i * step;
+    const high = min + (i + 1) * step;
+    return {
+      range: `${low.toFixed(1)}~${high.toFixed(1)}`,
+      count: data.filter(v => v >= low && v < high).length,
+    };
+  });
+};
+
+const pearson = (x: number[], y: number[]) => {
+  const n = x.length;
+  const mx = x.reduce((a, b) => a + b, 0) / n;
+  const my = y.reduce((a, b) => a + b, 0) / n;
+  let num = 0, dx = 0, dy = 0;
+  for (let i = 0; i < n; i++) {
+    num += (x[i] - mx) * (y[i] - my);
+    dx += (x[i] - mx) ** 2;
+    dy += (y[i] - my) ** 2;
+  }
+  return num / Math.sqrt(dx * dy);
+};
 
 const cardStyle: React.CSSProperties = {
   background: "#111827",
   border: "1px solid #1f2937",
 };
 
+/* ================= 页面组件 ================= */
+
 const VisualizationPage: React.FC = () => {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const fetchVehicles = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/crawl-vehicles`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
-      if (!res.ok) throw new Error("获取车辆失败");
-      setVehicles(await res.json());
-    } catch (e: any) {
-      messageApi.error(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchVehicles();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_BASE_URL}/crawl-cars`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (!res.ok) throw new Error("获取二手车数据失败");
+        setCars(await res.json());
+      } catch (e: any) {
+        messageApi.error(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  /* ===== 派生字段 ===== */
-  const parsed = useMemo(() => {
-    const year = new Date().getFullYear();
-    return vehicles.map((h) => {
-      const match = h.layout.match(/(\d+)室/);
-      const bedrooms = match ? Number(match[1]) : 0;
-      return {
-        ...h,
-        bedrooms,
-        age_years: year - h.build_year,
-        total_price_yuan: h.total_price_wan * 10000,
-      };
-    });
-  }, [vehicles]);
+  /* ================= 派生字段 ================= */
 
-  /* ===== 统计 ===== */
+  const parsed = useMemo(() => {
+    return cars
+      .map(c => {
+        const ageMonths = parseAgeMonths(c.info?.上牌时间);
+        const newPrice = c.info?.新车指导价;
+        const curPrice = c.info?.当前售价;
+        if (!ageMonths || !newPrice || !curPrice) return null;
+
+        return {
+          ageMonths,
+          ageYears: ageMonths / 12,
+          currentPrice: curPrice,
+          depreciationRate: (newPrice - curPrice) / newPrice,
+          saveMoney: c.info?.比新车省 ?? 0,
+        };
+      })
+      .filter(Boolean) as {
+        ageMonths: number;
+        ageYears: number;
+        currentPrice: number;
+        depreciationRate: number;
+        saveMoney: number;
+      }[];
+  }, [cars]);
+
+  /* ================= 统计指标 ================= */
+
   const stats = useMemo(() => {
     if (!parsed.length) return null;
-    const total = parsed.length;
-    const sumPrice = parsed.reduce((s, h) => s + h.total_price_yuan, 0);
-    const sumArea = parsed.reduce((s, h) => s + h.area_sqm, 0);
-
     return {
-      total,
-      avgPrice: sumPrice / total,
-      avgUnitPrice: sumPrice / sumArea,
+      total: parsed.length,
+      avgPrice:
+        parsed.reduce((s, c) => s + c.currentPrice, 0) / parsed.length,
+      avgDep:
+        parsed.reduce((s, c) => s + c.depreciationRate, 0) / parsed.length,
     };
   }, [parsed]);
 
-  /* ===== 图表数据 ===== */
-  const scatterData = parsed.map((h) => ({
-    x: h.area_sqm,
-    y: h.total_price_yuan,
-  }));
+  /* ================= 分布数据 ================= */
 
-  const barData = Object.values(
-    parsed.reduce((acc: any, h) => {
-      acc[h.bedrooms] ??= { bedrooms: h.bedrooms, sum: 0, cnt: 0 };
-      acc[h.bedrooms].sum += h.total_price_yuan;
-      acc[h.bedrooms].cnt++;
-      return acc;
-    }, {})
-  ).map((v: any) => ({
-    bedrooms: v.bedrooms,
-    avg_price: v.sum / v.cnt,
-  }));
+  const priceHist = useMemo(
+    () => binHistogram(parsed.map(c => c.currentPrice)),
+    [parsed]
+  );
 
-  const pieData = Object.values(
-    parsed.reduce((acc: any, h) => {
-      acc[h.bedrooms] = (acc[h.bedrooms] || 0) + 1;
-      return acc;
-    }, {})
-  ).map((v, i) => ({
-    bedrooms: i,
-    count: v,
-  }));
+  const ageHist = useMemo(
+    () => binHistogram(parsed.map(c => c.ageYears)),
+    [parsed]
+  );
+
+  const depHist = useMemo(
+    () => binHistogram(parsed.map(c => c.depreciationRate)),
+    [parsed]
+  );
+
+  const corrData = useMemo(() => {
+    if (!parsed.length) return [];
+
+    const features = {
+      车龄: parsed.map(c => c.ageYears),
+      价格: parsed.map(c => c.currentPrice),
+      折旧率: parsed.map(c => c.depreciationRate),
+      省钱: parsed.map(c => c.saveMoney),
+    };
+
+    const keys = Object.keys(features) as (keyof typeof features)[];
+
+    return keys.flatMap((k1, i) =>
+      keys.map((k2, j) => ({
+        x: i,
+        y: j,
+        nameX: k1,
+        nameY: k2,
+        value: pearson(features[k1], features[k2]),
+      }))
+    );
+  }, [parsed]);
+
+  /* ================= 渲染 ================= */
 
   return (
-    <div
-      style={{
-        padding: 16,
-        background: "#0f172a",
-        minHeight: "100vh",
-      }}
-    >
+    <div style={{ padding: 16, background: "#0f172a", minHeight: "100vh" }}>
       {contextHolder}
 
       <Title level={3} style={{ color: "#e5e7eb" }}>
-        车辆数据可视化 <Tag color="blue">Analytics</Tag>
+        二手车折旧特征统计分析 <Tag color="blue">EDA</Tag>
       </Title>
       <Text style={{ color: "#9ca3af" }}>
-        基于真实数据与结构字段的统计分析
+        基于懂车帝真实爬虫数据的折旧与价格特征分析
       </Text>
 
       <Divider style={{ borderColor: "#1f2937" }} />
@@ -164,101 +218,121 @@ const VisualizationPage: React.FC = () => {
           <Row gutter={16}>
             <Col span={8}>
               <Card style={cardStyle}>
-                <Statistic
-                  title={<span style={{ color: "#9ca3af" }}>车辆数量</span>}
-                  value={stats.total}
-                  valueStyle={{ color: "#e5e7eb" }}
-                />
+                <Statistic title="样本数量" value={stats.total} />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card style={cardStyle}>
+                <Statistic title="平均售价" value={formatWan(stats.avgPrice)} />
               </Card>
             </Col>
             <Col span={8}>
               <Card style={cardStyle}>
                 <Statistic
-                  title={<span style={{ color: "#9ca3af" }}>平均总价</span>}
-                  value={formatWan(stats.avgPrice)}
-                  valueStyle={{ color: "#e5e7eb" }}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title={<span style={{ color: "#9ca3af" }}>平均单价</span>}
-                  value={Math.round(stats.avgUnitPrice)}
-                  suffix="元/㎡"
-                  valueStyle={{ color: "#e5e7eb" }}
+                  title="平均折旧率"
+                  value={(stats.avgDep * 100).toFixed(1)}
+                  suffix="%"
                 />
               </Card>
             </Col>
           </Row>
-
-          <Divider style={{ borderColor: "#1f2937" }} />
+          <Divider />
         </>
       )}
 
-      {!loading && parsed.length > 0 && (
-        <Row gutter={16}>
-          <Col span={24}>
-            <Card title="面积 vs 总价" style={cardStyle} headStyle={{ color: "#e5e7eb" }}>
-              <ResponsiveContainer height={320}>
-                <ScatterChart>
-                  <CartesianGrid stroke="#1f2937" />
-                  <XAxis dataKey="x" unit="㎡" stroke="#9ca3af" />
-                  <YAxis tickFormatter={formatWan} stroke="#9ca3af" />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#1f2937",
-                      border: "none",
-                      color: "#e5e7eb",
-                    }}
-                    formatter={(v: number) => formatWan(v)}
-                  />
-                  <Scatter data={scatterData} fill="#60a5fa" />
-                </ScatterChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
+      {/* ===== 价格 / 车龄 / 折旧分布 ===== */}
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="图3-1 当前售价分布" style={cardStyle}>
+            <ResponsiveContainer height={240}>
+              <BarChart data={priceHist}>
+                <XAxis dataKey="range" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#60a5fa" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
 
-          <Col span={12}>
-            <Card title="卧室数平均总价" style={cardStyle} headStyle={{ color: "#e5e7eb" }}>
-              <ResponsiveContainer height={260}>
-                <BarChart data={barData}>
-                  <XAxis dataKey="bedrooms" stroke="#9ca3af" />
-                  <YAxis tickFormatter={formatWan} stroke="#9ca3af" />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#1f2937",
-                      border: "none",
-                      color: "#e5e7eb",
-                    }}
-                    formatter={(v: number) => formatWan(v)}
-                  />
-                  <Bar dataKey="avg_price">
-                    {barData.map((_, i) => (
-                      <Cell key={i} fill={BEDROOM_COLORS[i % BEDROOM_COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
+        <Col span={8}>
+          <Card title="图3-2 车龄分布" style={cardStyle}>
+            <ResponsiveContainer height={240}>
+              <BarChart data={ageHist}>
+                <XAxis dataKey="range" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#34d399" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
 
-          <Col span={12}>
-            <Card title="卧室分布" style={cardStyle} headStyle={{ color: "#e5e7eb" }}>
-              <ResponsiveContainer height={260}>
-                <PieChart>
-                  <Pie data={pieData} dataKey="count" outerRadius={80}>
-                    {pieData.map((_, i) => (
-                      <Cell key={i} fill={BEDROOM_COLORS[i % BEDROOM_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend wrapperStyle={{ color: "#9ca3af" }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-        </Row>
-      )}
+        <Col span={8}>
+          <Card title="图3-3 折旧率分布" style={cardStyle}>
+            <ResponsiveContainer height={240}>
+              <BarChart data={depHist}>
+                <XAxis dataKey="range" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#fbbf24" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+      </Row>
+
+      <Divider />
+
+      {/* ===== 相关性分析 ===== */}
+      <Card title="图3-4 特征相关性热力图" style={cardStyle}>
+        <ResponsiveContainer height={320}>
+          <ScatterChart>
+            <XAxis type="number" dataKey="x" tickFormatter={i => corrData[i]?.nameX} />
+            <YAxis type="number" dataKey="y" tickFormatter={i => corrData[i]?.nameY} />
+            <Tooltip formatter={(v: number) => v.toFixed(2)} />
+            <Scatter data={corrData} shape="square">
+              {corrData.map((d, i) => (
+                <Cell
+                  key={i}
+                  fill={`rgba(96,165,250,${Math.abs(d.value)})`}
+                />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+      </Card>
+
+      <Divider />
+
+      {/* ===== 共线性分析 ===== */}
+      <Row gutter={16}>
+        <Col span={12}>
+          <Card title="图3-5(a) 车龄 vs 售价" style={cardStyle}>
+            <ResponsiveContainer height={260}>
+              <ScatterChart>
+                <XAxis dataKey="ageYears" unit="年" />
+                <YAxis dataKey="currentPrice" unit="万" />
+                <Tooltip />
+                <Scatter data={parsed} fill="#38bdf8" />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+
+        <Col span={12}>
+          <Card title="图3-5(b) 折旧率 vs 售价" style={cardStyle}>
+            <ResponsiveContainer height={260}>
+              <ScatterChart>
+                <XAxis dataKey="depreciationRate" />
+                <YAxis dataKey="currentPrice" unit="万" />
+                <Tooltip />
+                <Scatter data={parsed} fill="#f472b6" />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

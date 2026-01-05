@@ -1,0 +1,32 @@
+{
+  "car_id": "21726781",
+  "title": "沃尔沃S60 2014款 S60L 2.0T 智远版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/ba260844114e40a28bdf9d47958fde12~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=NDkpPu4es58eYI6tMaXk5gSjmn8%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2014年07月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "深灰色",
+    "内饰颜色": "深色",
+    "新车指导价": 30.99,
+    "比新车省": 27.01,
+    "当前售价": 3.98,
+    "价格单位": "万"
+  },
+  "price_new_car": 30.99,
+  "price_discount": 27.01,
+  "price_after_discount": 3.98,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21726781",
+  "crawl_time": "2026-01-05 09:33:35",
+  "image_path": "crawl/images/21726781.jpg",
+  "page_no": 1
+}

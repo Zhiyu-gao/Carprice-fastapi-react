@@ -1,0 +1,32 @@
+{
+  "car_id": "22325441",
+  "title": "雪铁龙C5 2010款 2.3L 自动尊贵型",
+  "tags": [
+    "检测报告",
+    "过户1次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/68363138cf004094963e058213cd8068~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=YNQ15ES8zEUPTD8xJ4asxz7fQcg%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "廊坊",
+    "车源地": "北京",
+    "过户次数": "1次",
+    "上牌时间": "2011年01月",
+    "排量": "2.3L",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 22.69,
+    "比新车省": 20.81,
+    "当前售价": 1.88,
+    "价格单位": "万"
+  },
+  "price_new_car": 22.69,
+  "price_discount": 20.81,
+  "price_after_discount": 1.88,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22325441",
+  "crawl_time": "2026-01-05 09:41:21",
+  "image_path": "crawl/images/22325441.jpg",
+  "page_no": 2
+}

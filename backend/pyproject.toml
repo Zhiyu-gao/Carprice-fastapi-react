@@ -13,6 +13,7 @@ dependencies = [
     "fastapi>=0.121.3",
     "pandas>=2.3.3",
     "passlib[bcrypt]>=1.7.4",
+    "pillow>=12.0.0",
     "playwright>=1.57.0",
     "pydantic>=2.12.4",
     "pydantic-settings>=2.12.0",

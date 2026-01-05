@@ -1,0 +1,32 @@
+{
+  "car_id": "22191302",
+  "title": "蔚来ES6 2022款 455KM 运动版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p9-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/21eb5fb51f03409dbcdc27f0ff37947c~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786677&x-signature=Xr%2FZL8rSxkzgzk59wwHoZjhgnJo%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2023年03月",
+    "排量": "--",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 38.6,
+    "比新车省": 26.92,
+    "当前售价": 11.68,
+    "价格单位": "万"
+  },
+  "price_new_car": 38.6,
+  "price_discount": 26.92,
+  "price_after_discount": 11.68,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/22191302",
+  "crawl_time": "2026-01-05 09:39:39",
+  "image_path": "crawl/images/22191302.jpg",
+  "page_no": 2
+}

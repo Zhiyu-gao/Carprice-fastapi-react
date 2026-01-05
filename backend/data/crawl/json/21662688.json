@@ -1,0 +1,32 @@
+{
+  "car_id": "21662688",
+  "title": "英菲尼迪Q50L 2015款 2.0T 悦享版",
+  "tags": [
+    "检测报告",
+    "过户0次"
+  ],
+  "image_url": "https://p3-dcd-sign.byteimg.com/tos-cn-i-f042mdwyw7/aedf8f981f154d2d9138f36a812758a8~tplv-f042mdwyw7-auto-webp:480:0.jpg?rk3s=4892dee6&x-expires=1768786408&x-signature=t6q4M1Rc0Q7O3FAxiStzU8AD1P0%3D&psm=motor.sh.pack",
+  "info": {
+    "上牌地": "北京",
+    "车源地": "北京",
+    "过户次数": "0次",
+    "上牌时间": "2015年11月",
+    "排量": "2.0T",
+    "变速箱": "自动",
+    "保养方式": "无保养",
+    "车身颜色": "白色",
+    "内饰颜色": "深色",
+    "新车指导价": 30.98,
+    "比新车省": 24.6,
+    "当前售价": 6.38,
+    "价格单位": "万"
+  },
+  "price_new_car": 30.98,
+  "price_discount": 24.6,
+  "price_after_discount": 6.38,
+  "price_unit": "万",
+  "source_url": "https://www.dongchedi.com/usedcar/21662688",
+  "crawl_time": "2026-01-05 09:33:45",
+  "image_path": "crawl/images/21662688.jpg",
+  "page_no": 1
+}
