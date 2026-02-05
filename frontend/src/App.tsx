@@ -8,7 +8,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { Layout, Menu, Button, Typography, Space } from "antd";
+import { Layout, Menu, Button, Typography, Space, Spin } from "antd";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -33,6 +33,19 @@ import AiChatPage from "./pages/AiChatPage";
 import ProjectIntroPage from "./pages/ProjectIntroPage";
 import RequireAuth from "./auth/RequireAuth";
 import {clearToken } from "./auth/token";
+import { api } from "./api/client";
+import { useEffect, useState } from "react";
+
+import BuyerPage from "./pages/BuyerPage";
+import AdminMonitorPage from "./pages/AdminMonitorPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import ForumPage from "./pages/ForumPage";
+import ChatPage from "./pages/ChatPage";
+import SaasLandingPage from "./pages/SaasLandingPage";
+import HealthcareDashboardPage from "./pages/HealthcareDashboardPage";
+import PortfolioPage from "./pages/PortfolioPage";
+import EcommerceMobilePage from "./pages/EcommerceMobilePage";
+import FintechBankingPage from "./pages/FintechBankingPage";
 
 const { Sider, Header, Content } = Layout;
 const { Text } = Typography;
@@ -40,6 +53,8 @@ const { Text } = Typography;
 function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [me, setMe] = useState<{ role: string } | null>(null);
+  const [loadingMe, setLoadingMe] = useState(true);
 
   const path = location.pathname;
 
@@ -51,6 +66,11 @@ function AppLayout() {
     "/ai_chat": "ai_chat",
     "/crawler": "crawler",
     "/metadata": "metadata",
+    "/buyer": "buyer",
+    "/admin/monitor": "admin_monitor",
+    "/admin/users": "admin_users",
+    "/forum": "forum",
+    "/chat": "chat",
     "/intro": "intro",
   };
 
@@ -64,13 +84,44 @@ function AppLayout() {
     navigate("/login", { replace: true });
   };
 
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/me")
+      .then((res) => {
+        if (!mounted) return;
+        setMe(res.data);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setMe(null);
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoadingMe(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loadingMe) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  const role = me?.role || "seller";
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {/* 左侧 Sider */}
     <Sider
       width={240}
       style={{
-        background: "var(--background-secondary)",
+        background: "linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(17, 24, 39, 0.9))",
         borderRight: "1px solid var(--border-color)",
         display: "flex",
         flexDirection: "column",
@@ -92,8 +143,17 @@ function AppLayout() {
           padding: "0 16px",
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '24px' }}>🚗</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "999px",
+              background: "linear-gradient(135deg, #22d3ee, #f97316)",
+              boxShadow: "0 0 12px rgba(34, 211, 238, 0.6)",
+              display: "inline-block",
+            }}
+          />
           <span>车辆智能平台</span>
         </div>
       </div>
@@ -111,6 +171,11 @@ function AppLayout() {
           if (key === "ai_chat") navigate("/ai_chat");
           if (key === "crawler") navigate("/crawler");
           if (key === "metadata") navigate("/metadata");
+          if (key === "buyer") navigate("/buyer");
+          if (key === "admin_monitor") navigate("/admin/monitor");
+          if (key === "admin_users") navigate("/admin/users");
+          if (key === "forum") navigate("/forum");
+          if (key === "chat") navigate("/chat");
           if (key === "intro") navigate("/intro");
           if (key === "github") {
             window.open("https://github.com/Zhiyu-gao/Carprice-fastapi-react", "_blank");
@@ -149,6 +214,44 @@ function AppLayout() {
           key: "ai_chat",
           icon: <RobotOutlined />,
           label: "AI 问答助手",
+        },
+        {
+          key: "forum",
+          icon: <DatabaseOutlined />,
+          label: "论坛",
+        },
+        {
+          key: "chat",
+          icon: <RobotOutlined />,
+          label: "聊天",
+        },
+        ...(role === "buyer" || role === "admin"
+          ? [
+              {
+                key: "buyer",
+                icon: <DatabaseOutlined />,
+                label: "我要买房",
+              },
+            ]
+          : []),
+        ...(role === "admin"
+          ? [
+              {
+                key: "admin_monitor",
+                icon: <BarChartOutlined />,
+                label: "系统监控",
+              },
+              {
+                key: "admin_users",
+                icon: <IdcardOutlined />,
+                label: "用户管理",
+              },
+            ]
+          : []),
+        {
+          key: "crawler",
+          icon: <DatabaseOutlined />,
+          label: "爬虫任务",
         },
         {
           key: "metadata",
@@ -190,7 +293,7 @@ function AppLayout() {
         {/* 顶部导航栏 */}
         <Header
           style={{
-            background: "var(--background-secondary)",
+            background: "rgba(15, 23, 42, 0.9)",
             borderBottom: "1px solid var(--border-color)",
             display: "flex",
             alignItems: "center",
@@ -232,7 +335,7 @@ function AppLayout() {
 
         <Content
           style={{
-            background: "var(--background-primary)",
+            background: "transparent",
             padding: 32,
             minHeight: 'calc(100vh - 70px)',
           }}
@@ -251,10 +354,57 @@ function AppLayout() {
   );
 }
 
+function RequireRole({ allow, children }: { allow: string[]; children: React.ReactElement }) {
+  const [role, setRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/me")
+      .then((res) => {
+        if (!mounted) return;
+        setRole(res.data?.role || null);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setRole(null);
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Spin />
+      </div>
+    );
+  }
+
+  if (!role || !allow.includes(role)) {
+    return <Navigate to="/intro" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* UI/UX ProMax 页面预览（无需登录） */}
+        <Route path="/ui/saas-landing" element={<SaasLandingPage />} />
+        <Route path="/ui/healthcare-dashboard" element={<HealthcareDashboardPage />} />
+        <Route path="/ui/portfolio" element={<PortfolioPage />} />
+        <Route path="/ui/ecommerce-mobile" element={<EcommerceMobilePage />} />
+        <Route path="/ui/fintech-banking" element={<FintechBankingPage />} />
+
         {/* 登录/注册 */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -270,6 +420,33 @@ function App() {
           <Route index element={<Navigate to="/intro" replace />} />
           <Route path="/crawler" element={<CrawlerTaskPage />} />
           <Route path="/metadata" element={<MetadataPage />} />
+          <Route path="/forum" element={<ForumPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:userId" element={<ChatPage />} />
+          <Route
+            path="/buyer"
+            element={
+              <RequireRole allow={["buyer", "admin"]}>
+                <BuyerPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/monitor"
+            element={
+              <RequireRole allow={["admin"]}>
+                <AdminMonitorPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <RequireRole allow={["admin"]}>
+                <AdminUsersPage />
+              </RequireRole>
+            }
+          />
         </Route>
 
         {/* 兜底 */}

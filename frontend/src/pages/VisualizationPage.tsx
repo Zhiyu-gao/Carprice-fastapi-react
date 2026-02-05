@@ -9,6 +9,7 @@ import {
   Divider,
   Statistic,
   message,
+  Space,
 } from "antd";
 import {
   ScatterChart,
@@ -21,26 +22,15 @@ import {
   Bar,
   Cell,
 } from "recharts";
-import { getToken } from "../auth/token";
+import { api, getErrorMessage } from "../api/client";
+import type { CrawlCar, PageResp } from "../api/types";
 
 const { Title, Text } = Typography;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* ================= 数据结构（真实对齐） ================= */
 
-interface Car {
-  source_car_id: string;
-  title: string;
-  tags: string[];
-  info: {
-    上牌时间?: string;      // 2018年04月
-    上牌地?: string;
-    当前售价?: number;      // 万
-    新车指导价?: number;    // 万
-    比新车省?: number;      // 万
-    过户次数?: string;      // "0次"
-  };
-}
+type Car = CrawlCar;
 
 /* ================= 工具函数 ================= */
 
@@ -87,8 +77,17 @@ const pearson = (x: number[], y: number[]) => {
 };
 
 const cardStyle: React.CSSProperties = {
-  background: "#111827",
-  border: "1px solid #1f2937",
+  background: "linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.98))",
+  border: "1px solid rgba(148, 163, 184, 0.18)",
+  boxShadow: "var(--shadow-card)",
+  borderRadius: 18,
+};
+
+const kpiStyle: React.CSSProperties = {
+  background:
+    "linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(249, 115, 22, 0.12))",
+  border: "1px solid rgba(34, 211, 238, 0.25)",
+  borderRadius: 18,
 };
 
 /* ================= 页面组件 ================= */
@@ -102,13 +101,14 @@ const VisualizationPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/crawl-cars`, {
-          headers: { Authorization: `Bearer ${getToken()}` },
+        const res = await api.get<PageResp<CrawlCar>>("/crawl-cars", {
+          params: { page: 1, page_size: 500 },
         });
-        if (!res.ok) throw new Error("获取二手车数据失败");
-        setCars(await res.json());
+        const data = res.data;
+        const items = Array.isArray(data?.items) ? data.items : [];
+        setCars(items);
       } catch (e: any) {
-        messageApi.error(e.message);
+        messageApi.error(getErrorMessage(e, "获取二手车数据失败"));
       } finally {
         setLoading(false);
       }
@@ -199,15 +199,36 @@ const VisualizationPage: React.FC = () => {
   /* ================= 渲染 ================= */
 
   return (
-    <div style={{ padding: 16, background: "#0f172a", minHeight: "100vh" }}>
+    <div
+      style={{
+        padding: 24,
+        minHeight: "100vh",
+        background:
+          "radial-gradient(900px 500px at 90% -10%, rgba(34, 211, 238, 0.2), transparent 60%)",
+      }}
+    >
       {contextHolder}
 
-      <Title level={3} style={{ color: "#e5e7eb" }}>
-        二手车折旧特征统计分析 <Tag color="blue">EDA</Tag>
-      </Title>
-      <Text style={{ color: "#9ca3af" }}>
-        基于懂车帝真实爬虫数据的折旧与价格特征分析
-      </Text>
+      <Card
+        style={{
+          ...cardStyle,
+          marginBottom: 20,
+          background:
+            "linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98))",
+        }}
+      >
+        <Space align="center" size={12} wrap>
+          <Title level={3} style={{ margin: 0, color: "#e5e7eb" }}>
+            二手车折旧特征统计分析
+          </Title>
+          <Tag color="cyan">EDA</Tag>
+          <Tag color="geekblue">Real Data</Tag>
+          <Tag color="volcano">Depreciation</Tag>
+        </Space>
+        <Text style={{ color: "#9ca3af", display: "block", marginTop: 8 }}>
+          基于懂车帝爬虫数据的价格、车龄与折旧关系洞察
+        </Text>
+      </Card>
 
       <Divider style={{ borderColor: "#1f2937" }} />
 
@@ -215,19 +236,19 @@ const VisualizationPage: React.FC = () => {
 
       {!loading && stats && (
         <>
-          <Row gutter={16}>
-            <Col span={8}>
-              <Card style={cardStyle}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Card style={{ ...kpiStyle }}>
                 <Statistic title="样本数量" value={stats.total} />
               </Card>
             </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
+            <Col xs={24} md={8}>
+              <Card style={{ ...kpiStyle }}>
                 <Statistic title="平均售价" value={formatWan(stats.avgPrice)} />
               </Card>
             </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
+            <Col xs={24} md={8}>
+              <Card style={{ ...kpiStyle }}>
                 <Statistic
                   title="平均折旧率"
                   value={(stats.avgDep * 100).toFixed(1)}
@@ -241,41 +262,41 @@ const VisualizationPage: React.FC = () => {
       )}
 
       {/* ===== 价格 / 车龄 / 折旧分布 ===== */}
-      <Row gutter={16}>
-        <Col span={8}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}>
           <Card title="图3-1 当前售价分布" style={cardStyle}>
             <ResponsiveContainer height={240}>
               <BarChart data={priceHist}>
                 <XAxis dataKey="range" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#60a5fa" />
+                <Bar dataKey="count" fill="#38bdf8" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
         </Col>
 
-        <Col span={8}>
+        <Col xs={24} md={8}>
           <Card title="图3-2 车龄分布" style={cardStyle}>
             <ResponsiveContainer height={240}>
               <BarChart data={ageHist}>
                 <XAxis dataKey="range" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#34d399" />
+                <Bar dataKey="count" fill="#a3e635" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
         </Col>
 
-        <Col span={8}>
+        <Col xs={24} md={8}>
           <Card title="图3-3 折旧率分布" style={cardStyle}>
             <ResponsiveContainer height={240}>
               <BarChart data={depHist}>
                 <XAxis dataKey="range" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#fbbf24" />
+                <Bar dataKey="count" fill="#f97316" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
@@ -295,7 +316,7 @@ const VisualizationPage: React.FC = () => {
               {corrData.map((d, i) => (
                 <Cell
                   key={i}
-                  fill={`rgba(96,165,250,${Math.abs(d.value)})`}
+                  fill={`rgba(34,211,238,${Math.abs(d.value)})`}
                 />
               ))}
             </Scatter>
@@ -306,28 +327,28 @@ const VisualizationPage: React.FC = () => {
       <Divider />
 
       {/* ===== 共线性分析 ===== */}
-      <Row gutter={16}>
-        <Col span={12}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
           <Card title="图3-5(a) 车龄 vs 售价" style={cardStyle}>
             <ResponsiveContainer height={260}>
               <ScatterChart>
                 <XAxis dataKey="ageYears" unit="年" />
                 <YAxis dataKey="currentPrice" unit="万" />
                 <Tooltip />
-                <Scatter data={parsed} fill="#38bdf8" />
+                <Scatter data={parsed} fill="#22d3ee" />
               </ScatterChart>
             </ResponsiveContainer>
           </Card>
         </Col>
 
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card title="图3-5(b) 折旧率 vs 售价" style={cardStyle}>
             <ResponsiveContainer height={260}>
               <ScatterChart>
                 <XAxis dataKey="depreciationRate" />
                 <YAxis dataKey="currentPrice" unit="万" />
                 <Tooltip />
-                <Scatter data={parsed} fill="#f472b6" />
+                <Scatter data={parsed} fill="#f97316" />
               </ScatterChart>
             </ResponsiveContainer>
           </Card>

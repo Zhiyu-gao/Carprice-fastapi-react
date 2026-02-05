@@ -1,24 +1,60 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from app.schemas import ChatRequest
-from app.ai.graph import chat_graph
+from app.schemas import ChatRequest, ChatSessionCreate
 from app.security.jwt import get_current_user_from_jwt
+from app.storage.chat_db import (
+    create_session,
+    list_sessions,
+    list_messages,
+    add_message,
+    touch_session,
+    update_session_title,
+    get_session,
+    delete_session,
+)
+from app.storage.rag_store import retrieve
+from app.mcp.tools import run_mcp_tools
 import json
 
 router = APIRouter()
 
 
-@router.post("/ai/chat")
-def chat(
-    req: ChatRequest,
-    user = Depends(get_current_user_from_jwt),
+@router.get("/ai/chat/sessions")
+def get_chat_sessions(
+    user=Depends(get_current_user_from_jwt),
 ):
-    result = chat_graph.invoke({
-        "question": req.question,
-        "username": user["email"],  # 或 user_id
-    })
+    return list_sessions(str(user["user_id"]))
 
-    return {"answer": result["answer"]}
+
+@router.post("/ai/chat/sessions")
+def create_chat_session(
+    body: ChatSessionCreate,
+    user=Depends(get_current_user_from_jwt),
+):
+    title = (body.title or "新对话").strip() or "新对话"
+    return create_session(str(user["user_id"]), title)
+
+
+@router.get("/ai/chat/sessions/{session_id}/messages")
+def get_chat_messages(
+    session_id: str,
+    user=Depends(get_current_user_from_jwt),
+):
+    rows = list_messages(str(user["user_id"]), session_id)
+    # 前端仍然使用 ai 角色
+    for r in rows:
+        if r.get("role") == "assistant":
+            r["role"] = "ai"
+    return rows
+
+
+@router.delete("/ai/chat/sessions/{session_id}")
+def delete_chat_session(
+    session_id: str,
+    user=Depends(get_current_user_from_jwt),
+):
+    delete_session(str(user["user_id"]), session_id)
+    return {"ok": True}
 
 @router.post("/ai/chat/stream")
 def chat_stream(
@@ -27,40 +63,79 @@ def chat_stream(
 ):
     if not req.question:
         raise HTTPException(status_code=400, detail="question required")
+    user_id = str(user["user_id"])
+    session_id = req.session_id
 
-    # ✅ 第一步：用 LangGraph 判断意图（一次性）
-    result = chat_graph.invoke({
-        "question": req.question,
-        "username": user["email"],
-    })
+    if session_id:
+        session = get_session(user_id, session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail="session not found")
+    else:
+        # 自动创建新会话
+        session = create_session(user_id, req.question[:20].strip() or "新对话")
+        session_id = session["id"]
 
-    intent = result["intent"]
+    # 保存用户消息
+    add_message(session_id, "user", req.question)
+    touch_session(user_id, session_id)
 
-    # 非 chat 的，直接一次性返回（不用 stream）
-    if intent != "chat":
-        answer = result["answer"]
+    # 构建历史消息
+    history = list_messages(user_id, session_id)
+    messages = []
+    for m in history:
+        role = m["role"]
+        if role == "ai":
+            role = "assistant"
+        messages.append({"role": role, "content": m["content"]})
 
-        def once():
-            yield f"data: {json.dumps({'delta': answer})}\n\n"
-            yield "data: [DONE]\n\n"
+    # MCP / RAG
+    if req.mcp_enabled:
+        mcp_context = run_mcp_tools(req.question)
+        if mcp_context:
+            messages.insert(0, {"role": "system", "content": f"[MCP]\n{mcp_context}"})
 
-        return StreamingResponse(once(), media_type="text/event-stream")
+    if req.rag_enabled:
+        chunks = retrieve(req.question, top_k=5)
+        if chunks:
+            context = "\n\n".join(
+                [f"来源: {c['filename']}\n{c['content']}" for c in chunks]
+            )
+            messages.insert(
+                0,
+                {
+                    "role": "system",
+                    "content": (
+                        "你可以参考以下资料作答，若不相关请忽略：\n\n" + context
+                    ),
+                },
+            )
 
-    # ✅ 第二步：真正的流式 —— 直接用 Qwen
+    provider = req.provider
+
     def event_generator():
-        print("🔥 SSE stream started")
         try:
-            from app.providers.qwen_client import qwen_chat_stream
+            full_text = ""
+            if provider == "qwen":
+                from app.providers.qwen_client import qwen_chat_stream_messages
 
-            for token in qwen_chat_stream(req.question):
-                print("➡️ token:", repr(token))
-                yield f"data: {json.dumps({'delta': token})}\n\n"
+                for token in qwen_chat_stream_messages(messages):
+                    full_text += token
+                    yield f"data: {json.dumps({'delta': token, 'session_id': session_id})}\n\n"
+            elif provider == "kimi":
+                from app.providers.kimi_client import kimi_chat
+                full_text = kimi_chat(messages)
+                yield f"data: {json.dumps({'delta': full_text, 'session_id': session_id})}\n\n"
+            elif provider == "deepseek":
+                from app.providers.deepseek_client import deepseek_chat
+                full_text = deepseek_chat(messages)
+                yield f"data: {json.dumps({'delta': full_text, 'session_id': session_id})}\n\n"
+            else:
+                raise ValueError(f"unknown provider: {provider}")
 
-            print("✅ stream done")
+            add_message(session_id, "assistant", full_text)
+            touch_session(user_id, session_id)
             yield "data: [DONE]\n\n"
-
         except Exception as e:
-            print("❌ stream error:", e)
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
     return StreamingResponse(

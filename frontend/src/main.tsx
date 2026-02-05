@@ -17,12 +17,14 @@ createRoot(document.getElementById("root")!).render(
       theme={{
         algorithm: darkAlgorithm,
         token: {
-          colorBgBase: "#020617",          // 整体背景
-          colorBgContainer: "#1f2937",     // Card/Table 背景
-          colorBorder: "#374151",
-          colorTextBase: "#f9fafb",
-          colorTextSecondary: "#d1d5db",
-          borderRadiusLG: 12,
+          colorBgBase: "#0b0f14",
+          colorBgContainer: "#111827",
+          colorBorder: "rgba(148, 163, 184, 0.22)",
+          colorTextBase: "#f8fafc",
+          colorTextSecondary: "#cbd5e1",
+          colorPrimary: "#22d3ee",
+          colorInfo: "#38bdf8",
+          borderRadiusLG: 14,
         },
       }}
     >

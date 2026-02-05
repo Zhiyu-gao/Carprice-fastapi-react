@@ -28,4 +28,25 @@ class PriceAnalysisResponse(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
-    # history: list[dict] | None = None
+    provider: AiProvider = AiProvider.qwen
+    session_id: str | None = None
+    rag_enabled: bool = False
+    mcp_enabled: bool = False
+
+
+class ChatSessionCreate(BaseModel):
+    title: str | None = None
+
+
+class ChatSessionOut(BaseModel):
+    id: str
+    title: str
+    created_at: str
+    updated_at: str
+
+
+class ChatMessageOut(BaseModel):
+    id: str
+    role: str
+    content: str
+    created_at: str

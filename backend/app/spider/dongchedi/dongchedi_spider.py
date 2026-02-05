@@ -18,26 +18,36 @@ import re
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import urljoin
+from typing import Callable
 import os
 import requests
 from playwright.sync_api import sync_playwright
 from app.storage.local import save_image_local
+from app.db import SessionLocal
+from app.services.crawl_car_service import save_crawl_car
 
 
 # =========================
 # 配置区
 # =========================
 
-CDP_ENDPOINT = "http://127.0.0.1:9321"
+# 服务器环境下建议使用 Playwright 自己拉起浏览器
+HEADLESS = True
+BROWSER_ARGS = [
+    "--disable-blink-features=AutomationControlled",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+]
 
 BASE_URL = "https://www.dongchedi.com"
 LIST_URL_TEMPLATE = (
     "https://www.dongchedi.com/usedcar/"
-    "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-110000-{}-x-x-x-x-x"
+    "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-{}-{}-x-x-x-x-x"
 )
 
 START_PAGE = 1
 END_PAGE = 2
+CITY_CODE = "110000"
 
 SLEEP_PER_PAGE = (2.5, 4.0)
 SLEEP_DETAIL = (1.2, 2.0)
@@ -180,130 +190,176 @@ def parse_car_archives(page) -> dict:
 # 主流程
 # =========================
 
-def main():
-    with sync_playwright() as p:
-        print("[INFO] 连接 Chrome CDP")
-        browser = p.chromium.connect_over_cdp(CDP_ENDPOINT)
-        context = browser.contexts[0]
-        page = context.new_page()
+def run(
+    city_code: str,
+    start_page: int,
+    end_page: int,
+    log_fn: Callable[[str], None] | None = None,
+    save_to_db: bool = False,
+    should_stop: Callable[[], bool] | None = None,
+):
+    log = log_fn or (lambda msg: print(msg, flush=True))
+    db = SessionLocal() if save_to_db else None
+    # 运行时再次确保目录存在（防止 data 被手动删除）
+    JSON_DIR.mkdir(parents=True, exist_ok=True)
+    IMG_DIR.mkdir(parents=True, exist_ok=True)
 
-        for page_no in range(START_PAGE, END_PAGE + 1):
-            list_url = LIST_URL_TEMPLATE.format(page_no)
-            print(f"\n[PAGE] {list_url}")
-
-            page.goto(list_url, timeout=30000)
-            time.sleep(random.uniform(*SLEEP_PER_PAGE))
-
-            cards = page.locator("a.usedcar-card_card__3vUrx")
-            total = cards.count()
-            print(f"[INFO] 本页发现卡片 {total}")
-
-            scraped = 0
-            skipped = 0
-
-            for i in range(total):
-                card = cards.nth(i)
-
-                # 推荐分割线
-                try:
-                    if is_card_after_recommend(page, card):
-                        print("[STOP] 进入推荐区，停止本页")
-                        break
-                except Exception:
-                    pass
-
-                href = card.get_attribute("href")
-                if not href or not href.startswith("/usedcar/"):
-                    continue
-
-                car_id = href.split("/")[-1]
-                json_path = JSON_DIR / f"{car_id}.json"
-
-                # 断点续爬
-                if json_path.exists():
-                    skipped += 1
-                    continue
-
-                title = card.locator("dt p").inner_text().strip()
-                img_url = card.locator("img").first.get_attribute("src")
-
-                tags = []
-                try:
-                    tags = [
-                        s.inner_text().strip()
-                        for s in card.locator("dd").nth(1).locator("span").all()
-                        if s.inner_text().strip()
-                    ]
-                except Exception:
-                    pass
-
-                # === 进入详情页 ===
-                detail_url = urljoin(BASE_URL, href)
-                page.goto(detail_url, timeout=30000)
-                page.wait_for_load_state("domcontentloaded")
-                time.sleep(random.uniform(*SLEEP_DETAIL))
-
-                info = parse_car_archives(page)
-                price_info = parse_price_block(page)
-
-                # 🔥 把价格字段塞进 info
-                info.update({
-                    "新车指导价": price_info.get("price_new_car"),
-                    "比新车省": price_info.get("price_discount"),
-                    "当前售价": price_info.get("price_after_discount"),
-                    "价格单位": price_info.get("price_unit"),
-                })
-
-                image_path = None
-                data = {
-                    "car_id": car_id,
-                    "title": title,
-                    "tags": tags,
-                    "image_url": img_url,
-                    "info": info,
-                    **price_info,
-                    "source_url": detail_url,
-                    "crawl_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "image_path": image_path,
-                    "page_no": page_no,
-                }
-
-                if img_url:
-                    try:
-                        img_url = normalize_img_url(img_url)
-                        r = requests.get(img_url, headers={
-                            "User-Agent": "Mozilla/5.0",
-                            "Referer": "https://www.dongchedi.com/",
-                        }, timeout=20)
-                        r.raise_for_status()
-
-                        image_path = save_image_local(
-                            image_bytes=r.content,
-                            filename=f"{car_id}.jpg",
-                        )
-                        data["image_path"] = image_path
-
-                    except Exception as e:
-                        print(f"[IMG FAIL] {car_id}: {e}")
-
-                # 写 JSON
-                json_path.write_text(
-                    json.dumps(data, ensure_ascii=False, indent=2),
-                    encoding="utf-8"
+    try:
+        with sync_playwright() as p:
+            log("[INFO] 启动 Playwright Chromium")
+            browser = p.chromium.launch(headless=HEADLESS, args=BROWSER_ARGS)
+            context = browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
                 )
+            )
 
-                scraped += 1
-                print(f"[OK] {car_id} | {title}")
+            page = context.new_page()
 
-                # 回到列表页（重要）
-                page.go_back()
-                page.wait_for_load_state("domcontentloaded")
-                time.sleep(0.6)
+            for page_no in range(start_page, end_page + 1):
+                if should_stop and should_stop():
+                    log("[TASK] canceled before page start")
+                    break
 
-            print(f"[SUMMARY] page={page_no} scraped={scraped} skipped={skipped}")
+                list_url = LIST_URL_TEMPLATE.format(city_code, page_no)
+                log(f"\n[PAGE] {list_url}")
 
-        print("\n[DONE] 全部完成")
-        browser.close()
+                page.goto(list_url, timeout=30000)
+                time.sleep(random.uniform(*SLEEP_PER_PAGE))
+
+                cards = page.locator("a.usedcar-card_card__3vUrx")
+                total = cards.count()
+                log(f"[INFO] 本页发现卡片 {total}")
+
+                scraped = 0
+                skipped = 0
+
+                for i in range(total):
+                    if should_stop and should_stop():
+                        log("[TASK] canceled during page")
+                        break
+
+                    card = cards.nth(i)
+
+                    # 推荐分割线
+                    try:
+                        if is_card_after_recommend(page, card):
+                            log("[STOP] 进入推荐区，停止本页")
+                            break
+                    except Exception:
+                        pass
+
+                    href = card.get_attribute("href")
+                    if not href or not href.startswith("/usedcar/"):
+                        continue
+
+                    car_id = href.split("/")[-1]
+                    json_path = JSON_DIR / f"{car_id}.json"
+
+                    # 断点续爬
+                    if json_path.exists():
+                        skipped += 1
+                        continue
+
+                    title = card.locator("dt p").inner_text().strip()
+                    img_url = card.locator("img").first.get_attribute("src")
+
+                    tags = []
+                    try:
+                        tags = [
+                            s.inner_text().strip()
+                            for s in card.locator("dd").nth(1).locator("span").all()
+                            if s.inner_text().strip()
+                        ]
+                    except Exception:
+                        pass
+
+                    # === 进入详情页 ===
+                    detail_url = urljoin(BASE_URL, href)
+                    page.goto(detail_url, timeout=30000)
+                    page.wait_for_load_state("domcontentloaded")
+                    time.sleep(random.uniform(*SLEEP_DETAIL))
+
+                    info = parse_car_archives(page)
+                    price_info = parse_price_block(page)
+
+                    # 🔥 把价格字段塞进 info
+                    info.update({
+                        "新车指导价": price_info.get("price_new_car"),
+                        "比新车省": price_info.get("price_discount"),
+                        "当前售价": price_info.get("price_after_discount"),
+                        "价格单位": price_info.get("price_unit"),
+                    })
+
+                    image_path = None
+                    data = {
+                        "car_id": car_id,
+                        "title": title,
+                        "tags": tags,
+                        "image_url": img_url,
+                        "info": info,
+                        **price_info,
+                        "source_url": detail_url,
+                        "crawl_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "image_path": image_path,
+                        "page_no": page_no,
+                    }
+
+                    if img_url:
+                        try:
+                            img_url = normalize_img_url(img_url)
+                            r = requests.get(img_url, headers={
+                                "User-Agent": "Mozilla/5.0",
+                                "Referer": "https://www.dongchedi.com/",
+                            }, timeout=20)
+                            r.raise_for_status()
+
+                            image_path = save_image_local(
+                                image_bytes=r.content,
+                                filename=f"{car_id}.jpg",
+                            )
+                            data["image_path"] = image_path
+
+                        except Exception as e:
+                            log(f"[IMG FAIL] {car_id}: {e}")
+
+                    # 写 JSON
+                    json_path.write_text(
+                        json.dumps(data, ensure_ascii=False, indent=2),
+                        encoding="utf-8"
+                    )
+
+                    if db is not None:
+                        save_crawl_car(db, data)
+
+                    scraped += 1
+                    log(f"[OK] {car_id} | {title}")
+
+                    # 回到列表页（重要）
+                    page.go_back()
+                    page.wait_for_load_state("domcontentloaded")
+                    time.sleep(0.6)
+
+                if db is not None:
+                    db.commit()
+
+                log(f"[SUMMARY] page={page_no} scraped={scraped} skipped={skipped}")
+
+            log("\n[DONE] 全部完成")
+            browser.close()
+    except Exception:
+        if db is not None:
+            db.rollback()
+        raise
+    finally:
+        if db is not None:
+            db.close()
+
+
+def main():
+    run(CITY_CODE, START_PAGE, END_PAGE)
 
 
 if __name__ == "__main__":

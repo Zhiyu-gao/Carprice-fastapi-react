@@ -4,7 +4,10 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
+    username: str
+    role: str
     full_name: Optional[str] = None
+    avatar_path: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str

@@ -1,63 +1,76 @@
-import { Card, Table, Tag, Button, Space, message, Modal, Form, Input, Select } from "antd";
-import { useState } from "react";
+import { Card, Table, Tag, Button, Space, message, Modal, Select, Form, Input } from "antd";
+import { useEffect, useState } from "react";
+import { api, getErrorMessage } from "../api/client";
 
 interface CrawlerTask {
-  id: number;
+  id: string;
   name: string;
-  status: "pending" | "running" | "success" | "failed";
+  status: "pending" | "running" | "success" | "failed" | "canceled";
   created_at: string;
   updated_at: string;
+  city_name: string;
+  city_code: string;
+  log_url?: string;
 }
 
 export default function CrawlerTaskPage() {
-  const [tasks] = useState<CrawlerTask[]>([
-    {
-      id: 1,
-      name: "链家北京租房爬虫",
-      status: "running",
-      created_at: "2025-12-07 10:00",
-      updated_at: "2025-12-07 10:10",
-    },
-    {
-      id: 2,
-      name: "链家上海二手房爬虫",
-      status: "failed",
-      created_at: "2025-12-06 15:00",
-      updated_at: "2025-12-06 15:20",
-    },
-  ]);
+  const [tasks, setTasks] = useState<CrawlerTask[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [logModalOpen, setLogModalOpen] = useState(false);
+  const [logText, setLogText] = useState("");
+  const [logTitle, setLogTitle] = useState("");
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [startModalOpen, setStartModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
+  const cityOptions = [
+    { label: "北京", value: "110000" },
+    { label: "广州", value: "440100" },
+  ];
 
   const statusColors = {
     pending: "default",
     running: "processing",
     success: "success",
     failed: "error",
+    canceled: "default",
   };
 
-  const startTask = (task: CrawlerTask) => {
-    message.success(`已启动任务：${task.name}`);
+  const fetchTasks = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/crawl-tasks");
+      setTasks(res.data || []);
+    } catch (e: any) {
+      message.error(getErrorMessage(e, "获取任务失败"));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const stopTask = (task: CrawlerTask) => {
-    message.warning(`已停止任务：${task.name}`);
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const viewLogs = async (task: CrawlerTask) => {
+    try {
+      const res = await api.get(`/crawl-tasks/${task.id}/log`);
+      setLogTitle(`${task.name} — 日志`);
+      setLogText(res.data?.log || "");
+      setLogModalOpen(true);
+    } catch (e: any) {
+      message.error(getErrorMessage(e, "读取日志失败"));
+    }
   };
 
-  const viewLogs = (task: CrawlerTask) => {
-    Modal.info({
-      title: `${task.name} — 日志`,
-      width: 600,
-      content: (
-        <pre style={{ whiteSpace: "pre-wrap", maxHeight: 400, overflow: "auto" }}>
-日志示例：
-[10:00] 任务启动
-[10:01] 抓取链家页面成功
-[10:02] 解析数据成功
-...
-        </pre>
-      ),
-    });
+  const cancelTask = async (task: CrawlerTask) => {
+    try {
+      await api.post(`/crawl-tasks/${task.id}/cancel`);
+      message.success("任务已取消");
+      fetchTasks();
+    } catch (e: any) {
+      message.error(getErrorMessage(e, "取消失败"));
+    }
   };
 
   const columns = [
@@ -87,62 +100,101 @@ export default function CrawlerTaskPage() {
       width: 280,
       render: (_: any, task: CrawlerTask) => (
         <Space>
-          <Button size="small" onClick={() => startTask(task)} type="primary">
-            启动
+          <Button size="small" onClick={() => viewLogs(task)}>
+            查看日志
           </Button>
-          <Button size="small" onClick={() => stopTask(task)} danger>
-            停止
+          <Button
+            size="small"
+            danger
+            disabled={task.status !== "running"}
+            onClick={() => cancelTask(task)}
+          >
+            取消
           </Button>
-          <Button size="small" onClick={() => viewLogs(task)}>查看日志</Button>
         </Space>
       ),
     },
   ];
 
-  const onCreateTask = (values: any) => {
-    message.success(`创建任务成功：${values.name}`);
-    setCreateModalOpen(false);
+  const onStartTask = async (values: any) => {
+    const city = cityOptions.find((c) => c.value === values.city_code);
+    try {
+      await api.post("/crawl-tasks/start", {
+        city_code: values.city_code,
+        city_name: city?.label || values.city_code,
+        start_page: Number(values.start_page || 1),
+        end_page: Number(values.end_page || 1),
+      });
+      message.success("任务已启动");
+      setStartModalOpen(false);
+      form.resetFields();
+      fetchTasks();
+    } catch (e: any) {
+      message.error(getErrorMessage(e, "启动失败"));
+    }
   };
 
   return (
     <Card
       title="爬虫任务管理后台"
       extra={
-        <Button type="primary" onClick={() => setCreateModalOpen(true)}>
-          创建新任务
-        </Button>
+        <Space>
+          <Button onClick={fetchTasks}>刷新</Button>
+          <Button type="primary" onClick={() => setStartModalOpen(true)}>
+            启动爬虫
+          </Button>
+        </Space>
       }
     >
-      <Table rowKey="id" columns={columns} dataSource={tasks} pagination={{ pageSize: 5 }} />
+      <Table
+        rowKey="id"
+        columns={columns}
+        dataSource={tasks}
+        loading={loading}
+        pagination={{ pageSize: 5 }}
+      />
 
-      {/* 创建任务弹窗 */}
+      {/* 启动爬虫弹窗 */}
       <Modal
-        title="创建新任务"
-        open={createModalOpen}
-        onCancel={() => setCreateModalOpen(false)}
+        title="启动爬虫"
+        open={startModalOpen}
+        onCancel={() => setStartModalOpen(false)}
         footer={null}
       >
-        <Form onFinish={onCreateTask} layout="vertical">
-          <Form.Item name="name" label="任务名称" rules={[{ required: true }]}>
-            <Input placeholder="例如：链家北京租房爬虫" />
+        <Form form={form} onFinish={onStartTask} layout="vertical" initialValues={{ start_page: 1, end_page: 1 }}>
+          <Form.Item name="city_code" label="城市" rules={[{ required: true }]}>
+            <Select
+              options={cityOptions}
+              placeholder="请选择城市"
+            />
           </Form.Item>
 
-          <Form.Item name="city" label="城市" rules={[{ required: true }]}>
-            <Select
-              options={[
-                { label: "北京", value: "北京" },
-                { label: "上海", value: "上海" },
-                { label: "广州", value: "广州" },
-              ]}
-            />
+          <Form.Item name="start_page" label="开始页">
+            <Input placeholder="1" />
+          </Form.Item>
+
+          <Form.Item name="end_page" label="结束页">
+            <Input placeholder="1" />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              创建
+              开始爬虫
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title={logTitle}
+        open={logModalOpen}
+        onCancel={() => setLogModalOpen(false)}
+        footer={null}
+        width={700}
+      >
+        <pre style={{ whiteSpace: "pre-wrap", maxHeight: 500, overflow: "auto" }}>
+{logText || "暂无日志"}
+        </pre>
       </Modal>
     </Card>
   );

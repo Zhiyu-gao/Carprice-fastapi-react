@@ -9,14 +9,8 @@ from app import models
 from app.db import get_db
 from app.schemas import UserCreate, UserRead, Token
 from jose import JWTError, jwt  # 新增
-from app.core.security import (
-    get_password_hash,
-    verify_password,
-    create_access_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    SECRET_KEY,
-    ALGORITHM,
-)
+from app.core.security import SECRET_KEY, ALGORITHM
+from app.services.auth_service import register_user as register_user_svc, authenticate_user, create_login_token
 # from app.utils.aliyun_mail import send_email_code
 # from app.utils.email_store import verify_code
 print("🔐 BACKEND SECRET_KEY =", SECRET_KEY)
@@ -34,14 +28,34 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱已注册"
         )
 
-    user = models.User(
-        email=user_in.email,
-        full_name=user_in.full_name,
-        hashed_password=get_password_hash(user_in.password),
+    if user_in.username.strip().lower() == "admin":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用"
+        )
+
+    if user_in.role == "admin":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="管理员账号禁止注册"
+        )
+
+    existing_name = (
+        db.query(models.User)
+        .filter(models.User.username == user_in.username)
+        .first()
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    if existing_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用"
+        )
+
+    user = register_user_svc(
+        db,
+        email=user_in.email,
+        username=user_in.username,
+        role=user_in.role,
+        full_name=user_in.full_name,
+        password=user_in.password,
+    )
     return user
 
 
@@ -51,26 +65,18 @@ def login(
     db: Session = Depends(get_db),
 ):
     # OAuth2PasswordRequestForm 里 username 字段就当 email 用
-    user = (
-        db.query(models.User)
-        .filter(models.User.email == form_data.username)
-        .first()
-    )
+    user = authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱或密码错误"
         )
 
-    if not verify_password(form_data.password, user.hashed_password):
+    if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱或密码错误"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用"
         )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id), "email": user.email},
-        expires_delta=access_token_expires,
-    )
+    access_token = create_login_token(user=user)
 
     return Token(access_token=access_token, token_type="bearer")
 
@@ -108,6 +114,17 @@ async def get_current_user(
         )
 
     return user
+
+
+def get_current_admin(
+    current_user: models.User = Depends(get_current_user),
+) -> models.User:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="需要管理员权限",
+        )
+    return current_user
 
 # @router.post("/email/code")
 # def send_email_code_api(data: EmailCodeRequest):

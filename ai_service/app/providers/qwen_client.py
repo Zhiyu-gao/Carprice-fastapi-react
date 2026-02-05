@@ -53,3 +53,20 @@ def qwen_chat_stream(prompt: str):
         if content:
             yield content
 
+
+def qwen_chat_stream_messages(messages: list[dict]):
+    stream = client.chat.completions.create(
+        model=QWEN_CONFIG.model,
+        messages=messages,
+        temperature=0.7,
+        stream=True,
+    )
+
+    for chunk in stream:
+        if not chunk.choices:
+            continue
+
+        delta = chunk.choices[0].delta
+        content = getattr(delta, "content", None)
+        if content:
+            yield content

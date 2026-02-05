@@ -1,13 +1,15 @@
 // src/pages/RegisterPage.tsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Form, Input, Button, Typography, Card, message } from "antd";
-import { api } from "../api/client";
+import { Form, Input, Button, Typography, Card, message, Select } from "antd";
+import { api, getErrorMessage } from "../api/client";
 
 const { Title, Text } = Typography;
 
 interface RegisterFormValues {
   email: string;
+  username: string;
+  role: "buyer" | "seller";
   full_name?: string;
   password: string;
   confirm_password: string;
@@ -28,6 +30,8 @@ const RegisterPage: React.FC = () => {
 
       await api.post("/auth/register", {
         email: values.email,
+        username: values.username,
+        role: values.role,
         full_name: values.full_name,
         password: values.password,
       });
@@ -36,9 +40,7 @@ const RegisterPage: React.FC = () => {
       navigate("/login", { replace: true });
     } catch (err: any) {
       console.error(err);
-      message.error(
-        err?.response?.data?.detail || "注册失败，请稍后再试"
-      );
+      message.error(getErrorMessage(err, "注册失败，请稍后再试"));
     } finally {
       setLoading(false);
     }
@@ -51,12 +53,13 @@ const RegisterPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#f5f5f5",
+        background:
+          "radial-gradient(800px 400px at 85% -10%, rgba(34,211,238,0.25), transparent 60%), radial-gradient(700px 500px at 10% -20%, rgba(249,115,22,0.2), transparent 60%), #0b0f14",
       }}
     >
-      <Card style={{ width: 380 }}>
+      <Card style={{ width: 420, borderRadius: 18 }}>
         <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
-          房价预测系统 · 注册
+          车辆智能平台 · 注册
         </Title>
 
         <Form layout="vertical" onFinish={onFinish}>
@@ -69,6 +72,28 @@ const RegisterPage: React.FC = () => {
             ]}
           >
             <Input placeholder="请输入邮箱" />
+          </Form.Item>
+
+          <Form.Item
+            label="用户名"
+            name="username"
+            rules={[{ required: true, message: "请输入用户名" }]}
+          >
+            <Input placeholder="请输入用户名（不可为 admin）" />
+          </Form.Item>
+
+          <Form.Item
+            label="角色"
+            name="role"
+            rules={[{ required: true, message: "请选择角色" }]}
+          >
+            <Select
+              options={[
+                { label: "我要买房", value: "buyer" },
+                { label: "我要卖房", value: "seller" },
+              ]}
+              placeholder="请选择角色"
+            />
           </Form.Item>
 
           <Form.Item label="姓名" name="full_name">

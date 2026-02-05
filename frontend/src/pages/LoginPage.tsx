@@ -8,7 +8,7 @@ import {
   Card,
   message,
 } from "antd";
-import { api } from "../api/client";
+import { api, getErrorMessage } from "../api/client";
 import { setToken } from "../auth/token";
 import { AFTER_LOGIN_REDIRECT } from "../config/routes";
 
@@ -96,7 +96,7 @@ const LoginPage: React.FC = () => {
       message.success("登录成功");
       navigate(AFTER_LOGIN_REDIRECT, { replace: true });
     } catch (err: any) {
-      message.error(err?.response?.data?.detail || "登录失败");
+      message.error(getErrorMessage(err, "登录失败"));
     } finally {
       setLoading(false);
     }
@@ -109,12 +109,13 @@ const LoginPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#f5f5f5",
+        background:
+          "radial-gradient(800px 400px at 85% -10%, rgba(34,211,238,0.25), transparent 60%), radial-gradient(700px 500px at 10% -20%, rgba(249,115,22,0.2), transparent 60%), #0b0f14",
       }}
     >
-      <Card style={{ width: 380 }}>
+      <Card style={{ width: 420, borderRadius: 18 }}>
         <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
-          房价预测系统 · 登录
+          车辆智能平台 · 登录
         </Title>
 
         <Form

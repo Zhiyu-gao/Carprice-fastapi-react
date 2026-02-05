@@ -13,22 +13,13 @@ import {
   Divider,
   Descriptions,
 } from "antd";
+import { api, getErrorMessage } from "../api/client";
+import type { CrawlCar, PageResp } from "../api/types";
 
 const { Title, Text } = Typography;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 /* =====================
    类型定义
 ===================== */
-
-interface CrawlCar {
-  car_id: string;
-  title: string;
-  tags?: string[];
-  info?: Record<string, string | number | null>;
-  image_path?: string;
-  crawl_time?: string;
-}
 
 interface AnnotationForm {
   price_wan: number;
@@ -68,6 +59,9 @@ const CarAnnotationPage: React.FC = () => {
   const [cars, setCars] = useState<CrawlCar[]>([]);
   const [annotatedIds, setAnnotatedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const pageSize = 100;
 
   const [selected, setSelected] = useState<CrawlCar | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -79,36 +73,59 @@ const CarAnnotationPage: React.FC = () => {
      数据加载
   ===================== */
 
-  const fetchCars = async () => {
+  const fetchCars = async (pageNo: number) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/crawl-cars`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setCars(Array.isArray(data) ? data : []);
-    } catch {
-      messageApi.error("获取爬虫车辆失败");
+      const res = await api.get<PageResp<CrawlCar>>("/crawl-cars", {
+        params: { page: pageNo, page_size: pageSize },
+      });
+      const data = res.data;
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const normalized = items.map((item: any) => ({
+        ...item,
+        car_id: item.car_id || item.source_car_id,
+      }));
+      setCars(normalized);
+      setTotal(Number(data?.total || 0));
+      setPage(Number(data?.page || pageNo));
+    } catch (e: any) {
+      messageApi.error(getErrorMessage(e, "获取爬虫车辆失败"));
       setCars([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchAnnotatedIds = async () => {
+  const fetchAnnotatedIds = async (items: CrawlCar[]) => {
+    if (!items.length) {
+      setAnnotatedIds(new Set());
+      return;
+    }
     try {
-      const res = await fetch(`${API_BASE_URL}/annotations/ids`);
-      if (!res.ok) throw new Error();
-      const ids: string[] = await res.json();
+      const idsParam = items
+        .map((c) => c.car_id ?? c.source_car_id ?? "")
+        .filter((v): v is string => v.length > 0)
+        .join(",");
+      if (!idsParam) {
+        setAnnotatedIds(new Set());
+        return;
+      }
+      const res = await api.get<string[]>("/annotations/ids", {
+        params: { source_ids: idsParam },
+      });
+      const ids = res.data;
       setAnnotatedIds(new Set(ids));
-    } catch {
-      console.warn("获取已标注车辆失败");
+    } catch (e: any) {
+      console.warn(getErrorMessage(e, "获取已标注车辆失败"));
     }
   };
 
   useEffect(() => {
-    fetchCars();
-    fetchAnnotatedIds();
+    fetchCars(1);
   }, []);
+  useEffect(() => {
+    fetchAnnotatedIds(cars);
+  }, [cars]);
 
   /* =====================
      标注流程
@@ -134,25 +151,16 @@ const CarAnnotationPage: React.FC = () => {
         price_wan: values.price_wan,
       };
 
-      const res = await fetch(`${API_BASE_URL}/annotations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "标注失败");
-      }
+      await api.post("/annotations", payload);
 
       messageApi.success("标注成功");
 
       setDrawerOpen(false);
       setSelected(null);
       form.resetFields();
-      fetchAnnotatedIds();
+      fetchAnnotatedIds(cars);
     } catch (e: any) {
-      messageApi.error(e.message || "标注失败");
+      messageApi.error(getErrorMessage(e, "标注失败"));
     }
   };
 
@@ -173,9 +181,17 @@ const CarAnnotationPage: React.FC = () => {
         loading={loading}
         style={{ marginTop: 16 }}
         dataSource={cars}
-        rowKey="car_id"
+        rowKey={(item) => item.car_id ?? item.source_car_id ?? item.title ?? ""}
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          onChange: (p) => fetchCars(p),
+          showSizeChanger: false,
+        }}
         renderItem={(item) => {
-          const annotated = annotatedIds.has(item.car_id);
+          const carId = item.car_id ?? item.source_car_id ?? "";
+          const annotated = carId ? annotatedIds.has(carId) : false;
 
           return (
             <List.Item
@@ -226,7 +242,7 @@ const CarAnnotationPage: React.FC = () => {
                 <>
                   <Divider />
                   <img
-                    src={`${API_BASE_URL}/files/${selected.image_path}`}
+                    src={`${import.meta.env.VITE_API_BASE_URL}/files/${selected.image_path}`}
                     alt="car"
                     style={{
                       width: "100%",

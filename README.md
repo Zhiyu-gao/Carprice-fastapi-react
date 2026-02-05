@@ -1,230 +1,97 @@
-# 🏠 House Price Prediction & AI Analysis System
+# 🚗 Vehicle Intelligence Platform
 
-**React + FastAPI + MySQL + SQLAlchemy + Alembic + Machine Learning + AI Agent + LangGraph + Crawler**
+**React + FastAPI + MySQL + SQLAlchemy + Playwright + ML + AI Service (Kimi/Qwen/DeepSeek) + RAG/MCP**
 
-一个**工程级、可扩展、前后端分离**的房价预测与智能分析系统，融合：
-
-* 📊 **真实房源数据采集（链家爬虫）**
-* 📈 **传统机器学习房价预测**
-* 🤖 **多大模型 AI 分析（Kimi / Qwen / DeepSeek）**
-* 🧠 **LangGraph 驱动的多步骤智能分析 Agent**
-* 🧱 **微服务架构（Backend / AI Service 解耦）**
+一个工程级的车辆智能平台，包含：爬虫采集、数据标注、训练集管理、价格预测、AI 多模型问答、系统管理与监控。
 
 ---
 
-## ✨ 项目亮点（TL;DR）
+## ✨ 项目亮点
 
-* **不是 Demo**：JWT、CRUD、Alembic、MySQL、微服务齐全
-* **不是假数据**：真实链家二手房爬虫
-* **不是单模型**：传统 ML + 多大模型协同
-* **不是简单 LLM 调用**：LangGraph 编排可解释分析流程
-* **不是耦合架构**：业务后端 / AI 服务 / 爬虫完全解耦
+- **真实爬虫数据**：懂车帝二手车数据采集
+- **标注 → 训练集**：标注完成的数据进入训练集 `train_cars`
+- **AI 多模型**：Kimi / Qwen / DeepSeek 可切换
+- **RAG / MCP**：支持上传文档检索 + MCP 工具调用
+- **权限分级**：买房 / 卖房 / 管理员
+- **管理后台**：用户管理、系统监控、资源统计
 
 ---
 
-## 🚀 系统整体架构
+## 🧭 系统架构
 
 ```text
 ┌────────────┐      ┌────────────┐
-│  Frontend  │─────▶│  Backend   │─────▶ MySQL
-│  (React)   │      │ (FastAPI)  │
+│ Frontend   │─────▶│ Backend    │─────▶ MySQL
+│ (React)    │      │ (FastAPI)  │
 └────────────┘      └─────┬──────┘
                            │
                            ▼
                   ┌────────────────┐
-                  │   AI Service   │
-                  │ (FastAPI +     │
-                  │  LangGraph)    │
+                  │ AI Service     │
+                  │ (FastAPI)      │
                   └────────────────┘
-            ▲
-            │
-     ┌────────────┐
-     │  Crawler   │
-     │ (Lianjia)  │
-     └────────────┘
+                           ▲
+                           │
+                     ┌───────────┐
+                     │ Crawler   │
+                     │ (Playwright)
+                     └───────────┘
 ```
 
 ---
 
-## 🧩 功能模块概览
+## 🧩 功能模块
 
-## 🔧 Backend（FastAPI · 端口 8000）
+### ✅ Backend（FastAPI · 8000）
 
-**职责：业务系统 + 数据管理 + ML 预测**
+- 用户注册 / 登录（JWT）
+- 角色权限（buyer / seller / admin）
+- 爬虫任务管理
+- 数据标注 + 训练集
+- 车辆价格预测
+- 管理员监控 & 用户管理
 
-### 核心功能
+### ✅ AI Service（FastAPI · 8080）
 
-* 房源 CRUD（增 / 删 / 改 / 查）
-* 用户注册 / 登录（JWT）
-* 传统机器学习房价预测（LinearRegression）
-* 爬虫数据导入
-* MySQL 持久化 + SQLAlchemy ORM
-* Alembic 数据库迁移
-* CORS 支持前端访问
+- AI 聊天（可切换 Kimi/Qwen/DeepSeek）
+- 对话历史存储
+- RAG 文档上传检索
+- MCP 工具调用（任务/车辆查询）
 
-### 主要接口
+### ✅ Frontend（React · 5173）
 
-| Method | Path             | Description |
-| ------ | ---------------- | ----------- |
-| POST   | `/auth/register` | 用户注册        |
-| POST   | `/auth/login`    | 登录（JWT）     |
-| GET    | `/auth/me`       | 当前用户        |
-| GET    | `/houses`        | 房源列表        |
-| POST   | `/houses`        | 新建房源        |
-| PUT    | `/houses/{id}`   | 更新房源        |
-| DELETE | `/houses/{id}`   | 删除房源        |
-| POST   | `/predict`       | ML 房价预测     |
-| POST   | `/crawl/house`   | 导入爬虫房源      |
+- 登录 / 注册（支持角色选择）
+- 爬虫任务管理
+- 数据标注
+- 训练集展示（买房角色可见）
+- AI 聊天（多模型 + RAG + MCP）
+- 系统监控 + 用户管理（管理员）
 
 ---
 
-## 🤖 AI Service（FastAPI · 端口 8080）
+## 🔐 权限说明
 
-**职责：AI 推理 & Agent 编排**
+| 角色 | 可见功能 |
+|------|----------|
+| buyer | 训练集（我要买房） |
+| seller | 基础功能（爬虫/标注/预测等） |
+| admin | 所有页面 + 系统监控 + 用户管理 |
 
-### 支持的大模型（OpenAI 兼容协议）
-
-* **Kimi**
-* **Qwen**
-* **DeepSeek**
-
-### 核心能力
-
-* 房价 AI 分析（Markdown 输出）
-* 多模型统一接口
-* Prompt 集中管理
-* LangGraph 驱动多步骤分析流程
-
-### 核心接口
-
-| Method | Path              | Description |
-| ------ | ----------------- | ----------- |
-| POST   | `/price-analysis` | 房价 AI 分析    |
-
-**请求示例：**
-
-```json
-{
-  "provider": "qwen",
-  "features": {
-    "area_sqm": 80,
-    "bedrooms": 3,
-    "age_years": 5,
-  },
-  "predicted_price": 450000
-}
-```
+> 管理员账号不能注册，用户名固定 `admin`。
 
 ---
 
-## 🧠 LangGraph 智能分析 Agent（实验性）
+## 🚀 启动方式
 
-> 构建 **“可解释 · 多步骤 · 可扩展”** 的房价分析 Agent
-
-分析流程示例：
-
-1. 读取传统 ML 预测价格
-2. 判断价格合理性
-3. 风险分析（地段 / 年限 / 流动性）
-4. 买卖建议生成
-5. Markdown 报告输出
-
-📌 可扩展方向：
-
-* 多房源对比 Agent
-* 投资回报率分析
-* 自动生成投资报告
-
----
-
-## 🕷 链家房源爬虫系统（Lianjia Spider）
-
-**用于采集真实二手房数据**
-
-### 特点
-
-* 必须使用 **有头浏览器**
-* Cookie 登录态复用
-* 与业务系统完全解耦
-* JSON 形式落盘
-
-### 目录结构
-
-```text
-backend/app/spider/lianjia/
-├── login_save_state.py     # 登录并保存 cookie
-├── lianjia_spider.py       # 主爬虫
-├── lianjia_state.json      # 登录态
-└── lianjia_json/           # 爬取结果
-```
-
-### 使用步骤（重要）
-
-**① 保存登录态**
-
-```bash
-cd backend
-python app/spider/lianjia/login_save_state.py
-```
-
-**② 启动爬虫**
-
-```bash
-python -m app.spider.lianjia.lianjia_spider
-```
-
----
-
-## 💻 Frontend（React + Vite + Ant Design · 端口 5173）
-
-### 功能页面
-
-* 登录 / 注册（JWT）
-* 房价预测（传统 ML）
-* AI 分析（多模型）
-* 房源管理（CRUD）
-* 可视化图表
-* 爬虫任务 & 数据标注页面
-
----
-
-## 🧱 项目结构总览
-
-```text
-house-price/
-├── backend/          # FastAPI + ML + DB + Spider
-├── ai_service/       # AI Service + LangGraph
-├── frontend/         # React 前端
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-## ⚙️ 环境要求
-
-* Python ≥ 3.11（强烈推荐 `uv`）
-* Node.js ≥ 18
-* MySQL ≥ 8.0
-* Playwright（爬虫）
-
----
-
-## 🐍 Backend 启动（8000）
+### 1）后端（backend）
 
 ```bash
 cd backend
 uv sync
-uv run python create_database.py
-uv run alembic upgrade head
-uv run python -m app.scripts.import_crawl_json
-uv run python -m app.train
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
----
-
-## 🤖 AI Service 启动（8080）
+### 2）AI 服务（ai_service）
 
 ```bash
 cd ai_service
@@ -232,9 +99,7 @@ uv sync
 uv run uvicorn app.main:app --port 8080
 ```
 
----
-
-## 💻 Frontend 启动（5173）
+### 3）前端（frontend）
 
 ```bash
 cd frontend
@@ -244,35 +109,98 @@ npm run dev
 
 ---
 
-## 🛠 FAQ（常见问题）
+## ⚙️ 环境变量
 
-### ❓ uvicorn import 错误
+### backend/.env
+```
+MYSQL_USER=...
+MYSQL_PASSWORD=...
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DB=vehicle_price_db
 
-```bash
-uv run uvicorn app.main:app
+SECRET_KEY=abc123
+ALGORITHM=HS256
 ```
 
-### ❓ MySQL Unknown database
-
-```bash
-uv run python create_database.py
+### ai_service/.env
 ```
+KIMI_API_KEY=...
+KIMI_BASE_URL=https://api.moonshot.cn/v1
+KIMI_MODEL=kimi-k2-turbo-preview
 
-### ❓ Alembic 不生成迁移
+QWEN_API_KEY=...
+QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+QWEN_MODEL=qwen-plus
 
-```python
-from app.db import Base
-target_metadata = Base.metadata
+DEEPSEEK_API_KEY=...
+DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
+DEEPSEEK_MODEL=deepseek-chat
+
+SECRET_KEY=abc123
+ALGORITHM=HS256
 ```
 
 ---
 
-## 📌 说明
+## 🕷 爬虫（Playwright）
 
-> 本项目适合作为：
+入口脚本：
+```
+backend/app/spider/dongchedi/dongchedi_spider.py
+```
 
-* 工程级全栈项目展示
-* AI Agent / LangGraph 实验平台
-* 房价分析 / 数据产品原型
+运行方式：
+```bash
+cd backend
+python -m app.spider.dongchedi.dongchedi_spider
+```
 
 ---
+
+## 🧪 训练集说明
+
+- 标注数据写入：`train_cars`
+- 买房角色可看到训练集页面
+- 管理员可见所有
+
+---
+
+## 🛡 管理员账号创建
+
+```bash
+cd backend
+python -m app.scripts.create_admin
+```
+
+---
+
+## 📎 数据库迁移（示例）
+
+如果需要新增字段：
+
+```sql
+ALTER TABLE users ADD COLUMN username VARCHAR(64);
+ALTER TABLE users ADD COLUMN role VARCHAR(16) NOT NULL DEFAULT 'buyer';
+```
+
+---
+
+## 📂 项目结构
+
+```text
+Vehicle-Intelligence-Platform/
+├── backend/           # FastAPI + MySQL + Playwright
+├── ai_service/        # AI Service + RAG + MCP
+├── frontend/          # React + Ant Design
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## ✅ 维护建议
+
+- ai_service 与 backend 的 `SECRET_KEY` 必须一致
+- 不建议混用不同项目的 `.venv`
+- API Key 请勿提交到 Git

@@ -1,23 +1,40 @@
 /* src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color-scheme: dark;
-  /* 定义主题色变量 */
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --secondary-color: #64748b;
-  --background-primary: #0f172a;
-  --background-secondary: #1e293b;
-  --background-tertiary: #334155;
-  --border-color: #475569;
+
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Brand */
+  --accent-1: #22d3ee;
+  --accent-2: #f97316;
+  --accent-3: #a3e635;
+  --primary-color: #22d3ee;
+  --primary-hover: #06b6d4;
+  --secondary-color: #94a3b8;
+
+  /* Surface */
+  --background-primary: #0b0f14;
+  --background-secondary: #111827;
+  --background-tertiary: #1f2937;
+  --border-color: rgba(148, 163, 184, 0.22);
+
+  /* Text */
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
-  --success-color: #10b981;
+
+  /* Status */
+  --success-color: #22c55e;
   --error-color: #ef4444;
   --warning-color: #f59e0b;
-  --info-color: #3b82f6;
+  --info-color: #38bdf8;
+
+  /* Effects */
+  --shadow-card: 0 16px 40px rgba(2, 6, 23, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --shadow-soft: 0 6px 16px rgba(2, 6, 23, 0.35);
 }
 
 /* 让所有元素的尺寸计算更顺手 */
@@ -41,6 +58,10 @@ body {
   background-color: var(--background-primary);
   color: var(--text-primary);
   transition: background-color 0.3s ease;
+  background-image:
+    radial-gradient(1200px 600px at 85% -10%, rgba(34, 211, 238, 0.15), transparent 60%),
+    radial-gradient(900px 500px at 5% -20%, rgba(249, 115, 22, 0.14), transparent 60%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98));
 }
 
 /* 去掉 Vite 模板默认给 #root 的居中和 padding */
@@ -50,26 +71,30 @@ body {
 
 /* Antd 布局的统一背景 */
 .ant-layout {
-  background: var(--background-primary);
+  background: transparent;
 }
 
 /* 卡片暗色样式：有边框，有层次 */
 .ant-card {
-  background: var(--background-secondary);
-  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.98));
+  border-radius: 18px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .ant-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 20px 50px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* 卡片标题更明显一点 */
 .ant-card-head {
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 /* 表格暗色 */
@@ -77,13 +102,15 @@ body {
   background: var(--background-secondary);
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--shadow-soft);
 }
 
 .ant-table-thead > tr > th {
-  background: var(--background-tertiary) !important;
+  background: rgba(31, 41, 55, 0.9) !important;
   border-bottom: 1px solid var(--border-color) !important;
   color: var(--text-primary);
   font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 .ant-table-tbody > tr > td {
@@ -92,7 +119,7 @@ body {
 }
 
 .ant-table-tbody > tr:hover {
-  background: var(--background-tertiary) !important;
+  background: rgba(34, 211, 238, 0.08) !important;
 }
 
 /* 表单样式 */
@@ -104,36 +131,41 @@ body {
 .ant-input,
 .ant-select-selector,
 .ant-input-number {
-  background: var(--background-secondary) !important;
+  background: rgba(15, 23, 42, 0.9) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
 }
 
 .ant-input:focus,
 .ant-select-selector:focus,
 .ant-input-number:focus {
   border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
+}
+
+.ant-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
 }
 
 /* 按钮样式 */
 .ant-btn-primary {
-  background: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
-  border-radius: 8px !important;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 1), rgba(56, 189, 248, 1)) !important;
+  border-color: transparent !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 20px rgba(34, 211, 238, 0.25);
 }
 
 .ant-btn-primary:hover {
-  background: var(--primary-hover) !important;
-  border-color: var(--primary-hover) !important;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 1), rgba(14, 165, 233, 1)) !important;
+  border-color: transparent !important;
 }
 
 .ant-btn-default {
-  background: var(--background-secondary) !important;
+  background: rgba(15, 23, 42, 0.7) !important;
   border-color: var(--border-color) !important;
   color: var(--text-primary) !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
 }
 
 .ant-btn-default:hover {
@@ -143,51 +175,80 @@ body {
 
 /* 菜单样式 */
 .ant-menu-dark {
-  background: var(--background-secondary) !important;
+  background: transparent !important;
 }
 
 .ant-menu-dark .ant-menu-item-selected {
-  background-color: var(--primary-color) !important;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(249, 115, 22, 0.18)) !important;
+  color: var(--text-primary) !important;
 }
 
 .ant-menu-dark .ant-menu-item:hover {
-  background-color: var(--background-tertiary) !important;
+  background: rgba(34, 211, 238, 0.08) !important;
 }
 
 /* 标签样式 */
 .ant-tag {
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 12px;
-  padding: 2px 8px;
+  padding: 2px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* 通知样式 */
 .ant-message-notice-content {
   background: var(--background-secondary) !important;
   border: 1px solid var(--border-color) !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   color: var(--text-primary) !important;
 }
 
 /* 模态框样式 */
 .ant-modal {
-  border-radius: 12px !important;
+  border-radius: 16px !important;
 }
 
 .ant-modal-content {
-  background: var(--background-secondary) !important;
-  border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.98)) !important;
+  border-radius: 16px !important;
   border: 1px solid var(--border-color) !important;
 }
 
 .ant-modal-header {
   border-bottom: 1px solid var(--border-color) !important;
-  background: var(--background-tertiary) !important;
-  border-radius: 12px 12px 0 0 !important;
+  background: rgba(31, 41, 55, 0.9) !important;
+  border-radius: 16px 16px 0 0 !important;
 }
 
 .ant-modal-title {
   color: var(--text-primary) !important;
+}
+
+.ant-drawer-content {
+  background: var(--background-secondary) !important;
+}
+
+.ant-list-item {
+  border-block-end: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+@keyframes liftIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ant-card,
+.ant-table,
+.ant-list,
+.ant-drawer-content,
+.ant-modal-content {
+  animation: liftIn 0.35s ease;
 }
 
 /* 响应式调整 */

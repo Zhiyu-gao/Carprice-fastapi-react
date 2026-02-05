@@ -9,6 +9,20 @@ export const api = axios.create({
   withCredentials: false,
 });
 
+export type ApiError = {
+  detail?: string;
+  message?: string;
+};
+
+export function getErrorMessage(err: any, fallback = "请求失败") {
+  return (
+    err?.response?.data?.detail ||
+    err?.response?.data?.message ||
+    err?.message ||
+    fallback
+  );
+}
+
 
 // 请求拦截：自动加 Authorization 头
 api.interceptors.request.use(
