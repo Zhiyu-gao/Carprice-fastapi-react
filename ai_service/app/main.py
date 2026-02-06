@@ -13,8 +13,7 @@ from app.config import KIMI_CONFIG, QWEN_CONFIG, DEEPSEEK_CONFIG
 
 app = FastAPI(title="AI Vehicle Price Service")# 允许前端访问（和你 backend 的 CORS 一样）
 origins = [
-    "http://20.2.82.150",
-    "http://20.2.82.150:80",
+    "http://47.83.219.94",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
