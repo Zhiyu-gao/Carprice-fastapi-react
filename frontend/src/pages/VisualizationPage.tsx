@@ -26,7 +26,6 @@ import { api, getErrorMessage } from "../api/client";
 import type { CrawlCar, PageResp } from "../api/types";
 
 const { Title, Text } = Typography;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* ================= 数据结构（真实对齐） ================= */
 
@@ -36,8 +35,8 @@ type Car = CrawlCar;
 
 const formatWan = (v: number) => `${v.toFixed(1)}万`;
 
-const parseAgeMonths = (time?: string) => {
-  if (!time) return null;
+const parseAgeMonths = (time?: string | number | null) => {
+  if (!time || typeof time !== 'string') return null;
   const m = time.match(/(\d{4})年(\d{1,2})月/);
   if (!m) return null;
 
@@ -124,7 +123,7 @@ const VisualizationPage: React.FC = () => {
         const ageMonths = parseAgeMonths(c.info?.上牌时间);
         const newPrice = c.info?.新车指导价;
         const curPrice = c.info?.当前售价;
-        if (!ageMonths || !newPrice || !curPrice) return null;
+        if (!ageMonths || typeof newPrice !== 'number' || typeof curPrice !== 'number') return null;
 
         return {
           ageMonths,

@@ -6,6 +6,7 @@ export type UserMe = {
   full_name: string | null;
   is_active: number;
   created_at: string;
+  avatar_path?: string | null;
 };
 
 export type TrainCar = {

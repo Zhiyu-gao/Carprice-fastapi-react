@@ -1,5 +1,5 @@
-import { Card, Button, Typography, Divider, Row, Col, Avatar, Statistic } from "antd";
-import { StarOutlined, CheckOutlined, UserOutlined } from "@ant-design/icons";
+import { Card, Button, Typography, Row, Col, Avatar } from "antd";
+import { StarOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
 

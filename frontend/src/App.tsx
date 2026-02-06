@@ -41,11 +41,11 @@ import AdminMonitorPage from "./pages/AdminMonitorPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import ForumPage from "./pages/ForumPage";
 import ChatPage from "./pages/ChatPage";
-import SaasLandingPage from "./pages/SaasLandingPage";
-import HealthcareDashboardPage from "./pages/HealthcareDashboardPage";
-import PortfolioPage from "./pages/PortfolioPage";
-import EcommerceMobilePage from "./pages/EcommerceMobilePage";
-import FintechBankingPage from "./pages/FintechBankingPage";
+import SaasLandingPage from "./uiux-page/SaasLandingPage";
+import HealthcareDashboardPage from "./uiux-page/HealthcareDashboardPage";
+import PortfolioPage from "./uiux-page/PortfolioPage";
+import EcommerceMobilePage from "./uiux-page/EcommerceMobilePage";
+import FintechBankingPage from "./uiux-page/FintechBankingPage";
 
 const { Sider, Header, Content } = Layout;
 const { Text } = Typography;

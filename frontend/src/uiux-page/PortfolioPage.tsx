@@ -1,7 +1,7 @@
 import { Card, Button, Typography, Row, Col, Avatar, Space, Tag } from "antd";
 import { GithubOutlined, LinkedinOutlined, MailOutlined, LinkOutlined } from "@ant-design/icons";
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 interface ProjectType {
   key: string;

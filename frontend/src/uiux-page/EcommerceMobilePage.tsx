@@ -1,4 +1,4 @@
-import { Card, Button, Typography, Row, Col, Image, Space, Tag, Input, Badge } from "antd";
+import { Card, Button, Typography, Row, Col, Image, Space, Input, Badge } from "antd";
 import { SearchOutlined, ShoppingCartOutlined, HeartOutlined, StarOutlined, FilterOutlined, MenuOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
