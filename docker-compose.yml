@@ -36,7 +36,6 @@ services:
       uv sync &&
       uv run python create_database.py &&
       uv run alembic upgrade head &&
-      uv run python -m app.train &&
       uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
       "
 
