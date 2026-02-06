@@ -20,11 +20,15 @@ services:
     depends_on:
       - mysql
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: 123456
-      DB_NAME: vehicle_price_db
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_DB: vehicle_price_db
+      OSS_ENABLED: "true"
+      OSS_BUCKET: zhiyu-gao-20260206
+      OSS_ENDPOINT: oss-cn-shanghai.aliyuncs.com
+      OSS_PREFIX: car-price
     ports:
       - "8000:8000"
     command: >

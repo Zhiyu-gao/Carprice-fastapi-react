@@ -5,7 +5,7 @@ load_dotenv()
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, annotations, crawl_vehicle, crawl_task, predict, vehicle, admin, train_car, forum, user_profile, chat
+from app.routers import auth, annotations, crawl_vehicle, crawl_task, predict, vehicle, admin, train_car, forum, user_profile, chat, oss_files
 from app.routers.auth import get_current_user
 from app.schemas import UserOut, UserUpdate, PasswordUpdate
 from app import models
@@ -40,6 +40,7 @@ app.include_router(train_car.router)
 app.include_router(forum.router)
 app.include_router(user_profile.router)
 app.include_router(chat.router)
+app.include_router(oss_files.router)
 # app.include_router(vehicle.router)
 
 # ======================
