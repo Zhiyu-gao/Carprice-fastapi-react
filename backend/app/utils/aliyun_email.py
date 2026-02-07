@@ -5,6 +5,9 @@ import os
 
 
 def send_email_code(email: str, code: str):
+    print("AK=", os.getenv("ALIYUN_ACCESS_KEY_ID"))
+    print("FROM=", os.getenv("ALIYUN_MAIL_FROM"))
+
     config = open_api_models.Config(
         access_key_id=os.getenv("ALIYUN_ACCESS_KEY_ID"),
         access_key_secret=os.getenv("ALIYUN_ACCESS_KEY_SECRET"),
@@ -16,6 +19,7 @@ def send_email_code(email: str, code: str):
         account_name=os.getenv("ALIYUN_MAIL_FROM"),  # 如 no-reply@xxx.com
         address_type=1,
         to_address=email,
+        reply_to_address=True,
         subject="【房价预测系统】登录验证码",
         html_body=f"""
         <p>您的登录验证码是：</p>

@@ -1,18 +1,24 @@
 # app/routers/auth.py
-from datetime import timedelta
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app import models
 from app.db import get_db
-from app.schemas import UserCreate, UserRead, Token
+from app.schemas import (
+    UserRead,
+    Token,
+    EmailCodeRequest,
+    EmailCodeLoginRequest,
+    EmailRegisterRequest,
+    EmailPasswordResetRequest,
+)
 from jose import JWTError, jwt  # 新增
 from app.core.security import SECRET_KEY, ALGORITHM
 from app.services.auth_service import register_user as register_user_svc, authenticate_user, create_login_token
-# from app.utils.aliyun_mail import send_email_code
-# from app.utils.email_store import verify_code
+from app.core.security import get_password_hash
+from app.utils.aliyun_email import send_email_code
+from app.utils.email_store import generate_and_store_code, verify_code
 print("🔐 BACKEND SECRET_KEY =", SECRET_KEY)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -20,7 +26,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")  # 注意路径要跟登录接口对应
 
 @router.post("/register", response_model=UserRead)
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
+def register_user(user_in: EmailRegisterRequest, db: Session = Depends(get_db)):
+    if not verify_code(user_in.email, user_in.code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="验证码错误或已过期"
+        )
+
     # 检查邮箱是否已存在
     existing = db.query(models.User).filter(models.User.email == user_in.email).first()
     if existing:
@@ -79,6 +90,61 @@ def login(
     access_token = create_login_token(user=user)
 
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/email/code")
+def send_email_code_api(data: EmailCodeRequest):
+    code = generate_and_store_code(str(data.email))
+    send_email_code(str(data.email), code)
+    return {"message": "验证码已发送，请查收邮箱"}
+
+
+@router.post("/email/code-login", response_model=Token)
+def email_code_login(
+    data: EmailCodeLoginRequest,
+    db: Session = Depends(get_db),
+):
+    if not verify_code(str(data.email), data.code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="验证码错误或已过期",
+        )
+
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="用户不存在，请先注册",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用"
+        )
+
+    access_token = create_login_token(user=user)
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/password/reset")
+def reset_password_with_code(
+    data: EmailPasswordResetRequest,
+    db: Session = Depends(get_db),
+):
+    if not verify_code(str(data.email), data.code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="验证码错误或已过期",
+        )
+    user = db.query(models.User).filter(models.User.email == data.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="用户不存在",
+        )
+    user.hashed_password = get_password_hash(data.new_password)
+    db.commit()
+    return {"ok": True}
 
 # ------------ 依赖：通过 token 获取当前用户 ------------
 

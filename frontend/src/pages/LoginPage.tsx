@@ -23,7 +23,7 @@ interface LoginFormValues {
 const LoginPage: React.FC = () => {
   const [form] = Form.useForm<LoginFormValues>();
 
-  const [mode] = useState<"password" | "code">("password");
+  const [mode, setMode] = useState<"password" | "code">("password");
   const [loading, setLoading] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -187,7 +187,7 @@ const LoginPage: React.FC = () => {
           </Form.Item>
         </Form>
 
-        {/* 切换登录方式
+        {/* 切换登录方式 */}
         <div style={{ textAlign: "center", marginTop: 8 }}>
           <Button
             type="link"
@@ -199,7 +199,7 @@ const LoginPage: React.FC = () => {
               ? "使用邮箱验证码登录"
               : "使用密码登录"}
           </Button>
-        </div> */}
+        </div>
 
         {/* 注册入口 */}
         <div style={{ textAlign: "center", marginTop: 4 }}>

@@ -8,6 +8,7 @@ const { Title, Text } = Typography;
 
 interface RegisterFormValues {
   email: string;
+  code: string;
   username: string;
   role: "buyer" | "seller";
   full_name?: string;
@@ -16,8 +17,38 @@ interface RegisterFormValues {
 }
 
 const RegisterPage: React.FC = () => {
+  const [form] = Form.useForm<RegisterFormValues>();
   const [loading, setLoading] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
+
+  const sendEmailCode = async () => {
+    try {
+      const email = form.getFieldValue("email");
+      if (!email) {
+        message.warning("请先输入邮箱");
+        return;
+      }
+      setSendingCode(true);
+      await api.post("/auth/email/code", { email });
+      message.success("验证码已发送，请查收邮箱");
+      setCountdown(60);
+      const timer = setInterval(() => {
+        setCountdown((c) => {
+          if (c <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return c - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      message.error(getErrorMessage(err, "发送验证码失败"));
+    } finally {
+      setSendingCode(false);
+    }
+  };
 
   const onFinish = async (values: RegisterFormValues) => {
     try {
@@ -30,6 +61,7 @@ const RegisterPage: React.FC = () => {
 
       await api.post("/auth/register", {
         email: values.email,
+        code: values.code,
         username: values.username,
         role: values.role,
         full_name: values.full_name,
@@ -62,7 +94,7 @@ const RegisterPage: React.FC = () => {
           车辆智能平台 · 注册
         </Title>
 
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
             label="邮箱"
             name="email"
@@ -72,6 +104,26 @@ const RegisterPage: React.FC = () => {
             ]}
           >
             <Input placeholder="请输入邮箱" />
+          </Form.Item>
+
+          <Form.Item label="邮箱验证码" required>
+            <Input.Group compact>
+              <Form.Item
+                name="code"
+                noStyle
+                rules={[{ required: true, message: "请输入验证码" }]}
+              >
+                <Input style={{ width: "60%" }} placeholder="6 位验证码" />
+              </Form.Item>
+              <Button
+                style={{ width: "40%" }}
+                loading={sendingCode}
+                disabled={countdown > 0}
+                onClick={sendEmailCode}
+              >
+                {countdown > 0 ? `${countdown}s` : "获取验证码"}
+              </Button>
+            </Input.Group>
           </Form.Item>
 
           <Form.Item

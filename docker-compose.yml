@@ -13,12 +13,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  redis:
+    image: redis:7
+    container_name: vehicle_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
   backend:
     build: ./backend
     container_name: vehicle_backend
     restart: always
     depends_on:
       - mysql
+      - redis
     environment:
       SECRET_KEY: "carprice-secret-123456"
       ALGORITHM: "HS256"
@@ -27,7 +35,9 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: 123456
       MYSQL_DB: vehicle_price_db
+      REDIS_URL: redis://redis:6379/0
       OSS_ENABLED: "true"
+      OSS_AUTH_MODE: "ram"
       OSS_BUCKET: zhiyu-gao-20260206
       OSS_ENDPOINT: oss-cn-shanghai.aliyuncs.com
       OSS_PREFIX: car-price

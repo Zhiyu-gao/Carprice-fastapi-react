@@ -198,9 +198,7 @@ Vehicle-Intelligence-Platform/
 ```
 
 ---
+服务器命令：
 
-## ✅ 维护建议
-
-- ai_service 与 backend 的 `SECRET_KEY` 必须一致
-- 不建议混用不同项目的 `.venv`
-- API Key 请勿提交到 Git
+创建管理员
+docker exec -it vehicle_backend uv run python -m app.scripts.create_admin

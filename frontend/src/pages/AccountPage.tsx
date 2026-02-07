@@ -14,6 +14,8 @@ const AccountPage: React.FC = () => {
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
 
   const fetchMe = async () => {
@@ -53,10 +55,19 @@ const AccountPage: React.FC = () => {
     }
   };
 
-  const handlePasswordSave = async (values: { old_password: string; new_password: string }) => {
+  const handlePasswordSave = async (values: { code: string; new_password: string }) => {
     try {
       setSavingPassword(true);
-      await api.put("/me/password", values);
+      const email = user?.email;
+      if (!email) {
+        messageApi.error("未获取到邮箱信息");
+        return;
+      }
+      await api.post("/auth/password/reset", {
+        email,
+        code: values.code,
+        new_password: values.new_password,
+      });
       passwordForm.resetFields();
       messageApi.success("密码已修改");
     } catch (err: any) {
@@ -64,6 +75,33 @@ const AccountPage: React.FC = () => {
       messageApi.error(getErrorMessage(err, "修改密码失败"));
     } finally {
       setSavingPassword(false);
+    }
+  };
+
+  const sendEmailCode = async () => {
+    try {
+      const email = user?.email;
+      if (!email) {
+        messageApi.error("未获取到邮箱信息");
+        return;
+      }
+      setSendingCode(true);
+      await api.post("/auth/email/code", { email });
+      messageApi.success("验证码已发送，请查收邮箱");
+      setCountdown(60);
+      const timer = setInterval(() => {
+        setCountdown((c) => {
+          if (c <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return c - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      messageApi.error(getErrorMessage(err, "发送验证码失败"));
+    } finally {
+      setSendingCode(false);
     }
   };
 
@@ -182,12 +220,28 @@ const AccountPage: React.FC = () => {
                 label: "修改密码",
                 children: (
                   <Form form={passwordForm} layout="vertical" onFinish={handlePasswordSave}>
-                    <Form.Item
-                      label="原密码"
-                      name="old_password"
-                      rules={[{ required: true, message: "请输入原密码" }]}
-                    >
-                      <Input.Password />
+                    <Form.Item label="邮箱">
+                      <Input value={user?.email} disabled />
+                    </Form.Item>
+
+                    <Form.Item label="邮箱验证码" required>
+                      <Input.Group compact>
+                        <Form.Item
+                          name="code"
+                          noStyle
+                          rules={[{ required: true, message: "请输入验证码" }]}
+                        >
+                          <Input style={{ width: "60%" }} placeholder="6 位验证码" />
+                        </Form.Item>
+                        <Button
+                          style={{ width: "40%" }}
+                          loading={sendingCode}
+                          disabled={countdown > 0}
+                          onClick={sendEmailCode}
+                        >
+                          {countdown > 0 ? `${countdown}s` : "获取验证码"}
+                        </Button>
+                      </Input.Group>
                     </Form.Item>
 
                     <Form.Item
