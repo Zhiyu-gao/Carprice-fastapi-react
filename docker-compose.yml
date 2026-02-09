@@ -1,6 +1,21 @@
 version: '3.9'
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: vehicle_nginx
+    restart: always
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/cert:/etc/letsencrypt
+      - ./nginx/www:/var/www/certbot
+
   mysql:
     image: mysql:8
     container_name: vehicle_mysql
@@ -69,8 +84,8 @@ services:
     build: ./frontend
     container_name: vehicle_frontend
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
 
 volumes:
   mysql_data:
