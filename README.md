@@ -202,3 +202,4 @@ Vehicle-Intelligence-Platform/
 
 创建管理员
 docker exec -it vehicle_backend uv run python -m app.scripts.create_admin
+docker compose up -d --build

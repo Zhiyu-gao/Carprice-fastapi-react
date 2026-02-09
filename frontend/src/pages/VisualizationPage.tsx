@@ -6,11 +6,16 @@ import {
   Skeleton,
   Typography,
   Tag,
-  Divider,
   Statistic,
   message,
-  Space,
 } from "antd";
+import {
+  BarChartOutlined,
+  LineChartOutlined,
+  DatabaseOutlined,
+  ThunderboltOutlined,
+  PieChartOutlined,
+} from "@ant-design/icons";
 import {
   ScatterChart,
   Scatter,
@@ -25,7 +30,7 @@ import {
 import { api, getErrorMessage } from "../api/client";
 import type { CrawlCar, PageResp } from "../api/types";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 /* ================= 数据结构（真实对齐） ================= */
 
@@ -75,18 +80,24 @@ const pearson = (x: number[], y: number[]) => {
   return num / Math.sqrt(dx * dy);
 };
 
+/* ================= 样式常量 ================= */
+
 const cardStyle: React.CSSProperties = {
-  background: "linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(15, 23, 42, 0.98))",
-  border: "1px solid rgba(148, 163, 184, 0.18)",
-  boxShadow: "var(--shadow-card)",
-  borderRadius: 18,
+  background: "rgba(15, 23, 42, 0.6)",
+  border: "1px solid rgba(148, 163, 184, 0.1)",
+  borderRadius: 16,
+  backdropFilter: "blur(12px)",
 };
 
 const kpiStyle: React.CSSProperties = {
-  background:
-    "linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(249, 115, 22, 0.12))",
+  background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(249, 115, 22, 0.12))",
   border: "1px solid rgba(34, 211, 238, 0.25)",
-  borderRadius: 18,
+  borderRadius: 16,
+};
+
+const chartCardStyle: React.CSSProperties = {
+  ...cardStyle,
+  height: "100%",
 };
 
 /* ================= 页面组件 ================= */
@@ -195,164 +206,353 @@ const VisualizationPage: React.FC = () => {
     );
   }, [parsed]);
 
+  const features = [
+    {
+      icon: <DatabaseOutlined style={{ color: "#22d3ee", fontSize: 24 }} />,
+      title: "500+ 真实样本",
+      desc: "来自懂车帝实时数据",
+    },
+    {
+      icon: <BarChartOutlined style={{ color: "#f97316", fontSize: 24 }} />,
+      title: "多维度分析",
+      desc: "价格、车龄、折旧率",
+    },
+    {
+      icon: <ThunderboltOutlined style={{ color: "#a78bfa", fontSize: 24 }} />,
+      title: "实时计算",
+      desc: "动态相关性热力图",
+    },
+  ];
+
   /* ================= 渲染 ================= */
 
   return (
-    <div
-      style={{
-        padding: 24,
-        minHeight: "100vh",
-        background:
-          "radial-gradient(900px 500px at 90% -10%, rgba(34, 211, 238, 0.2), transparent 60%)",
-      }}
-    >
+    <div style={{ padding: "24px 48px", maxWidth: 1400, margin: "0 auto" }}>
       {contextHolder}
 
-      <Card
-        style={{
-          ...cardStyle,
-          marginBottom: 20,
-          background:
-            "linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98))",
-        }}
-      >
-        <Space align="center" size={12} wrap>
-          <Title level={3} style={{ margin: 0, color: "#e5e7eb" }}>
-            二手车折旧特征统计分析
-          </Title>
-          <Tag color="cyan">EDA</Tag>
-          <Tag color="geekblue">Real Data</Tag>
-          <Tag color="volcano">Depreciation</Tag>
-        </Space>
-        <Text style={{ color: "#9ca3af", display: "block", marginTop: 8 }}>
-          基于懂车帝爬虫数据的价格、车龄与折旧关系洞察
-        </Text>
-      </Card>
+      {/* 页面标题 */}
+      <div style={{ marginBottom: 32 }}>
+        <Title level={2} style={{ color: "white", marginBottom: 8 }}>
+          <LineChartOutlined style={{ marginRight: 12, color: "#22d3ee" }} />
+          数据可视化分析
+        </Title>
+        <Paragraph style={{ color: "#94A3B8", fontSize: 16 }}>
+          基于真实二手车数据的探索性数据分析（EDA），洞察价格、车龄与折旧的关系
+        </Paragraph>
+      </div>
 
-      <Divider style={{ borderColor: "#1f2937" }} />
+      {/* 功能特性卡片 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        {features.map((feature, idx) => (
+          <Col xs={24} sm={8} key={idx}>
+            <Card
+              style={{
+                background: "rgba(15, 23, 42, 0.4)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
+                borderRadius: 12,
+                height: "100%",
+              }}
+              bodyStyle={{ padding: 24 }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 12,
+                    background: "rgba(255, 255, 255, 0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {feature.icon}
+                </div>
+                <div>
+                  <Text strong style={{ color: "white", display: "block", fontSize: 16 }}>
+                    {feature.title}
+                  </Text>
+                  <Text style={{ color: "#64748B", fontSize: 13 }}>{feature.desc}</Text>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
-      {loading && <Skeleton active />}
+      {loading && (
+        <Card style={cardStyle}>
+          <Skeleton active />
+        </Card>
+      )}
 
       {!loading && stats && (
         <>
-          <Row gutter={[16, 16]}>
+          {/* KPI 统计 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             <Col xs={24} md={8}>
-              <Card style={{ ...kpiStyle }}>
-                <Statistic title="样本数量" value={stats.total} />
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card style={{ ...kpiStyle }}>
-                <Statistic title="平均售价" value={formatWan(stats.avgPrice)} />
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card style={{ ...kpiStyle }}>
+              <Card style={kpiStyle} bodyStyle={{ padding: 24 }}>
                 <Statistic
-                  title="平均折旧率"
+                  title={<Text style={{ color: "#94A3B8" }}>样本数量</Text>}
+                  value={stats.total}
+                  valueStyle={{ color: "white", fontSize: 32, fontWeight: 700 }}
+                  prefix={<DatabaseOutlined style={{ marginRight: 8, color: "#22d3ee" }} />}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card style={kpiStyle} bodyStyle={{ padding: 24 }}>
+                <Statistic
+                  title={<Text style={{ color: "#94A3B8" }}>平均售价</Text>}
+                  value={formatWan(stats.avgPrice)}
+                  valueStyle={{ color: "white", fontSize: 32, fontWeight: 700 }}
+                  prefix={<PieChartOutlined style={{ marginRight: 8, color: "#f97316" }} />}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card style={kpiStyle} bodyStyle={{ padding: 24 }}>
+                <Statistic
+                  title={<Text style={{ color: "#94A3B8" }}>平均折旧率</Text>}
                   value={(stats.avgDep * 100).toFixed(1)}
                   suffix="%"
+                  valueStyle={{ color: "white", fontSize: 32, fontWeight: 700 }}
+                  prefix={<LineChartOutlined style={{ marginRight: 8, color: "#a78bfa" }} />}
                 />
               </Card>
             </Col>
           </Row>
-          <Divider />
+
+          {/* 分布图表 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+            <Col xs={24} md={8}>
+              <Card
+                style={chartCardStyle}
+                title={
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <BarChartOutlined style={{ color: "#22d3ee" }} />
+                    <Text strong style={{ color: "white" }}>当前售价分布</Text>
+                  </div>
+                }
+                headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                <ResponsiveContainer height={240}>
+                  <BarChart data={priceHist}>
+                    <XAxis dataKey="range" tick={{ fill: "#64748B", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "#64748B" }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 8,
+                      }}
+                      labelStyle={{ color: "#94A3B8" }}
+                    />
+                    <Bar dataKey="count" fill="#22d3ee" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Card
+                style={chartCardStyle}
+                title={
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <LineChartOutlined style={{ color: "#34d399" }} />
+                    <Text strong style={{ color: "white" }}>车龄分布</Text>
+                  </div>
+                }
+                headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                <ResponsiveContainer height={240}>
+                  <BarChart data={ageHist}>
+                    <XAxis dataKey="range" tick={{ fill: "#64748B", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "#64748B" }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 8,
+                      }}
+                      labelStyle={{ color: "#94A3B8" }}
+                    />
+                    <Bar dataKey="count" fill="#34d399" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Card
+                style={chartCardStyle}
+                title={
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <PieChartOutlined style={{ color: "#f97316" }} />
+                    <Text strong style={{ color: "white" }}>折旧率分布</Text>
+                  </div>
+                }
+                headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                <ResponsiveContainer height={240}>
+                  <BarChart data={depHist}>
+                    <XAxis dataKey="range" tick={{ fill: "#64748B", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "#64748B" }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 8,
+                      }}
+                      labelStyle={{ color: "#94A3B8" }}
+                    />
+                    <Bar dataKey="count" fill="#f97316" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* 相关性热力图 */}
+          <Card
+            style={{ ...cardStyle, marginBottom: 24 }}
+            title={
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <ThunderboltOutlined style={{ color: "#a78bfa" }} />
+                <Text strong style={{ color: "white" }}>特征相关性热力图</Text>
+                <Tag
+                  color="purple"
+                  style={{
+                    marginLeft: 12,
+                    background: "rgba(167, 139, 250, 0.2)",
+                    border: "none",
+                    color: "#a78bfa",
+                  }}
+                >
+                  Pearson 相关系数
+                </Tag>
+              </div>
+            }
+            headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            <ResponsiveContainer height={320}>
+              <ScatterChart>
+                <XAxis
+                  type="number"
+                  dataKey="x"
+                  tickFormatter={i => corrData[i]?.nameX}
+                  tick={{ fill: "#64748B" }}
+                  axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                />
+                <YAxis
+                  type="number"
+                  dataKey="y"
+                  tickFormatter={i => corrData[i]?.nameY}
+                  tick={{ fill: "#64748B" }}
+                  axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                />
+                <Tooltip
+                  formatter={(v: number) => v.toFixed(2)}
+                  contentStyle={{
+                    background: "rgba(15, 23, 42, 0.95)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8,
+                  }}
+                  labelStyle={{ color: "#94A3B8" }}
+                />
+                <Scatter data={corrData} shape="square">
+                  {corrData.map((d, i) => (
+                    <Cell
+                      key={i}
+                      fill={`rgba(34,211,238,${Math.abs(d.value)})`}
+                    />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </Card>
+
+          {/* 共线性分析 */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                style={chartCardStyle}
+                title={
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <LineChartOutlined style={{ color: "#22d3ee" }} />
+                    <Text strong style={{ color: "white" }}>车龄 vs 售价</Text>
+                  </div>
+                }
+                headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                <ResponsiveContainer height={280}>
+                  <ScatterChart>
+                    <XAxis
+                      dataKey="ageYears"
+                      unit="年"
+                      tick={{ fill: "#64748B" }}
+                      axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                    />
+                    <YAxis
+                      dataKey="currentPrice"
+                      unit="万"
+                      tick={{ fill: "#64748B" }}
+                      axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 8,
+                      }}
+                      labelStyle={{ color: "#94A3B8" }}
+                    />
+                    <Scatter data={parsed} fill="#22d3ee" />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Card
+                style={chartCardStyle}
+                title={
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <PieChartOutlined style={{ color: "#f97316" }} />
+                    <Text strong style={{ color: "white" }}>折旧率 vs 售价</Text>
+                  </div>
+                }
+                headStyle={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                <ResponsiveContainer height={280}>
+                  <ScatterChart>
+                    <XAxis
+                      dataKey="depreciationRate"
+                      tick={{ fill: "#64748B" }}
+                      axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                    />
+                    <YAxis
+                      dataKey="currentPrice"
+                      unit="万"
+                      tick={{ fill: "#64748B" }}
+                      axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.95)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 8,
+                      }}
+                      labelStyle={{ color: "#94A3B8" }}
+                    />
+                    <Scatter data={parsed} fill="#f97316" />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+          </Row>
         </>
       )}
-
-      {/* ===== 价格 / 车龄 / 折旧分布 ===== */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
-          <Card title="图3-1 当前售价分布" style={cardStyle}>
-            <ResponsiveContainer height={240}>
-              <BarChart data={priceHist}>
-                <XAxis dataKey="range" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#38bdf8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-
-        <Col xs={24} md={8}>
-          <Card title="图3-2 车龄分布" style={cardStyle}>
-            <ResponsiveContainer height={240}>
-              <BarChart data={ageHist}>
-                <XAxis dataKey="range" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#a3e635" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-
-        <Col xs={24} md={8}>
-          <Card title="图3-3 折旧率分布" style={cardStyle}>
-            <ResponsiveContainer height={240}>
-              <BarChart data={depHist}>
-                <XAxis dataKey="range" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#f97316" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-      </Row>
-
-      <Divider />
-
-      {/* ===== 相关性分析 ===== */}
-      <Card title="图3-4 特征相关性热力图" style={cardStyle}>
-        <ResponsiveContainer height={320}>
-          <ScatterChart>
-            <XAxis type="number" dataKey="x" tickFormatter={i => corrData[i]?.nameX} />
-            <YAxis type="number" dataKey="y" tickFormatter={i => corrData[i]?.nameY} />
-            <Tooltip formatter={(v: number) => v.toFixed(2)} />
-            <Scatter data={corrData} shape="square">
-              {corrData.map((d, i) => (
-                <Cell
-                  key={i}
-                  fill={`rgba(34,211,238,${Math.abs(d.value)})`}
-                />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
-      </Card>
-
-      <Divider />
-
-      {/* ===== 共线性分析 ===== */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <Card title="图3-5(a) 车龄 vs 售价" style={cardStyle}>
-            <ResponsiveContainer height={260}>
-              <ScatterChart>
-                <XAxis dataKey="ageYears" unit="年" />
-                <YAxis dataKey="currentPrice" unit="万" />
-                <Tooltip />
-                <Scatter data={parsed} fill="#22d3ee" />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-
-        <Col xs={24} md={12}>
-          <Card title="图3-5(b) 折旧率 vs 售价" style={cardStyle}>
-            <ResponsiveContainer height={260}>
-              <ScatterChart>
-                <XAxis dataKey="depreciationRate" />
-                <YAxis dataKey="currentPrice" unit="万" />
-                <Tooltip />
-                <Scatter data={parsed} fill="#f97316" />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-      </Row>
     </div>
   );
 };

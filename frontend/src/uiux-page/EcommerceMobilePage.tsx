@@ -17,63 +17,63 @@ interface ProductType {
 const products: ProductType[] = [
   { 
     key: '1', 
-    name: 'Wireless Headphones', 
+    name: '无线耳机', 
     price: 149.99, 
     originalPrice: 199.99, 
     discount: 25, 
     rating: 4.8, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Electronics' 
+    category: '电子产品' 
   },
   { 
     key: '2', 
-    name: 'Smart Watch', 
+    name: '智能手表', 
     price: 299.99, 
     originalPrice: 349.99, 
     discount: 14, 
     rating: 4.7, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Electronics' 
+    category: '电子产品' 
   },
   { 
     key: '3', 
-    name: 'Bluetooth Speaker', 
+    name: '蓝牙音箱', 
     price: 79.99, 
     originalPrice: 99.99, 
     discount: 20, 
     rating: 4.6, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Electronics' 
+    category: '电子产品' 
   },
   { 
     key: '4', 
-    name: 'Wireless Charger', 
+    name: '无线充电器', 
     price: 29.99, 
     originalPrice: 39.99, 
     discount: 25, 
     rating: 4.5, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Electronics' 
+    category: '电子产品' 
   },
   { 
     key: '5', 
-    name: 'Phone Case', 
+    name: '手机壳', 
     price: 19.99, 
     originalPrice: 29.99, 
     discount: 33, 
     rating: 4.4, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Accessories' 
+    category: '配件' 
   },
   { 
     key: '6', 
-    name: 'Screen Protector', 
+    name: '屏幕保护膜', 
     price: 14.99, 
     originalPrice: 19.99, 
     discount: 25, 
     rating: 4.3, 
     image: 'https://via.placeholder.com/300x300', 
-    category: 'Accessories' 
+    category: '配件' 
   },
 ];
 
@@ -91,7 +91,7 @@ export default function EcommerceMobilePage() {
           </Col>
           <Col xs={20}>
             <Input 
-              placeholder="Search products..." 
+              placeholder="搜索商品..." 
               prefix={<SearchOutlined style={{ color: "#064E3B" }} />}
               style={{ 
                 background: "#ECFDF5", 
@@ -116,10 +116,10 @@ export default function EcommerceMobilePage() {
       {/* Hero Section */}
       <div style={{ background: "#059669", padding: "32px 24px", marginBottom: "24px" }}>
         <Title level={2} style={{ color: "white", marginBottom: "16px", fontSize: "32px" }}>
-          Summer Sale
+          夏季大促
         </Title>
         <Paragraph style={{ color: "white", fontSize: "18px", marginBottom: "24px" }}>
-          Up to 50% off on selected products
+          精选商品低至5折
         </Paragraph>
         <Button 
           type="primary" 
@@ -132,17 +132,17 @@ export default function EcommerceMobilePage() {
             fontWeight: 600 
           }}
         >
-          Shop Now
+          立即购买
         </Button>
       </div>
 
       {/* Categories Section */}
       <div style={{ padding: "0 24px 24px" }}>
         <Title level={3} style={{ color: "#064E3B", marginBottom: "24px", fontSize: "24px" }}>
-          Categories
+          商品分类
         </Title>
         <Row gutter={[16, 16]}>
-          {['Electronics', 'Clothing', 'Home', 'Beauty', 'Sports', 'Books'].map((category) => (
+          {['电子产品', '服装', '家居', '美妆', '运动', '图书'].map((category) => (
             <Col key={category} xs={8} sm={6} md={4}>
               <Card 
                 bordered={false} 
@@ -174,14 +174,14 @@ export default function EcommerceMobilePage() {
       <div style={{ padding: "0 24px 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <Title level={3} style={{ color: "#064E3B", margin: 0, fontSize: "24px" }}>
-            Featured Products
+            精选商品
           </Title>
           <Button 
             type="text" 
             style={{ color: "#059669", fontSize: "16px", fontWeight: 600 }}
             icon={<FilterOutlined />}
           >
-            Filter
+            筛选
           </Button>
         </div>
         <Row gutter={[16, 16]}>
@@ -239,10 +239,10 @@ export default function EcommerceMobilePage() {
                     <Space direction="vertical" size="small" style={{ width: "100%" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <Text style={{ color: "#F97316", fontSize: "20px", fontWeight: 600 }}>
-                          ${product.price}
+                          ¥{product.price}
                         </Text>
                         <Text style={{ color: "#9CA3AF", fontSize: "14px", textDecoration: "line-through" }}>
-                          ${product.originalPrice}
+                          ¥{product.originalPrice}
                         </Text>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -275,7 +275,7 @@ export default function EcommerceMobilePage() {
                   }}
                   icon={<ShoppingCartOutlined />}
                 >
-                  Add to Cart
+                  加入购物车
                 </Button>
               </Card>
             </Col>
@@ -291,7 +291,7 @@ export default function EcommerceMobilePage() {
               type="text" 
               style={{ color: "#064E3B", fontSize: "16px", fontWeight: 600 }}
             >
-              Home
+              首页
             </Button>
           </Col>
           <Col xs={6} sm={4} md={3}>
@@ -299,7 +299,7 @@ export default function EcommerceMobilePage() {
               type="text" 
               style={{ color: "#064E3B", fontSize: "16px", fontWeight: 600 }}
             >
-              Shop
+              商城
             </Button>
           </Col>
           <Col xs={6} sm={4} md={3}>
@@ -307,7 +307,7 @@ export default function EcommerceMobilePage() {
               type="text" 
               style={{ color: "#064E3B", fontSize: "16px", fontWeight: 600 }}
             >
-              Cart
+              购物车
             </Button>
           </Col>
           <Col xs={6} sm={4} md={3}>
@@ -315,7 +315,7 @@ export default function EcommerceMobilePage() {
               type="text" 
               style={{ color: "#064E3B", fontSize: "16px", fontWeight: 600 }}
             >
-              Profile
+              我的
             </Button>
           </Col>
         </Row>

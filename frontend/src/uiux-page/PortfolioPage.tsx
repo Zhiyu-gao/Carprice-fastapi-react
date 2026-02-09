@@ -15,48 +15,48 @@ interface ProjectType {
 const projects: ProjectType[] = [
   { 
     key: '1', 
-    title: 'E-commerce Platform', 
-    description: 'Full-stack e-commerce application with React, Node.js, and MongoDB', 
+    title: '电商平台', 
+    description: '使用React、Node.js和MongoDB开发的全栈电商应用', 
     tags: ['React', 'Node.js', 'MongoDB', 'Redux'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
   },
   { 
     key: '2', 
-    title: 'Healthcare Dashboard', 
-    description: 'Analytics dashboard for healthcare providers with real-time data visualization', 
+    title: '医疗仪表板', 
+    description: '为医疗服务提供者打造的实时数据可视化分析仪表板', 
     tags: ['React', 'D3.js', 'Express', 'PostgreSQL'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
   },
   { 
     key: '3', 
-    title: 'Social Media App', 
-    description: 'Mobile-first social media application with user authentication and real-time chat', 
+    title: '社交媒体应用', 
+    description: '移动端优先的社交媒体应用，支持用户认证和实时聊天', 
     tags: ['React Native', 'Firebase', 'Redux', 'TypeScript'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
   },
   { 
     key: '4', 
-    title: 'AI Image Generator', 
-    description: 'Web application that generates images from text prompts using OpenAI DALL-E', 
+    title: 'AI图像生成器', 
+    description: '使用OpenAI DALL-E从文本提示生成图像的Web应用', 
     tags: ['React', 'OpenAI', 'Node.js', 'Tailwind CSS'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
   },
   { 
     key: '5', 
-    title: 'Weather App', 
-    description: 'Responsive weather application with geolocation and 7-day forecast', 
+    title: '天气应用', 
+    description: '响应式天气应用，支持地理定位和7天预报', 
     tags: ['React', 'TypeScript', 'OpenWeatherMap API', 'Styled Components'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
   },
   { 
     key: '6', 
-    title: 'Task Management System', 
-    description: 'Collaborative task management tool with drag-and-drop functionality', 
+    title: '任务管理系统', 
+    description: '支持拖拽功能的协作任务管理工具', 
     tags: ['React', 'DnD Kit', 'Firebase', 'Material UI'], 
     image: 'https://via.placeholder.com/600x400', 
     link: '#' 
@@ -80,15 +80,14 @@ export default function PortfolioPage() {
               }}
             />
             <Title level={1} style={{ color: "white", marginBottom: "16px", fontSize: "48px" }}>
-              John Doe
+              张明
             </Title>
             <Paragraph style={{ color: "#9CA3AF", fontSize: "24px", marginBottom: "32px" }}>
-              Full-Stack Developer & UI/UX Designer
+              全栈开发工程师 & UI/UX设计师
             </Paragraph>
             <Paragraph style={{ color: "#D1D5DB", fontSize: "18px", lineHeight: 1.8, marginBottom: "32px" }}>
-              I build beautiful, functional web and mobile applications with a focus on user experience
-              and performance. With 5+ years of experience, I specialize in React, Node.js, and modern
-              web technologies.
+              我专注于构建美观、功能完善的Web和移动应用，注重用户体验和性能。
+              拥有5年以上经验，专精于React、Node.js和现代Web技术。
             </Paragraph>
             <Space size="large" wrap>
               <Button 
@@ -102,7 +101,7 @@ export default function PortfolioPage() {
                   fontWeight: 600 
                 }}
               >
-                View Projects
+                查看项目
               </Button>
               <Button 
                 size="large" 
@@ -115,7 +114,7 @@ export default function PortfolioPage() {
                   fontWeight: 600 
                 }}
               >
-                <MailOutlined /> Contact Me
+                <MailOutlined /> 联系我
               </Button>
             </Space>
           </Col>
@@ -133,10 +132,10 @@ export default function PortfolioPage() {
                 hoverable
               >
                 <Title level={4} style={{ color: "white", marginBottom: "16px" }}>
-                  5+ Years Experience
+                  5年以上经验
                 </Title>
                 <Paragraph style={{ color: "#9CA3AF", lineHeight: 1.8 }}>
-                  Building high-quality web and mobile applications for clients worldwide
+                  为全球客户构建高质量的Web和移动应用
                 </Paragraph>
               </Card>
               <Card 
@@ -151,10 +150,10 @@ export default function PortfolioPage() {
                 hoverable
               >
                 <Title level={4} style={{ color: "white", marginBottom: "16px" }}>
-                  50+ Projects Completed
+                  50+项目完成
                 </Title>
                 <Paragraph style={{ color: "#9CA3AF", lineHeight: 1.8 }}>
-                  Delivering exceptional results for startups and enterprises
+                  为初创企业和大型企业交付卓越成果
                 </Paragraph>
               </Card>
               <Card 
@@ -169,10 +168,10 @@ export default function PortfolioPage() {
                 hoverable
               >
                 <Title level={4} style={{ color: "white", marginBottom: "16px" }}>
-                  100% Client Satisfaction
+                  100%客户满意度
                 </Title>
                 <Paragraph style={{ color: "#9CA3AF", lineHeight: 1.8 }}>
-                  Building long-term relationships through quality work and communication
+                  通过优质工作和沟通建立长期合作关系
                 </Paragraph>
               </Card>
             </div>
@@ -183,7 +182,7 @@ export default function PortfolioPage() {
       {/* Skills Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto 80px" }}>
         <Title level={2} style={{ color: "white", marginBottom: "48px", textAlign: "center" }}>
-          Skills & Technologies
+          技能与技术
         </Title>
         <Row gutter={[16, 16]} justify="center">
           {['React', 'Node.js', 'TypeScript', 'JavaScript', 'Python', 'Django', 'Express', 'MongoDB', 'PostgreSQL', 'Firebase', 'AWS', 'Docker', 'Git', 'HTML/CSS', 'Tailwind CSS', 'Material UI'].map((skill) => (
@@ -211,7 +210,7 @@ export default function PortfolioPage() {
       {/* Projects Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto 80px" }}>
         <Title level={2} style={{ color: "white", marginBottom: "48px", textAlign: "center" }}>
-          Featured Projects
+          精选项目
         </Title>
         <Row gutter={[24, 24]}>
           {projects.map((project) => (
@@ -246,7 +245,7 @@ export default function PortfolioPage() {
                   href={project.link}
                   target="_blank"
                 >
-                  View Project
+                  查看项目
                 </Button>
               </Card>
             </Col>
@@ -266,11 +265,11 @@ export default function PortfolioPage() {
           }}
         >
           <Title level={2} style={{ color: "white", marginBottom: "24px", textAlign: "center" }}>
-            Get In Touch
+            联系我
           </Title>
           <Paragraph style={{ color: "#9CA3AF", fontSize: "18px", marginBottom: "32px", textAlign: "center" }}>
-            I'm currently available for freelance work and full-time opportunities.
-            Feel free to reach out to discuss your project or just say hello!
+            我目前可接受自由职业和全职工作机会。
+            欢迎随时联系讨论您的项目或打个招呼！
           </Paragraph>
           <Space size="large" wrap direction="vertical" style={{ width: "100%", justifyContent: "center" }}>
             <Button 
@@ -285,7 +284,7 @@ export default function PortfolioPage() {
               }}
               icon={<MailOutlined />}
             >
-              Send Email
+              发送邮件
             </Button>
             <Space size="large" wrap style={{ justifyContent: "center" }}>
               <Button 

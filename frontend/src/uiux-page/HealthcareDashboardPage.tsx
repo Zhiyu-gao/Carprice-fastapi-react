@@ -15,20 +15,20 @@ interface PatientDataType {
 }
 
 const columns: ColumnsType<PatientDataType> = [
-  { title: 'Name', dataIndex: 'name', key: 'name', width: 150 },
-  { title: 'Age', dataIndex: 'age', key: 'age', width: 80 },
-  { title: 'Gender', dataIndex: 'gender', key: 'gender', width: 100 },
-  { title: 'Condition', dataIndex: 'condition', key: 'condition', width: 200 },
-  { title: 'Status', dataIndex: 'status', key: 'status', width: 120 },
-  { title: 'Last Visit', dataIndex: 'lastVisit', key: 'lastVisit', width: 150 },
+  { title: '姓名', dataIndex: 'name', key: 'name', width: 150 },
+  { title: '年龄', dataIndex: 'age', key: 'age', width: 80 },
+  { title: '性别', dataIndex: 'gender', key: 'gender', width: 100 },
+  { title: '病情', dataIndex: 'condition', key: 'condition', width: 200 },
+  { title: '状态', dataIndex: 'status', key: 'status', width: 120 },
+  { title: '最近就诊', dataIndex: 'lastVisit', key: 'lastVisit', width: 150 },
 ];
 
 const data: PatientDataType[] = [
-  { key: '1', name: 'John Doe', age: 45, gender: 'Male', condition: 'Hypertension', status: 'Stable', lastVisit: '2026-02-01' },
-  { key: '2', name: 'Jane Smith', age: 38, gender: 'Female', condition: 'Diabetes', status: 'Controlled', lastVisit: '2026-02-02' },
-  { key: '3', name: 'Bob Johnson', age: 62, gender: 'Male', condition: 'Heart Disease', status: 'Monitoring', lastVisit: '2026-02-03' },
-  { key: '4', name: 'Alice Williams', age: 29, gender: 'Female', condition: 'Asthma', status: 'Good', lastVisit: '2026-02-04' },
-  { key: '5', name: 'Charlie Brown', age: 54, gender: 'Male', condition: 'Cancer', status: 'Treatment', lastVisit: '2026-02-05' },
+  { key: '1', name: '张三', age: 45, gender: '男', condition: '高血压', status: '稳定', lastVisit: '2026-02-01' },
+  { key: '2', name: '李四', age: 38, gender: '女', condition: '糖尿病', status: '控制中', lastVisit: '2026-02-02' },
+  { key: '3', name: '王五', age: 62, gender: '男', condition: '心脏病', status: '监测中', lastVisit: '2026-02-03' },
+  { key: '4', name: '赵六', age: 29, gender: '女', condition: '哮喘', status: '良好', lastVisit: '2026-02-04' },
+  { key: '5', name: '陈七', age: 54, gender: '男', condition: '癌症', status: '治疗中', lastVisit: '2026-02-05' },
 ];
 
 export default function HealthcareDashboardPage() {
@@ -39,10 +39,10 @@ export default function HealthcareDashboardPage() {
         <Row justify="space-between" align="middle">
           <Col>
             <Title level={2} style={{ color: "#1E3A8A", margin: 0 }}>
-              Healthcare Analytics Dashboard
+              医疗健康数据分析仪表板
             </Title>
             <Paragraph style={{ color: "#64748B", margin: 0 }}>
-              Real-time patient monitoring and health analytics
+              实时患者监测与健康数据分析
             </Paragraph>
           </Col>
           <Col>
@@ -55,7 +55,7 @@ export default function HealthcareDashboardPage() {
                   padding: "8px 16px"
                 }}
               >
-                <ExportOutlined /> Export Data
+                <ExportOutlined /> 导出数据
               </Button>
               <Button 
                 style={{ 
@@ -64,7 +64,7 @@ export default function HealthcareDashboardPage() {
                   padding: "8px 16px"
                 }}
               >
-                <FilterOutlined /> Filter
+                <FilterOutlined /> 筛选
               </Button>
             </Space>
           </Col>
@@ -87,13 +87,13 @@ export default function HealthcareDashboardPage() {
               hoverable
             >
               <Statistic 
-                title="Total Patients" 
+                title="总患者数" 
                 value={1256} 
                 valueStyle={{ color: "#1E40AF" }} 
                 prefix={<LineChartOutlined style={{ color: "#1E40AF", fontSize: "24px" }} />}
               />
               <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0, marginTop: "8px" }}>
-                +12% from last month
+                较上月增长12%
               </Paragraph>
             </Card>
           </Col>
@@ -110,13 +110,13 @@ export default function HealthcareDashboardPage() {
               hoverable
             >
               <Statistic 
-                title="Active Cases" 
+                title="活跃病例" 
                 value={342} 
                 valueStyle={{ color: "#F59E0B" }} 
                 prefix={<BarChartOutlined style={{ color: "#F59E0B", fontSize: "24px" }} />}
               />
               <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0, marginTop: "8px" }}>
-                +5% from last week
+                较上周增长5%
               </Paragraph>
             </Card>
           </Col>
@@ -133,14 +133,14 @@ export default function HealthcareDashboardPage() {
               hoverable
             >
               <Statistic 
-                title="Recovery Rate" 
+                title="康复率" 
                 value={89.2} 
                 suffix="%" 
                 valueStyle={{ color: "#10B981" }} 
                 prefix={<PieChartOutlined style={{ color: "#10B981", fontSize: "24px" }} />}
               />
               <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0, marginTop: "8px" }}>
-                +2.3% from last month
+                较上月增长2.3%
               </Paragraph>
             </Card>
           </Col>
@@ -157,14 +157,14 @@ export default function HealthcareDashboardPage() {
               hoverable
             >
               <Statistic 
-                title="Average Stay" 
+                title="平均住院天数" 
                 value={4.2} 
-                suffix="days" 
+                suffix="天" 
                 valueStyle={{ color: "#EF4444" }} 
                 prefix={<LineChartOutlined style={{ color: "#EF4444", fontSize: "24px" }} />}
               />
               <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0, marginTop: "8px" }}>
-                -0.5 days from last month
+                较上月减少0.5天
               </Paragraph>
             </Card>
           </Col>
@@ -185,12 +185,12 @@ export default function HealthcareDashboardPage() {
                 cursor: "pointer"
               }}
               hoverable
-              title="Patient Admissions Trend"
-              extra={<Button size="small" style={{ color: "#1E40AF", borderColor: "#1E40AF" }}>View Details</Button>}
+              title="患者入院趋势"
+              extra={<Button size="small" style={{ color: "#1E40AF", borderColor: "#1E40AF" }}>查看详情</Button>}
             >
               <div style={{ height: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Paragraph style={{ color: "#64748B", fontSize: "18px" }}>
-                  Line Chart Placeholder
+                  折线图占位
                 </Paragraph>
               </div>
             </Card>
@@ -206,12 +206,12 @@ export default function HealthcareDashboardPage() {
                 cursor: "pointer"
               }}
               hoverable
-              title="Condition Distribution"
-              extra={<Button size="small" style={{ color: "#1E40AF", borderColor: "#1E40AF" }}>View Details</Button>}
+              title="病情分布"
+              extra={<Button size="small" style={{ color: "#1E40AF", borderColor: "#1E40AF" }}>查看详情</Button>}
             >
               <div style={{ height: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Paragraph style={{ color: "#64748B", fontSize: "18px" }}>
-                  Pie Chart Placeholder
+                  饼图占位
                 </Paragraph>
               </div>
             </Card>
@@ -228,14 +228,14 @@ export default function HealthcareDashboardPage() {
             borderRadius: "12px", 
             boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
           }}
-          title="Recent Patients"
+          title="最近患者"
           extra={
             <Space>
               <Select defaultValue="all" style={{ width: 120 }}>
-                <Select.Option value="all">All Status</Select.Option>
-                <Select.Option value="stable">Stable</Select.Option>
-                <Select.Option value="monitoring">Monitoring</Select.Option>
-                <Select.Option value="treatment">Treatment</Select.Option>
+                <Select.Option value="all">全部状态</Select.Option>
+                <Select.Option value="stable">稳定</Select.Option>
+                <Select.Option value="monitoring">监测中</Select.Option>
+                <Select.Option value="treatment">治疗中</Select.Option>
               </Select>
               <DatePicker.RangePicker style={{ width: 250 }} />
             </Space>

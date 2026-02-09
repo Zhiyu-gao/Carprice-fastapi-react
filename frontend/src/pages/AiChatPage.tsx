@@ -1,10 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, Input, Button, theme, Select, Switch, message, Popconfirm } from "antd";
-import { ArrowUpOutlined, PlusOutlined } from "@ant-design/icons";
+import { Input, Button, Select, Switch, message, Popconfirm, Typography, Space } from "antd";
+import {
+  ArrowUpOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  RobotOutlined,
+  MessageOutlined,
+  FileTextOutlined,
+  ThunderboltOutlined,
+  DatabaseOutlined,
+} from "@ant-design/icons";
 import { getToken } from "../auth/token";
 
 const { TextArea } = Input;
-const { useToken } = theme;
+const { Text, Title } = Typography;
 
 const AI_BASE_URL = import.meta.env.VITE_AI_BASE_URL;
 
@@ -20,9 +29,46 @@ type ChatSession = {
   updated_at: string;
 };
 
-export default function AiChatPage() {
-  const { token } = useToken();
+// 样式常量
+const sidebarStyle: React.CSSProperties = {
+  width: 280,
+  background: "rgba(15, 23, 42, 0.8)",
+  borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+  display: "flex",
+  flexDirection: "column",
+  backdropFilter: "blur(12px)",
+};
 
+const chatAreaStyle: React.CSSProperties = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  background: "#020617",
+};
+
+const messageBubbleUser: React.CSSProperties = {
+  background: "linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%)",
+  color: "white",
+  padding: "12px 16px",
+  borderRadius: "16px 16px 4px 16px",
+  maxWidth: "70%",
+  whiteSpace: "pre-wrap",
+  lineHeight: 1.6,
+  boxShadow: "0 4px 12px rgba(34, 211, 238, 0.2)",
+};
+
+const messageBubbleAI: React.CSSProperties = {
+  background: "rgba(255, 255, 255, 0.05)",
+  border: "1px solid rgba(255, 255, 255, 0.1)",
+  color: "#e2e8f0",
+  padding: "12px 16px",
+  borderRadius: "16px 16px 16px 4px",
+  maxWidth: "70%",
+  whiteSpace: "pre-wrap",
+  lineHeight: 1.6,
+};
+
+export default function AiChatPage() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -213,40 +259,47 @@ export default function AiChatPage() {
     }
   };
 
+  const providers = [
+    { value: "kimi", label: "Kimi", color: "#22d3ee" },
+    { value: "deepseek", label: "DeepSeek", color: "#f97316" },
+    { value: "qwen", label: "Qwen", color: "#a78bfa" },
+  ];
+
   return (
-    <Card
-      bodyStyle={{
-        height: "100vh",
-        padding: 0,
-        background: token.colorBgLayout,
-        display: "flex",
-      }}
-    >
+    <div style={{ display: "flex", height: "calc(100vh - 64px)", background: "#020617" }}>
       {/* 左侧会话列表 */}
-      <div
-        style={{
-          width: 260,
-          borderRight: `1px solid ${token.colorBorderSecondary}`,
-          background: token.colorBgLayout,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div style={sidebarStyle}>
+        {/* 头部 */}
         <div
           style={{
-            padding: "16px",
-            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            padding: "20px",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <span style={{ fontWeight: 600 }}>对话</span>
-          <Button size="small" icon={<PlusOutlined />} onClick={createSession}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <RobotOutlined style={{ color: "#22d3ee", fontSize: 20 }} />
+            <Text strong style={{ color: "white", fontSize: 16 }}>
+              AI 助手
+            </Text>
+          </div>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={createSession}
+            style={{
+              background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
+              border: "none",
+            }}
+          >
             新建
           </Button>
         </div>
-        <div style={{ flex: 1, overflowY: "auto" }}>
+
+        {/* 会话列表 */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           {sessions.map((s) => (
             <div
               key={s.id}
@@ -256,35 +309,67 @@ export default function AiChatPage() {
                 cursor: "pointer",
                 background:
                   s.id === activeSessionId
-                    ? token.colorFillSecondary
+                    ? "rgba(34, 211, 238, 0.15)"
                     : "transparent",
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                fontSize: 13,
+                borderRadius: 8,
+                marginBottom: 8,
+                border:
+                  s.id === activeSessionId
+                    ? "1px solid rgba(34, 211, 238, 0.3)"
+                    : "1px solid transparent",
+                transition: "all 0.2s",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {s.title}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                  <MessageOutlined style={{ color: s.id === activeSessionId ? "#22d3ee" : "#64748B", fontSize: 14 }} />
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      color: s.id === activeSessionId ? "white" : "#94A3B8",
+                      fontSize: 14,
+                    }}
+                  >
+                    {s.title}
+                  </span>
+                </div>
                 <Popconfirm
                   title="确定删除该对话？"
                   okText="删除"
                   cancelText="取消"
-                  onConfirm={() => deleteSession(s.id)}
+                  onConfirm={(e) => {
+                    e?.stopPropagation();
+                    deleteSession(s.id);
+                  }}
                 >
-                  <Button size="small">删</Button>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<DeleteOutlined style={{ color: "#64748B", fontSize: 12 }} />}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ padding: "0 4px" }}
+                  />
                 </Popconfirm>
               </div>
             </div>
           ))}
         </div>
+
+        {/* 资料库 */}
         <div
           style={{
-            borderTop: `1px solid ${token.colorBorderSecondary}`,
-            padding: "12px 16px",
+            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            padding: "16px",
           }}
         >
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>资料库</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <FileTextOutlined style={{ color: "#fbbf24", fontSize: 14 }} />
+            <Text strong style={{ color: "white", fontSize: 14 }}>
+              资料库
+            </Text>
+          </div>
           <input
             type="file"
             accept=".pdf,.doc,.docx,.txt,.md"
@@ -293,82 +378,118 @@ export default function AiChatPage() {
               if (f) uploadDoc(f);
               e.currentTarget.value = "";
             }}
+            style={{
+              width: "100%",
+              padding: "8px",
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: 6,
+              color: "#94A3B8",
+              fontSize: 12,
+            }}
           />
-          <div style={{ marginTop: 8, fontSize: 12, color: token.colorTextSecondary }}>
-            {docs.length ? docs.map((d) => <div key={d.id}>{d.filename}</div>) : "暂无文档"}
+          <div style={{ marginTop: 8, fontSize: 12 }}>
+            {docs.length ? (
+              docs.map((d) => (
+                <div key={d.id} style={{ color: "#64748B", padding: "2px 0" }}>
+                  • {d.filename}
+                </div>
+              ))
+            ) : (
+              <Text style={{ color: "#64748B" }}>暂无文档</Text>
+            )}
           </div>
         </div>
       </div>
 
       {/* 右侧聊天区 */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={chatAreaStyle}>
         {/* 顶部标题栏 */}
         <div
           style={{
-            height: 56,
+            height: 64,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 24px",
-            borderBottom: `1px solid ${token.colorBorderSecondary}`,
-            background: token.colorBgLayout,
+            padding: "0 32px",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "rgba(15, 23, 42, 0.5)",
+            backdropFilter: "blur(12px)",
           }}
         >
-          <span style={{ fontSize: 16, fontWeight: 600, color: token.colorText }}>
-            AI 聊天
-          </span>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <ThunderboltOutlined style={{ color: "#22d3ee", fontSize: 18 }} />
+            <Text strong style={{ fontSize: 16, color: "white" }}>
+              {providers.find((p) => p.value === provider)?.label} AI 聊天
+            </Text>
+          </div>
+          <Space size={16}>
             <Select
               value={provider}
               onChange={(v) => setProvider(v)}
-              style={{ width: 140 }}
-              options={[
-                { label: "Kimi", value: "kimi" },
-                { label: "DeepSeek", value: "deepseek" },
-                { label: "Qwen", value: "qwen" },
-              ]}
+              style={{ width: 120 }}
+              options={providers.map((p) => ({
+                label: (
+                  <span style={{ color: p.color }}>{p.label}</span>
+                ),
+                value: p.value,
+              }))}
+              dropdownStyle={{ background: "#1e293b" }}
             />
-            <span style={{ fontSize: 12 }}>RAG</span>
-            <Switch size="small" checked={ragEnabled} onChange={setRagEnabled} />
-            <span style={{ fontSize: 12 }}>MCP</span>
-            <Switch size="small" checked={mcpEnabled} onChange={setMcpEnabled} />
-          </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <DatabaseOutlined style={{ color: "#34d399", fontSize: 14 }} />
+              <Text style={{ color: "#94A3B8", fontSize: 13 }}>RAG</Text>
+              <Switch
+                size="small"
+                checked={ragEnabled}
+                onChange={setRagEnabled}
+                style={{ backgroundColor: ragEnabled ? "#34d399" : undefined }}
+              />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <ThunderboltOutlined style={{ color: "#f97316", fontSize: 14 }} />
+              <Text style={{ color: "#94A3B8", fontSize: 13 }}>MCP</Text>
+              <Switch
+                size="small"
+                checked={mcpEnabled}
+                onChange={setMcpEnabled}
+                style={{ backgroundColor: mcpEnabled ? "#f97316" : undefined }}
+              />
+            </div>
+          </Space>
         </div>
 
-        {/* 消息区（独立滚动） */}
+        {/* 消息区 */}
         <div
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "24px 0",
-            background: token.colorBgLayout,
+            padding: "32px",
           }}
         >
-          <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 16px" }}>
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            {messages.length === 0 && (
+              <div style={{ textAlign: "center", padding: "60px 0" }}>
+                <RobotOutlined style={{ fontSize: 64, color: "rgba(34, 211, 238, 0.3)" }} />
+                <Title level={4} style={{ color: "white", marginTop: 24, marginBottom: 8 }}>
+                  开始与 AI 助手对话
+                </Title>
+                <Text style={{ color: "#64748B" }}>
+                  支持 Kimi、DeepSeek、Qwen 等多种大模型，可开启 RAG 和 MCP 增强功能
+                </Text>
+              </div>
+            )}
             {messages.map((m, i) => (
               <div
                 key={i}
                 style={{
                   display: "flex",
                   justifyContent: m.role === "user" ? "flex-end" : "flex-start",
-                  margin: "10px 0",
+                  margin: "16px 0",
                 }}
               >
-                <div
-                  style={{
-                    background:
-                      m.role === "user"
-                        ? token.colorPrimary
-                        : token.colorBgContainer,
-                    color: token.colorText,
-                    padding: "12px 16px",
-                    borderRadius: 14,
-                    maxWidth: "70%",
-                    whiteSpace: "pre-wrap",
-                    lineHeight: 1.6,
-                  }}
-                >
+                <div style={m.role === "user" ? messageBubbleUser : messageBubbleAI}>
                   {m.content}
                 </div>
               </div>
@@ -377,25 +498,25 @@ export default function AiChatPage() {
           </div>
         </div>
 
-        {/* 输入区（sticky 底部） */}
+        {/* 输入区 */}
         <div
           style={{
-            position: "sticky",
-            bottom: 0,
-            background: token.colorBgLayout,
-            padding: "16px 0",
-            borderTop: `1px solid ${token.colorBorderSecondary}`,
+            padding: "24px 32px",
+            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "rgba(15, 23, 42, 0.5)",
+            backdropFilter: "blur(12px)",
           }}
         >
-          <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 16px" }}>
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
             <div
               style={{
-                background: token.colorBgContainer,
-                borderRadius: 14,
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 16,
                 display: "flex",
-                alignItems: "center",
+                alignItems: "flex-end",
                 gap: 8,
-                padding: "4px 6px 4px 14px",
+                padding: "8px 8px 8px 16px",
               }}
             >
               <TextArea
@@ -408,13 +529,13 @@ export default function AiChatPage() {
                     handleAsk();
                   }
                 }}
-                placeholder="输入你的问题…"
+                placeholder="输入你的问题，按 Enter 发送，Shift + Enter 换行..."
                 bordered={false}
                 style={{
                   background: "transparent",
-                  color: token.colorText,
+                  color: "white",
                   resize: "none",
-                  padding: "6px 0",
+                  padding: "8px 0",
                   fontSize: 15,
                   lineHeight: "22px",
                 }}
@@ -427,15 +548,20 @@ export default function AiChatPage() {
                 loading={loading}
                 onClick={handleAsk}
                 style={{
-                  width: 36,
-                  height: 36,
-                  minWidth: 36,
+                  width: 40,
+                  height: 40,
+                  background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(34, 211, 238, 0.3)",
                 }}
               />
             </div>
+            <Text style={{ color: "#64748B", fontSize: 12, display: "block", marginTop: 8, textAlign: "center" }}>
+              AI 生成内容仅供参考，请核实重要信息
+            </Text>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

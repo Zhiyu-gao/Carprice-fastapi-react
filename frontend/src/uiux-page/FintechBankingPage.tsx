@@ -13,11 +13,11 @@ interface TransactionType {
 }
 
 const transactions: TransactionType[] = [
-  { key: '1', name: 'Grocery Store', amount: -125.50, type: 'debit', date: '2026-02-05', category: 'Food' },
-  { key: '2', name: 'Salary', amount: 3500.00, type: 'credit', date: '2026-02-01', category: 'Income' },
-  { key: '3', name: 'Electric Bill', amount: -89.99, type: 'debit', date: '2026-02-03', category: 'Utilities' },
-  { key: '4', name: 'Coffee Shop', amount: -4.99, type: 'debit', date: '2026-02-04', category: 'Food' },
-  { key: '5', name: 'Netflix Subscription', amount: -15.99, type: 'debit', date: '2026-02-01', category: 'Entertainment' },
+  { key: '1', name: '杂货店', amount: -125.50, type: 'debit', date: '2026-02-05', category: '食品' },
+  { key: '2', name: '工资', amount: 3500.00, type: 'credit', date: '2026-02-01', category: '收入' },
+  { key: '3', name: '电费', amount: -89.99, type: 'debit', date: '2026-02-03', category: '水电' },
+  { key: '4', name: '咖啡店', amount: -4.99, type: 'debit', date: '2026-02-04', category: '食品' },
+  { key: '5', name: 'Netflix订阅', amount: -15.99, type: 'debit', date: '2026-02-01', category: '娱乐' },
 ];
 
 export default function FintechBankingPage() {
@@ -28,7 +28,7 @@ export default function FintechBankingPage() {
         <Row align="middle" justify="space-between">
           <Col>
             <Title level={4} style={{ color: "white", margin: 0, fontSize: "24px" }}>
-              My Bank
+              我的银行
             </Title>
           </Col>
           <Col>
@@ -58,15 +58,15 @@ export default function FintechBankingPage() {
           }}
         >
           <Paragraph style={{ color: "#9CA3AF", fontSize: "16px", marginBottom: "8px" }}>
-            Current Balance
+            当前余额
           </Paragraph>
           <Statistic 
             value={5234.78} 
-            prefix="$" 
+            prefix="¥" 
             valueStyle={{ color: "white", fontSize: "48px", fontWeight: 700 }} 
           />
           <Paragraph style={{ color: "#10B981", fontSize: "16px", margin: 0, marginTop: "8px" }}>
-            +$123.45 from last month
+            较上月增加¥123.45
           </Paragraph>
         </Card>
 
@@ -86,7 +86,7 @@ export default function FintechBankingPage() {
               }}
               icon={<WalletOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />}
             >
-              Deposit
+              存款
             </Button>
           </Col>
           <Col xs={12} sm={6} md={3}>
@@ -103,7 +103,7 @@ export default function FintechBankingPage() {
               }}
               icon={<CreditCardOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />}
             >
-              Pay
+              支付
             </Button>
           </Col>
           <Col xs={12} sm={6} md={3}>
@@ -120,7 +120,7 @@ export default function FintechBankingPage() {
               }}
               icon={<SwapOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />}
             >
-              Transfer
+              转账
             </Button>
           </Col>
           <Col xs={12} sm={6} md={3}>
@@ -137,14 +137,14 @@ export default function FintechBankingPage() {
               }}
               icon={<HistoryOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />}
             >
-              History
+              历史
             </Button>
           </Col>
         </Row>
 
         {/* Cards Section */}
         <Title level={3} style={{ color: "white", marginBottom: "16px", fontSize: "24px" }}>
-          My Cards
+          我的卡片
         </Title>
         <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
           <Col xs={24} sm={12}>
@@ -161,7 +161,7 @@ export default function FintechBankingPage() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
                 <Text style={{ color: "white", fontSize: "18px", fontWeight: 600 }}>
-                  Visa Classic
+                   Visa经典卡
                 </Text>
                 <Text style={{ color: "white", fontSize: "24px" }}>
                   💳
@@ -172,10 +172,10 @@ export default function FintechBankingPage() {
               </Paragraph>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Text style={{ color: "#9CA3AF", fontSize: "14px" }}>
-                  Expires 12/26
+                  有效期 12/26
                 </Text>
                 <Text style={{ color: "#9CA3AF", fontSize: "14px" }}>
-                  John Doe
+                  张明
                 </Text>
               </div>
             </Card>
@@ -194,7 +194,7 @@ export default function FintechBankingPage() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
                 <Text style={{ color: "white", fontSize: "18px", fontWeight: 600 }}>
-                  Mastercard Gold
+                  万事达金卡
                 </Text>
                 <Text style={{ color: "white", fontSize: "24px" }}>
                   💳
@@ -205,10 +205,10 @@ export default function FintechBankingPage() {
               </Paragraph>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Text style={{ color: "#9CA3AF", fontSize: "14px" }}>
-                  Expires 06/27
+                  有效期 06/27
                 </Text>
                 <Text style={{ color: "#9CA3AF", fontSize: "14px" }}>
-                  John Doe
+                  张明
                 </Text>
               </div>
             </Card>
@@ -217,7 +217,7 @@ export default function FintechBankingPage() {
 
         {/* Recent Transactions Section */}
         <Title level={3} style={{ color: "white", marginBottom: "16px", fontSize: "24px" }}>
-          Recent Transactions
+          最近交易
         </Title>
         <Card 
           bordered={false} 
@@ -257,7 +257,7 @@ export default function FintechBankingPage() {
                   fontWeight: 600, 
                   margin: 0 
                 }}>
-                  {transaction.type === 'credit' ? '+' : ''}${Math.abs(transaction.amount)}
+                  {transaction.type === 'credit' ? '+' : ''}¥{Math.abs(transaction.amount)}
                 </Paragraph>
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function FintechBankingPage() {
       {/* Financial Insights Section */}
       <div style={{ padding: "0 24px 24px" }}>
         <Title level={3} style={{ color: "white", marginBottom: "16px", fontSize: "24px" }}>
-          Financial Insights
+          财务洞察
         </Title>
         <Card 
           bordered={false} 
@@ -281,23 +281,23 @@ export default function FintechBankingPage() {
         >
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
             <Text style={{ color: "white", fontSize: "18px", fontWeight: 600 }}>
-              Spending by Category
+              按类别支出
             </Text>
             <Button 
               type="text" 
               style={{ color: "#CA8A04", fontSize: "16px", fontWeight: 600 }}
               icon={<BarChartOutlined />}
             >
-              View Chart
+              查看图表
             </Button>
           </div>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
             {[
-              { category: 'Food', amount: 456.78, percentage: 35 },
-              { category: 'Utilities', amount: 234.56, percentage: 18 },
-              { category: 'Entertainment', amount: 123.45, percentage: 10 },
-              { category: 'Transportation', amount: 345.67, percentage: 27 },
-              { category: 'Other', amount: 123.45, percentage: 10 }
+              { category: '食品', amount: 456.78, percentage: 35 },
+              { category: '水电', amount: 234.56, percentage: 18 },
+              { category: '娱乐', amount: 123.45, percentage: 10 },
+              { category: '交通', amount: 345.67, percentage: 27 },
+              { category: '其他', amount: 123.45, percentage: 10 }
             ].map((item) => (
               <div key={item.category} style={{ width: "100%" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
@@ -305,7 +305,7 @@ export default function FintechBankingPage() {
                     {item.category}
                   </Text>
                   <Text style={{ color: "#9CA3AF", fontSize: "16px" }}>
-                    ${item.amount}
+                    ¥{item.amount}
                   </Text>
                 </div>
                 <div style={{ width: "100%", height: "8px", background: "#3F3F46", borderRadius: "4px" }}>

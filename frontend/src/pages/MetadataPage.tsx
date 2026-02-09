@@ -12,24 +12,42 @@ import {
   Card,
   Divider,
   Descriptions,
+  Row,
+  Col,
+  Statistic,
+  Badge,
 } from "antd";
 import { api, getErrorMessage } from "../api/client";
 import type { CrawlCar, PageResp } from "../api/types";
+import {
+  EditOutlined,
+  CheckCircleOutlined,
+  CarOutlined,
+  TagsOutlined,
+  DatabaseOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
-/* =====================
-   类型定义
-===================== */
+
+const cardStyle: React.CSSProperties = {
+  background: "rgba(15, 23, 42, 0.6)",
+  border: "1px solid rgba(148, 163, 184, 0.1)",
+  borderRadius: 16,
+  backdropFilter: "blur(12px)",
+};
+
+const gradientButtonStyle: React.CSSProperties = {
+  background: "linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%)",
+  border: "none",
+  borderRadius: 8,
+  height: 40,
+  fontWeight: 600,
+};
 
 interface AnnotationForm {
   price_wan: number;
 }
 
-/* =====================
-   工具函数
-===================== */
-
-/** 从 info 中提取“建议标注价” */
 function getSuggestedPrice(
   info?: Record<string, string | number | null>
 ): number | undefined {
@@ -51,10 +69,6 @@ function getSuggestedPrice(
   return undefined;
 }
 
-/* =====================
-   主组件
-===================== */
-
 const CarAnnotationPage: React.FC = () => {
   const [cars, setCars] = useState<CrawlCar[]>([]);
   const [annotatedIds, setAnnotatedIds] = useState<Set<string>>(new Set());
@@ -68,10 +82,6 @@ const CarAnnotationPage: React.FC = () => {
 
   const [form] = Form.useForm<AnnotationForm>();
   const [messageApi, contextHolder] = message.useMessage();
-
-  /* =====================
-     数据加载
-  ===================== */
 
   const fetchCars = async (pageNo: number) => {
     try {
@@ -127,10 +137,6 @@ const CarAnnotationPage: React.FC = () => {
     fetchAnnotatedIds(cars);
   }, [cars]);
 
-  /* =====================
-     标注流程
-  ===================== */
-
   const openAnnotate = (car: CrawlCar) => {
     setSelected(car);
     setDrawerOpen(true);
@@ -164,83 +170,156 @@ const CarAnnotationPage: React.FC = () => {
     }
   };
 
-  /* =====================
-     渲染
-  ===================== */
+  // 统计数据
+  const annotatedCount = cars.filter(car => {
+    const carId = car.car_id ?? car.source_car_id ?? "";
+    return carId ? annotatedIds.has(carId) : false;
+  }).length;
 
   return (
-    <>
+    <div style={{ padding: "24px" }}>
       {contextHolder}
 
-      <Title level={3}>车辆价格标注</Title>
-      <Text type="secondary">
-        爬虫已给出网页参考价，人工仅需确认或微调
-      </Text>
+      {/* 页面标题 */}
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ color: "#f1f5f9", marginBottom: 8 }}>
+          <DatabaseOutlined style={{ marginRight: 12, color: "#22d3ee" }} />
+          车辆价格标注
+        </Title>
+        <Text style={{ color: "#94a3b8" }}>
+          爬虫已给出网页参考价，人工仅需确认或微调
+        </Text>
+      </div>
 
-      <List
-        loading={loading}
-        style={{ marginTop: 16 }}
-        dataSource={cars}
-        rowKey={(item) => item.car_id ?? item.source_car_id ?? item.title ?? ""}
-        pagination={{
-          current: page,
-          pageSize,
-          total,
-          onChange: (p) => fetchCars(p),
-          showSizeChanger: false,
-        }}
-        renderItem={(item) => {
-          const carId = item.car_id ?? item.source_car_id ?? "";
-          const annotated = carId ? annotatedIds.has(carId) : false;
+      {/* 统计卡片 */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={12} sm={8}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>总车辆</Text>}
+              value={total}
+              prefix={<CarOutlined style={{ color: "#22d3ee" }} />}
+              valueStyle={{ color: "#f1f5f9", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={8}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>已标注</Text>}
+              value={annotatedCount}
+              prefix={<CheckCircleOutlined style={{ color: "#10b981" }} />}
+              valueStyle={{ color: "#10b981", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={8}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>待标注</Text>}
+              value={total - annotatedCount}
+              prefix={<EditOutlined style={{ color: "#f59e0b" }} />}
+              valueStyle={{ color: "#f59e0b", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+      </Row>
 
-          return (
-            <List.Item
-              actions={[
-                <Button
-                  type="primary"
-                  disabled={annotated}
-                  onClick={() => openAnnotate(item)}
-                >
-                  {annotated ? "已标注" : "标注"}
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                title={
-                  <Space>
-                    <span>{item.title}</span>
-                    {annotated && <Tag color="green">已标注</Tag>}
-                  </Space>
-                }
-                description={
-                  item.tags && (
-                    <Space wrap>
-                      {item.tags.map((t) => (
-                        <Tag key={t}>{t}</Tag>
-                      ))}
+      {/* 车辆列表 */}
+      <Card style={cardStyle}>
+        <List
+          loading={loading}
+          dataSource={cars}
+          rowKey={(item) => item.car_id ?? item.source_car_id ?? item.title ?? ""}
+          pagination={{
+            current: page,
+            pageSize,
+            total,
+            onChange: (p) => fetchCars(p),
+            showSizeChanger: false,
+            style: { marginTop: 16 },
+          }}
+          renderItem={(item) => {
+            const carId = item.car_id ?? item.source_car_id ?? "";
+            const annotated = carId ? annotatedIds.has(carId) : false;
+
+            return (
+              <List.Item
+                style={{
+                  borderBottom: "1px solid rgba(148, 163, 184, 0.1)",
+                  padding: "16px 0",
+                }}
+                actions={[
+                  <Button
+                    type="primary"
+                    disabled={annotated}
+                    onClick={() => openAnnotate(item)}
+                    icon={annotated ? <CheckCircleOutlined /> : <EditOutlined />}
+                    style={annotated ? {} : gradientButtonStyle}
+                  >
+                    {annotated ? "已标注" : "标注"}
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Text style={{ color: "#f1f5f9", fontSize: 16, fontWeight: 500 }}>
+                        {item.title}
+                      </Text>
+                      {annotated && (
+                        <Badge
+                          status="success"
+                          text={<Text style={{ color: "#10b981" }}>已标注</Text>}
+                        />
+                      )}
                     </Space>
-                  )
-                }
-              />
-            </List.Item>
-          );
-        }}
-      />
+                  }
+                  description={
+                    item.tags && (
+                      <Space wrap style={{ marginTop: 8 }}>
+                        <TagsOutlined style={{ color: "#64748b" }} />
+                        {item.tags.map((t) => (
+                          <Tag
+                            key={t}
+                            style={{
+                              background: "rgba(34, 211, 238, 0.1)",
+                              color: "#22d3ee",
+                              border: "1px solid rgba(34, 211, 238, 0.3)",
+                            }}
+                          >
+                            {t}
+                          </Tag>
+                        ))}
+                      </Space>
+                    )
+                  }
+                />
+              </List.Item>
+            );
+          }}
+        />
+      </Card>
 
       <Drawer
-        title="车辆价格标注（确认 / 微调）"
+        title={<Text style={{ color: "#f1f5f9" }}>车辆价格标注（确认 / 微调）</Text>}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         size="large"
+        styles={{
+          header: { background: "#0f172a", borderBottom: "1px solid rgba(148, 163, 184, 0.1)" },
+          body: { background: "#0f172a" },
+          mask: { background: "rgba(0, 0, 0, 0.7)" },
+        }}
       >
         {selected && (
           <>
-            <Card bordered={false}>
-              <Title level={5}>{selected.title}</Title>
+            <Card style={{ ...cardStyle, marginBottom: 16 }}>
+              <Title level={5} style={{ color: "#f1f5f9" }}>{selected.title}</Title>
 
               {selected.image_path && (
                 <>
-                  <Divider />
+                  <Divider style={{ borderColor: "rgba(148, 163, 184, 0.1)" }} />
                   <img
                     src={`${import.meta.env.VITE_API_BASE_URL}/files/${selected.image_path}`}
                     alt="car"
@@ -248,6 +327,7 @@ const CarAnnotationPage: React.FC = () => {
                       width: "100%",
                       maxHeight: 320,
                       objectFit: "contain",
+                      borderRadius: 8,
                     }}
                   />
                 </>
@@ -255,11 +335,15 @@ const CarAnnotationPage: React.FC = () => {
 
               {selected.info && (
                 <>
-                  <Divider />
+                  <Divider style={{ borderColor: "rgba(148, 163, 184, 0.1)" }} />
                   <Descriptions
                     size="small"
                     column={2}
                     bordered
+                    styles={{
+                      label: { background: "rgba(15, 23, 42, 0.8)", color: "#94a3b8" },
+                      content: { background: "rgba(15, 23, 42, 0.6)", color: "#e2e8f0" },
+                    }}
                   >
                     {Object.entries(selected.info).map(([k, v]) => (
                       <Descriptions.Item key={k} label={k}>
@@ -271,7 +355,7 @@ const CarAnnotationPage: React.FC = () => {
               )}
             </Card>
 
-            <Divider />
+            <Divider style={{ borderColor: "rgba(148, 163, 184, 0.1)" }} />
 
             <Form
               form={form}
@@ -280,24 +364,29 @@ const CarAnnotationPage: React.FC = () => {
             >
               <Form.Item
                 name="price_wan"
-                label="成交价（万元，已填网页参考价）"
+                label={<Text style={{ color: "#94a3b8" }}>成交价（万元，已填网页参考价）</Text>}
                 rules={[{ required: true, message: "请输入成交价（万元）" }]}
               >
                 <InputNumber
                   min={0}
                   precision={2}
-                  style={{ width: "100%" }}
+                  style={{
+                    width: "100%",
+                    background: "rgba(15, 23, 42, 0.6)",
+                    borderColor: "rgba(148, 163, 184, 0.2)",
+                    color: "#e2e8f0",
+                  }}
                 />
               </Form.Item>
 
-              <Button type="primary" htmlType="submit" block>
+              <Button type="primary" htmlType="submit" block style={gradientButtonStyle}>
                 确认标注
               </Button>
             </Form>
           </>
         )}
       </Drawer>
-    </>
+    </div>
   );
 };
 

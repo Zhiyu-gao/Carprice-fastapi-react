@@ -11,11 +11,10 @@ export default function SaasLandingPage() {
         <Row align="middle" gutter={[48, 24]}>
           <Col xs={24} md={12}>
             <Title level={1} style={{ color: "#0C4A6E", marginBottom: "24px", fontSize: "48px" }}>
-              Transform Your Business with Our SaaS Platform
+              使用我们的SaaS平台转变您的业务
             </Title>
             <Paragraph style={{ color: "#0C4A6E", fontSize: "20px", marginBottom: "32px", lineHeight: 1.8 }}>
-              Powerful, scalable, and secure software solutions designed to accelerate your growth
-              and streamline operations.
+              强大、可扩展且安全的软件解决方案，旨在加速您的增长并简化运营流程。
             </Paragraph>
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
               <Button 
@@ -29,7 +28,7 @@ export default function SaasLandingPage() {
                   fontWeight: 600 
                 }}
               >
-                Get Started Free
+                免费开始使用
               </Button>
               <Button 
                 size="large" 
@@ -41,19 +40,19 @@ export default function SaasLandingPage() {
                   fontWeight: 600 
                 }}
               >
-                Request Demo
+                申请演示
               </Button>
             </div>
           </Col>
           <Col xs={24} md={12}>
             <div style={{ background: "white", borderRadius: "16px", padding: "32px", boxShadow: "0 10px 15px rgba(0,0,0,0.1)" }}>
               <Title level={3} style={{ color: "#0C4A6E", marginBottom: "24px" }}>
-                Try It Now
+                立即体验
               </Title>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <input 
                   type="email" 
-                  placeholder="Your work email" 
+                  placeholder="您的工作邮箱" 
                   style={{ 
                     padding: "12px 16px", 
                     border: "1px solid #E2E8F0", 
@@ -63,7 +62,7 @@ export default function SaasLandingPage() {
                 />
                 <input 
                   type="password" 
-                  placeholder="Create password" 
+                  placeholder="创建密码" 
                   style={{ 
                     padding: "12px 16px", 
                     border: "1px solid #E2E8F0", 
@@ -81,10 +80,10 @@ export default function SaasLandingPage() {
                     fontWeight: 600 
                   }}
                 >
-                  Start Free Trial
+                  开始免费试用
                 </Button>
                 <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0, textAlign: "center" }}>
-                  No credit card required. Cancel anytime.
+                  无需信用卡，随时可取消。
                 </Paragraph>
               </div>
             </div>
@@ -95,26 +94,26 @@ export default function SaasLandingPage() {
       {/* Trusted By Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto 80px" }}>
         <Paragraph style={{ color: "#64748B", fontSize: "16px", marginBottom: "32px", textAlign: "center" }}>
-          TRUSTED BY 10,000+ BUSINESSES WORLDWIDE
+          全球10,000+企业信赖之选
         </Paragraph>
         <Row gutter={[48, 24]} justify="center">
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company A</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 A</Text>
           </Col>
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company B</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 B</Text>
           </Col>
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company C</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 C</Text>
           </Col>
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company D</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 D</Text>
           </Col>
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company E</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 E</Text>
           </Col>
           <Col xs={6} sm={4} md={3} style={{ textAlign: "center" }}>
-            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>Company F</Text>
+            <Text style={{ color: "#0C4A6E", fontSize: "24px", fontWeight: 600 }}>公司 F</Text>
           </Col>
         </Row>
       </div>
@@ -122,7 +121,7 @@ export default function SaasLandingPage() {
       {/* Features Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto 80px" }}>
         <Title level={2} style={{ color: "#0C4A6E", marginBottom: "48px", textAlign: "center" }}>
-          Powerful Features to Boost Your Productivity
+          强大功能，提升您的生产力
         </Title>
         <Row gutter={[24, 24]}>
           <Col xs={24} sm={12} md={8}>
@@ -138,10 +137,10 @@ export default function SaasLandingPage() {
               hoverable
             >
               <Title level={4} style={{ color: "#0C4A6E", marginBottom: "16px" }}>
-                Secure & Scalable
+                安全且可扩展
               </Title>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8 }}>
-                Enterprise-grade security and unlimited scalability to grow with your business.
+                企业级安全性和无限可扩展性，与您的业务共同成长。
               </Paragraph>
             </Card>
           </Col>
@@ -158,10 +157,10 @@ export default function SaasLandingPage() {
               hoverable
             >
               <Title level={4} style={{ color: "#0C4A6E", marginBottom: "16px" }}>
-                Real-time Analytics
+                实时分析
               </Title>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8 }}>
-                Track key metrics and make data-driven decisions with powerful analytics.
+                追踪关键指标，通过强大的分析功能做出数据驱动的决策。
               </Paragraph>
             </Card>
           </Col>
@@ -178,10 +177,10 @@ export default function SaasLandingPage() {
               hoverable
             >
               <Title level={4} style={{ color: "#0C4A6E", marginBottom: "16px" }}>
-                24/7 Support
+                7×24小时支持
               </Title>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8 }}>
-                Get help whenever you need it from our dedicated support team.
+                我们专业的支持团队随时为您提供帮助。
               </Paragraph>
             </Card>
           </Col>
@@ -191,7 +190,7 @@ export default function SaasLandingPage() {
       {/* Testimonials Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto 80px" }}>
         <Title level={2} style={{ color: "#0C4A6E", marginBottom: "48px", textAlign: "center" }}>
-          What Our Customers Say
+          客户怎么说
         </Title>
         <Row gutter={[24, 24]}>
           <Col xs={24} sm={12} md={8}>
@@ -212,16 +211,16 @@ export default function SaasLandingPage() {
                 ))}
               </div>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8, marginBottom: "24px" }}>
-                "This platform has transformed our business operations. We've seen a 300% increase in productivity since implementing it."
+                "这个平台彻底改变了我们的业务运营。自实施以来，我们的生产力提升了300%。"
               </Paragraph>
               <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                 <Avatar size={48} icon={<UserOutlined />} style={{ backgroundColor: "#0EA5E9" }} />
                 <div>
                   <Title level={5} style={{ color: "#0C4A6E", margin: 0 }}>
-                    Sarah Johnson
+                    张晓明
                   </Title>
                   <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0 }}>
-                    CEO, TechCorp
+                    首席执行官，科技公司
                   </Paragraph>
                 </div>
               </div>
@@ -245,16 +244,16 @@ export default function SaasLandingPage() {
                 ))}
               </div>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8, marginBottom: "24px" }}>
-                "The best SaaS solution we've ever used. The customer support is exceptional and the features are top-notch."
+                "我们用过的最好的SaaS解决方案。客户支持非常出色，功能也是一流的。"
               </Paragraph>
               <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                 <Avatar size={48} icon={<UserOutlined />} style={{ backgroundColor: "#0EA5E9" }} />
                 <div>
                   <Title level={5} style={{ color: "#0C4A6E", margin: 0 }}>
-                    Michael Chen
+                    李建华
                   </Title>
                   <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0 }}>
-                    CTO, Innovatech
+                    技术总监，创新科技
                   </Paragraph>
                 </div>
               </div>
@@ -278,16 +277,16 @@ export default function SaasLandingPage() {
                 ))}
               </div>
               <Paragraph style={{ color: "#0C4A6E", lineHeight: 1.8, marginBottom: "24px" }}>
-                "We were able to scale our business globally thanks to this platform. The integration capabilities are amazing."
+                "多亏了这个平台，我们得以将业务扩展到全球。集成能力令人惊叹。"
               </Paragraph>
               <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
                 <Avatar size={48} icon={<UserOutlined />} style={{ backgroundColor: "#0EA5E9" }} />
                 <div>
                   <Title level={5} style={{ color: "#0C4A6E", margin: 0 }}>
-                    Emily Rodriguez
+                    王芳
                   </Title>
                   <Paragraph style={{ color: "#64748B", fontSize: "14px", margin: 0 }}>
-                    Founder, GlobalScale
+                    创始人，全球扩展
                   </Paragraph>
                 </div>
               </div>
@@ -299,10 +298,10 @@ export default function SaasLandingPage() {
       {/* CTA Section */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", background: "#0EA5E9", borderRadius: "16px", padding: "64px 32px", textAlign: "center" }}>
         <Title level={2} style={{ color: "white", marginBottom: "24px" }}>
-          Ready to Transform Your Business?
+          准备好转变您的业务了吗？
         </Title>
         <Paragraph style={{ color: "white", fontSize: "20px", marginBottom: "32px", lineHeight: 1.8 }}>
-          Join thousands of businesses already using our platform to drive growth and efficiency.
+          加入数千家已经在使用我们平台推动增长和提升效率的企业。
         </Paragraph>
         <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
           <Button 
@@ -316,7 +315,7 @@ export default function SaasLandingPage() {
               fontWeight: 600 
             }}
           >
-            Get Started Free
+            免费开始使用
           </Button>
           <Button 
             size="large" 
@@ -329,7 +328,7 @@ export default function SaasLandingPage() {
               fontWeight: 600 
             }}
           >
-            Request Demo
+            申请演示
           </Button>
         </div>
       </div>
