@@ -51,8 +51,13 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "http://47.83.219.94"
+        "http://47.83.219.94",
+        "http://www.nrydawang.shop",
+        "https://www.nrydawang.shop",
+        "http://nrydawang.shop",
+        "https://nrydawang.shop",
     ],
+
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

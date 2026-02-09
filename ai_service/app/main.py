@@ -12,11 +12,16 @@ from app.rag import router as rag_router
 from app.config import KIMI_CONFIG, QWEN_CONFIG, DEEPSEEK_CONFIG
 
 app = FastAPI(title="AI Vehicle Price Service")# 允许前端访问（和你 backend 的 CORS 一样）
-origins = [
-    "http://47.83.219.94",
+origins=[
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-]
+    "http://47.83.219.94",
+    "http://www.nrydawang.shop",
+    "https://www.nrydawang.shop",
+    "http://nrydawang.shop",
+    "https://nrydawang.shop",
+],
+
 
 app.include_router(chat_router)
 app.include_router(rag_router)
