@@ -198,6 +198,10 @@ Vehicle-Intelligence-Platform/
 ```
 
 ---
+
+系统监控
+Prometheus + Grafana + node_exporter + cadvisor
+
 服务器命令：
 
 创建管理员

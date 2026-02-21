@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { api, getErrorMessage } from "../api/client";
 import type { ForumPost, ForumComment, UserProfile } from "../api/types";
+import { resolveFileUrl } from "../utils/fileUrl";
 import {
   MessageOutlined,
   UserOutlined,
@@ -30,8 +31,6 @@ import {
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const cardStyle: React.CSSProperties = {
   background: "rgba(15, 23, 42, 0.6)",
   border: "1px solid rgba(148, 163, 184, 0.1)",
@@ -134,7 +133,7 @@ export default function ForumPage() {
     if (avatarPath) {
       return (
         <Avatar
-          src={`${API_BASE_URL}/files/${avatarPath}`}
+          src={resolveFileUrl(avatarPath)}
           size={40}
           style={{ border: "2px solid rgba(34, 211, 238, 0.3)" }}
         />

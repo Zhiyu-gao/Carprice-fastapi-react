@@ -77,7 +77,15 @@ def start_task(
     city_name: str,
     start_page: int,
     end_page: int,
+    write_local_db: bool = True,
+    write_cloud_db: bool = False,
 ) -> dict[str, Any]:
+    db_targets: list[str] = []
+    if write_local_db:
+        db_targets.append("local")
+    if write_cloud_db:
+        db_targets.append("cloud")
+
     task_id = uuid4().hex
     log_rel = f"logs/crawl/{task_id}.log"
     task = {
@@ -87,6 +95,9 @@ def start_task(
         "city_name": city_name,
         "start_page": start_page,
         "end_page": end_page,
+        "write_local_db": write_local_db,
+        "write_cloud_db": write_cloud_db,
+        "db_targets": db_targets,
         "status": "running",
         "created_at": _now(),
         "updated_at": _now(),
@@ -106,13 +117,15 @@ def start_task(
 
     def _runner():
         log("[TASK] start")
+        log(f"[TASK] db_targets={db_targets or ['none']}")
         try:
             run_spider(
                 city_code=city_code,
                 start_page=start_page,
                 end_page=end_page,
                 log_fn=log,
-                save_to_db=True,
+                save_to_db=bool(db_targets),
+                db_targets=db_targets,
                 should_stop=cancel_event.is_set,
             )
             status = "canceled" if cancel_event.is_set() else "success"
@@ -160,3 +173,28 @@ def read_task_log(task_id: str, max_lines: int = 2000) -> str:
     if len(lines) > max_lines:
         lines = lines[-max_lines:]
     return "\n".join(lines)
+
+
+def delete_task(task_id: str) -> bool:
+    with _lock:
+        tasks = _read_tasks()
+        idx = next((i for i, t in enumerate(tasks) if t.get("id") == task_id), -1)
+        if idx < 0:
+            return False
+        task = tasks[idx]
+        tasks.pop(idx)
+        _write_tasks(tasks)
+
+    flag = _cancel_flags.get(task_id)
+    if flag:
+        flag.set()
+
+    log_rel = task.get("log_path")
+    if log_rel:
+        log_path = DATA_DIR / log_rel
+        try:
+            if log_path.exists():
+                log_path.unlink()
+        except Exception:
+            pass
+    return True

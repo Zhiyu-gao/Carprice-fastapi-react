@@ -5,6 +5,7 @@ import {
   Drawer,
   Form,
   InputNumber,
+  Input,
   Typography,
   Tag,
   message,
@@ -19,12 +20,15 @@ import {
 } from "antd";
 import { api, getErrorMessage } from "../api/client";
 import type { CrawlCar, PageResp } from "../api/types";
+import { resolveFileUrl } from "../utils/fileUrl";
 import {
   EditOutlined,
   CheckCircleOutlined,
   CarOutlined,
   TagsOutlined,
   DatabaseOutlined,
+  DeleteOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -76,6 +80,7 @@ const CarAnnotationPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 100;
+  const [keyword, setKeyword] = useState("");
 
   const [selected, setSelected] = useState<CrawlCar | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -83,11 +88,12 @@ const CarAnnotationPage: React.FC = () => {
   const [form] = Form.useForm<AnnotationForm>();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const fetchCars = async (pageNo: number) => {
+  const fetchCars = async (pageNo: number, kw?: string) => {
     try {
       setLoading(true);
+      const keywordValue = (kw ?? keyword).trim();
       const res = await api.get<PageResp<CrawlCar>>("/crawl-cars", {
-        params: { page: pageNo, page_size: pageSize },
+        params: { page: pageNo, page_size: pageSize, keyword: keywordValue || undefined },
       });
       const data = res.data;
       const items = Array.isArray(data?.items) ? data.items : [];
@@ -170,6 +176,18 @@ const CarAnnotationPage: React.FC = () => {
     }
   };
 
+  const deleteCar = async (car: CrawlCar) => {
+    const id = car.car_id ?? car.source_car_id ?? "";
+    if (!id) return;
+    try {
+      await api.delete(`/crawl-cars/${id}`);
+      messageApi.success("数据已删除");
+      await fetchCars(page);
+    } catch (e: any) {
+      messageApi.error(getErrorMessage(e, "删除失败"));
+    }
+  };
+
   // 统计数据
   const annotatedCount = cars.filter(car => {
     const carId = car.car_id ?? car.source_car_id ?? "";
@@ -227,6 +245,34 @@ const CarAnnotationPage: React.FC = () => {
 
       {/* 车辆列表 */}
       <Card style={cardStyle}>
+        <Space style={{ width: "100%", marginBottom: 12 }} direction="vertical">
+          <Input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onPressEnter={() => fetchCars(1)}
+            placeholder="输入车源ID或标题搜索"
+            prefix={<SearchOutlined />}
+            allowClear
+            style={{
+              background: "rgba(15, 23, 42, 0.6)",
+              borderColor: "rgba(148, 163, 184, 0.2)",
+              color: "#e2e8f0",
+            }}
+          />
+          <Space>
+            <Button type="primary" onClick={() => fetchCars(1)} style={gradientButtonStyle}>
+              搜索
+            </Button>
+            <Button
+              onClick={() => {
+                setKeyword("");
+                fetchCars(1, "");
+              }}
+            >
+              重置
+            </Button>
+          </Space>
+        </Space>
         <List
           loading={loading}
           dataSource={cars}
@@ -258,6 +304,13 @@ const CarAnnotationPage: React.FC = () => {
                     style={annotated ? {} : gradientButtonStyle}
                   >
                     {annotated ? "已标注" : "标注"}
+                  </Button>,
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => deleteCar(item)}
+                  >
+                    删除
                   </Button>,
                 ]}
               >
@@ -321,7 +374,7 @@ const CarAnnotationPage: React.FC = () => {
                 <>
                   <Divider style={{ borderColor: "rgba(148, 163, 184, 0.1)" }} />
                   <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}/files/${selected.image_path}`}
+                    src={resolveFileUrl(selected.image_path)}
                     alt="car"
                     style={{
                       width: "100%",

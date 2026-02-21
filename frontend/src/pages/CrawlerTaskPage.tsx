@@ -1,4 +1,4 @@
-import { Card, Table, Tag, Button, Space, message, Modal, Select, Form, Input, Typography, Row, Col, Statistic } from "antd";
+import { Card, Table, Tag, Button, Space, message, Modal, Select, Form, Input, Typography, Row, Col, Statistic, Switch } from "antd";
 import { useEffect, useState } from "react";
 import { api, getErrorMessage } from "../api/client";
 import {
@@ -10,6 +10,7 @@ import {
   FileTextOutlined,
   ReloadOutlined,
   BugOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -23,6 +24,8 @@ interface CrawlerTask {
   city_name: string;
   city_code: string;
   log_url?: string;
+  write_local_db?: boolean;
+  write_cloud_db?: boolean;
 }
 
 const cardStyle: React.CSSProperties = {
@@ -97,6 +100,16 @@ export default function CrawlerTaskPage() {
       fetchTasks();
     } catch (e: any) {
       message.error(getErrorMessage(e, "取消失败"));
+    }
+  };
+
+  const deleteTask = async (task: CrawlerTask) => {
+    try {
+      await api.delete(`/crawl-tasks/${task.id}`);
+      message.success("任务已删除");
+      fetchTasks();
+    } catch (e: any) {
+      message.error(getErrorMessage(e, "删除失败"));
     }
   };
 
@@ -183,12 +196,24 @@ export default function CrawlerTaskPage() {
           >
             取消
           </Button>
+          <Button
+            size="small"
+            danger
+            onClick={() => deleteTask(task)}
+            icon={<DeleteOutlined />}
+          >
+            删除
+          </Button>
         </Space>
       ),
     },
   ];
 
   const onStartTask = async (values: any) => {
+    if (!values.write_local_db && !values.write_cloud_db) {
+      message.warning("至少开启一个数据库写入开关");
+      return;
+    }
     const city = cityOptions.find((c) => c.value === values.city_code);
     try {
       await api.post("/crawl-tasks/start", {
@@ -196,6 +221,8 @@ export default function CrawlerTaskPage() {
         city_name: city?.label || values.city_code,
         start_page: Number(values.start_page || 1),
         end_page: Number(values.end_page || 1),
+        write_local_db: Boolean(values.write_local_db),
+        write_cloud_db: Boolean(values.write_cloud_db),
       });
       message.success("任务已启动");
       setStartModalOpen(false);
@@ -311,7 +338,12 @@ export default function CrawlerTaskPage() {
           mask: { background: "rgba(0, 0, 0, 0.7)" },
         }}
       >
-        <Form form={form} onFinish={onStartTask} layout="vertical" initialValues={{ start_page: 1, end_page: 1 }}>
+        <Form
+          form={form}
+          onFinish={onStartTask}
+          layout="vertical"
+          initialValues={{ start_page: 1, end_page: 1, write_local_db: true, write_cloud_db: false }}
+        >
           <Form.Item
             name="city_code"
             label={<Text style={{ color: "#94a3b8" }}>城市</Text>}
@@ -332,6 +364,22 @@ export default function CrawlerTaskPage() {
 
           <Form.Item name="end_page" label={<Text style={{ color: "#94a3b8" }}>结束页</Text>}>
             <Input placeholder="1" style={{ background: "rgba(15, 23, 42, 0.6)" }} />
+          </Form.Item>
+
+          <Form.Item
+            name="write_local_db"
+            label={<Text style={{ color: "#94a3b8" }}>写入本地数据库</Text>}
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          </Form.Item>
+
+          <Form.Item
+            name="write_cloud_db"
+            label={<Text style={{ color: "#94a3b8" }}>写入云端数据库</Text>}
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="开" unCheckedChildren="关" />
           </Form.Item>
 
           <Form.Item>

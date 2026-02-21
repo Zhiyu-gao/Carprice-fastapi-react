@@ -7,7 +7,9 @@ services:
     restart: always
     depends_on:
       - frontend
+      - frontend_mobile
       - backend
+      - ai_service
     ports:
       - "80:80"
       - "443:443"
@@ -83,6 +85,13 @@ services:
   frontend:
     build: ./frontend
     container_name: vehicle_frontend
+    restart: always
+    expose:
+      - "80"
+
+  frontend_mobile:
+    build: ./mobile2
+    container_name: vehicle_frontend_mobile
     restart: always
     expose:
       - "80"

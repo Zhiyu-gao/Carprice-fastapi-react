@@ -9,6 +9,7 @@ OSS_URL_EXPIRE = int(os.getenv("OSS_URL_EXPIRE", "600"))
 OSS_AUTH_MODE = os.getenv("OSS_AUTH_MODE", "ram").lower()
 OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID", "")
 OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET", "")
+OSS_PUBLIC_BASE_URL = os.getenv("OSS_PUBLIC_BASE_URL", "").strip()
 
 
 def _get_bucket() -> oss2.Bucket:
@@ -46,3 +47,21 @@ def sign_url(relative_path: str) -> str:
     bucket = _get_bucket()
     key = _build_key(relative_path)
     return bucket.sign_url("GET", key, OSS_URL_EXPIRE)
+
+
+def is_oss_ready() -> bool:
+    return OSS_ENABLED and bool(OSS_BUCKET) and bool(OSS_ENDPOINT)
+
+
+def object_url(relative_path: str) -> str:
+    if not is_oss_ready():
+        return ""
+
+    key = _build_key(relative_path)
+    if OSS_PUBLIC_BASE_URL:
+        return f"{OSS_PUBLIC_BASE_URL.rstrip('/')}/{key}"
+
+    endpoint = OSS_ENDPOINT.strip()
+    if "://" in endpoint:
+        endpoint = endpoint.split("://", 1)[1]
+    return f"https://{OSS_BUCKET}.{endpoint}/{key}"

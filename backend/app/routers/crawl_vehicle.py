@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.db import get_db
 from app import models
 from app.schemas.crawl_vehicle import CrawlVehicleOut
@@ -10,9 +11,18 @@ router = APIRouter(prefix="/crawl-cars", tags=["crawl"])
 def list_crawl_cars(
     page: int = Query(1, ge=1),
     page_size: int = Query(100, ge=1, le=500),
+    keyword: str | None = Query(None, description="按车源ID或标题搜索"),
     db: Session = Depends(get_db),
 ):
     q = db.query(models.CrawlCar)
+    kw = (keyword or "").strip()
+    if kw:
+        q = q.filter(
+            or_(
+                models.CrawlCar.source_car_id.like(f"%{kw}%"),
+                models.CrawlCar.title.like(f"%{kw}%"),
+            )
+        )
     total = q.count()
     items = (
         q.order_by(models.CrawlCar.crawl_time.desc())
@@ -45,3 +55,25 @@ def get_crawl_car(
     if not item:
         raise HTTPException(status_code=404, detail="未找到车辆")
     return CrawlVehicleOut.model_validate(item)
+
+
+@router.delete("/{source_car_id}")
+def delete_crawl_car(
+    source_car_id: str,
+    db: Session = Depends(get_db),
+):
+    item = (
+        db.query(models.CrawlCar)
+        .filter(models.CrawlCar.source_car_id == source_car_id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="未找到车辆")
+
+    # 删除关联标注，避免残留训练数据
+    db.query(models.TrainCar).filter(
+        models.TrainCar.source_car_id == source_car_id
+    ).delete()
+    db.delete(item)
+    db.commit()
+    return {"ok": True}

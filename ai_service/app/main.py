@@ -20,7 +20,7 @@ origins=[
     "https://www.nrydawang.shop",
     "http://nrydawang.shop",
     "https://nrydawang.shop",
-],
+]
 
 
 app.include_router(chat_router)

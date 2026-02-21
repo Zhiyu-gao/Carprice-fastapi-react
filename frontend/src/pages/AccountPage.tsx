@@ -15,6 +15,7 @@ import {
 } from "@ant-design/icons";
 import { api, getErrorMessage } from "../api/client";
 import type { UserMe } from "../api/types";
+import { resolveFileUrl } from "../utils/fileUrl";
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -194,11 +195,7 @@ const AccountPage: React.FC = () => {
               <div style={{ position: "relative", display: "inline-block" }}>
                 <Avatar
                   size={120}
-                  src={
-                    user?.avatar_path
-                      ? `${import.meta.env.VITE_API_BASE_URL}/files/${user.avatar_path}`
-                      : undefined
-                  }
+                  src={resolveFileUrl(user?.avatar_path)}
                   style={{
                     background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
                     border: "4px solid rgba(34, 211, 238, 0.3)",

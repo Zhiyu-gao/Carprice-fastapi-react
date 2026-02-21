@@ -48,6 +48,7 @@ import HealthcareDashboardPage from "./uiux-page/HealthcareDashboardPage";
 import PortfolioPage from "./uiux-page/PortfolioPage";
 import EcommerceMobilePage from "./uiux-page/EcommerceMobilePage";
 import FintechBankingPage from "./uiux-page/FintechBankingPage";
+import TestPage from "./pages/Test";
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -359,6 +360,9 @@ function App() {
         <Route path="/ui/portfolio" element={<PortfolioPage />} />
         <Route path="/ui/ecommerce-mobile" element={<EcommerceMobilePage />} />
         <Route path="/ui/fintech-banking" element={<FintechBankingPage />} />
+
+        {/* 测试页面（无需登录） */}
+        <Route path="/test" element={<TestPage />} />
 
         {/* 登录/注册/介绍合并页 */}
         <Route path="/landing" element={<LandingPage />} />

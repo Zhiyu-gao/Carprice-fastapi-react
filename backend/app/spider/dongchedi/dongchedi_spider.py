@@ -23,7 +23,7 @@ import os
 import requests
 from playwright.sync_api import sync_playwright
 from app.storage.local import save_image_local
-from app.db import SessionLocal
+from app.db import get_session_by_target
 from app.services.crawl_car_service import save_crawl_car
 
 
@@ -196,13 +196,21 @@ def run(
     end_page: int,
     log_fn: Callable[[str], None] | None = None,
     save_to_db: bool = False,
+    db_targets: list[str] | None = None,
     should_stop: Callable[[], bool] | None = None,
 ):
     log = log_fn or (lambda msg: print(msg, flush=True))
-    db = SessionLocal() if save_to_db else None
+    targets = db_targets or ["local"]
+    db_sessions = []
+    if save_to_db:
+        for target in targets:
+            db_sessions.append((target, get_session_by_target(target)))
+
     # 运行时再次确保目录存在（防止 data 被手动删除）
     JSON_DIR.mkdir(parents=True, exist_ok=True)
     IMG_DIR.mkdir(parents=True, exist_ok=True)
+    if db_sessions:
+        log(f"[DB] 写入目标: {[t for t, _ in db_sessions]}")
 
     try:
         with sync_playwright() as p:
@@ -331,7 +339,7 @@ def run(
                         encoding="utf-8"
                     )
 
-                    if db is not None:
+                    for _target, db in db_sessions:
                         save_crawl_car(db, data)
 
                     scraped += 1
@@ -342,7 +350,7 @@ def run(
                     page.wait_for_load_state("domcontentloaded")
                     time.sleep(0.6)
 
-                if db is not None:
+                for _target, db in db_sessions:
                     db.commit()
 
                 log(f"[SUMMARY] page={page_no} scraped={scraped} skipped={skipped}")
@@ -350,11 +358,11 @@ def run(
             log("\n[DONE] 全部完成")
             browser.close()
     except Exception:
-        if db is not None:
+        for _target, db in db_sessions:
             db.rollback()
         raise
     finally:
-        if db is not None:
+        for _target, db in db_sessions:
             db.close()
 
 
