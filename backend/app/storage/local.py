@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
-from app.storage.oss import upload_bytes, sign_url, object_url, is_oss_ready
+
+from app.storage.oss import is_oss_ready, object_url, sign_url, upload_bytes
 
 DATA_DIR = Path(os.getenv("DATA_DIR", "data")).resolve()
 IMAGE_DIR = DATA_DIR / "crawl" / "images"

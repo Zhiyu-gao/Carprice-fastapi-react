@@ -1,8 +1,8 @@
+import logging
 import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 from uuid import uuid4
 
 from openai import OpenAI
@@ -21,6 +21,9 @@ QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "rag_chunks").strip() or "rag
 EMBED_BASE_URL = os.getenv("RAG_EMBEDDING_BASE_URL", os.getenv("QWEN_BASE_URL", "")).strip()
 EMBED_API_KEY = os.getenv("RAG_EMBEDDING_API_KEY", os.getenv("QWEN_API_KEY", "")).strip()
 EMBED_MODEL = os.getenv("RAG_EMBEDDING_MODEL", "text-embedding-v3").strip()
+logger = logging.getLogger(__name__)
+RagDoc = dict[str, str | None]
+RagHit = dict[str, str | float]
 
 
 def _now() -> str:
@@ -137,6 +140,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS rag_docs (
               id TEXT PRIMARY KEY,
               filename TEXT NOT NULL,
+              upload_path TEXT,
               created_at TEXT NOT NULL
             );
             """
@@ -152,12 +156,16 @@ def init_db() -> None:
             );
             """
         )
+        cols = conn.execute("PRAGMA table_info(rag_docs)").fetchall()
+        col_names = {str(r[1]) for r in cols}
+        if "upload_path" not in col_names:
+            conn.execute("ALTER TABLE rag_docs ADD COLUMN upload_path TEXT")
         conn.commit()
     finally:
         conn.close()
 
 
-def save_document(filename: str, content: str) -> dict[str, Any]:
+def save_document(filename: str, content: str, upload_path: str | None = None) -> RagDoc:
     init_db()
     doc_id = uuid4().hex
     chunks = _chunk_text(content)
@@ -191,8 +199,8 @@ def save_document(filename: str, content: str) -> dict[str, Any]:
     conn = _get_conn()
     try:
         conn.execute(
-            "INSERT INTO rag_docs (id, filename, created_at) VALUES (?, ?, ?)",
-            (doc_id, filename, now),
+            "INSERT INTO rag_docs (id, filename, upload_path, created_at) VALUES (?, ?, ?, ?)",
+            (doc_id, filename, upload_path, now),
         )
         for i, chunk in enumerate(chunks):
             conn.execute(
@@ -205,12 +213,12 @@ def save_document(filename: str, content: str) -> dict[str, Any]:
     return {"id": doc_id, "filename": filename}
 
 
-def list_docs() -> list[dict[str, Any]]:
+def list_docs() -> list[RagDoc]:
     init_db()
     conn = _get_conn()
     try:
         rows = conn.execute(
-            "SELECT id, filename, created_at FROM rag_docs ORDER BY created_at DESC"
+            "SELECT id, filename, upload_path, created_at FROM rag_docs ORDER BY created_at DESC"
         ).fetchall()
         return [dict(r) for r in rows]
     finally:
@@ -233,13 +241,43 @@ def delete_doc(doc_id: str) -> None:
 
     conn = _get_conn()
     try:
+        row = conn.execute(
+            "SELECT upload_path FROM rag_docs WHERE id = ?",
+            (doc_id,),
+        ).fetchone()
+        upload_path = str(row["upload_path"]) if row and row["upload_path"] else ""
         conn.execute("DELETE FROM rag_docs WHERE id = ?", (doc_id,))
         conn.commit()
     finally:
         conn.close()
+    if upload_path:
+        try:
+            p = Path(upload_path)
+            if p.exists() and p.is_file():
+                p.unlink()
+        except OSError:
+            logger.warning("failed to delete uploaded file: %s", upload_path)
 
 
-def retrieve(query: str, top_k: int = 5) -> list[dict[str, Any]]:
+def _search_points(qdrant: QdrantClient, vector: list[float], top_k: int):
+    if hasattr(qdrant, "search"):
+        return qdrant.search(
+            collection_name=QDRANT_COLLECTION,
+            query_vector=vector,
+            limit=top_k,
+            with_payload=True,
+        )
+    resp = qdrant.query_points(
+        collection_name=QDRANT_COLLECTION,
+        query=vector,
+        limit=top_k,
+        with_payload=True,
+    )
+    points = getattr(resp, "points", None)
+    return points if points is not None else resp
+
+
+def retrieve(query: str, top_k: int = 5) -> list[RagHit]:
     init_db()
     query = (query or "").strip()
     if not query:
@@ -251,14 +289,9 @@ def retrieve(query: str, top_k: int = 5) -> list[dict[str, Any]]:
     collection_info = qdrant.get_collection(QDRANT_COLLECTION)
     if (collection_info.points_count or 0) == 0:
         _reindex_from_sqlite()
-    results = qdrant.search(
-        collection_name=QDRANT_COLLECTION,
-        query_vector=q_vec,
-        limit=top_k,
-        with_payload=True,
-    )
+    results = _search_points(qdrant, q_vec, top_k)
 
-    hits: list[dict[str, Any]] = []
+    hits: list[RagHit] = []
     for r in results:
         payload = r.payload or {}
         content = str(payload.get("content") or "").strip()

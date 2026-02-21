@@ -1,6 +1,8 @@
 # app/models/car.py
-from sqlalchemy import Column, Integer, Float, String
+from sqlalchemy import Column, Float, Integer, String
+
 from app.db import Base
+
 
 class TrainCar(Base):
     __tablename__ = "train_cars"

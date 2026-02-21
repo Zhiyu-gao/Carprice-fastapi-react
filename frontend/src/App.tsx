@@ -8,7 +8,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { Layout, Menu, Button, Typography, Space, Spin } from "antd";
+import { Layout, Menu, Button, Typography, Space, Spin, Dropdown, Avatar } from "antd";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -17,17 +17,18 @@ import {
   DatabaseOutlined,
   GithubOutlined,
   LogoutOutlined,
-  DashboardOutlined,
   MessageOutlined,
   UsergroupAddOutlined,
-  SettingOutlined,
   UserOutlined,
+  FundProjectionScreenOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
 
 import LandingPage from "./pages/LandingPage";
 import PredictPage from "./pages/PredictPage";
 import AccountPage from "./pages/AccountPage";
 import VisualizationPage from "./pages/VisualizationPage";
+import VisualizationScreenPage from "./pages/VisualizationScreenPage";
 import CrawlerTaskPage from "./pages/CrawlerTaskPage";
 import MetadataPage from "./pages/MetadataPage";
 import AiChatPage from "./pages/AiChatPage";
@@ -57,7 +58,7 @@ const { Text } = Typography;
 function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [me, setMe] = useState<{ role: string } | null>(null);
+  const [me, setMe] = useState<{ role: string; username?: string } | null>(null);
   const [loadingMe, setLoadingMe] = useState(true);
 
   const path = location.pathname;
@@ -66,6 +67,7 @@ function AppLayout() {
     "/intro": "intro",
     "/predict": "predict",
     "/visualization": "visualization",
+    "/visualization-screen": "visualization_screen",
     "/account": "account",
     "/ai_chat": "ai_chat",
     "/crawler": "crawler",
@@ -130,10 +132,11 @@ function AppLayout() {
       icon: <BarChartOutlined />,
       label: "价格预测",
     },
+    // 暂时隐藏「可视化」
     {
-      key: "visualization",
-      icon: <DashboardOutlined />,
-      label: "可视化",
+      key: "visualization_screen",
+      icon: <FundProjectionScreenOutlined />,
+      label: "数据大屏",
     },
     {
       key: "ai_chat",
@@ -161,11 +164,7 @@ function AppLayout() {
       : []),
     ...(role === "admin"
       ? [
-          {
-            key: "admin_monitor",
-            icon: <SettingOutlined />,
-            label: "系统监控",
-          },
+          // 暂时隐藏「系统监控」
           {
             key: "admin_users",
             icon: <UsergroupAddOutlined />,
@@ -183,10 +182,34 @@ function AppLayout() {
       icon: <DatabaseOutlined />,
       label: "元数据",
     },
+  ];
+
+  const userMenuItems = [
+    {
+      key: "account",
+      icon: <IdcardOutlined />,
+      label: "我的",
+      onClick: () => navigate("/account"),
+    },
     {
       key: "author",
       icon: <UserOutlined />,
       label: "关于作者",
+      onClick: () => navigate("/author"),
+    },
+    {
+      key: "github",
+      icon: <GithubOutlined />,
+      label: "GitHub",
+      onClick: () =>
+        window.open("https://github.com/Zhiyu-gao/Carprice-fastapi-react", "_blank"),
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "退出",
+      danger: true,
+      onClick: handleLogout,
     },
   ];
 
@@ -197,9 +220,9 @@ function AppLayout() {
         style={{
           background: "#0F172A",
           borderBottom: "1px solid rgba(255,255,255,0.1)",
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "220px 1fr 220px",
           alignItems: "center",
-          justifyContent: "space-between",
           padding: "0 48px",
           height: 64,
           position: "fixed",
@@ -234,64 +257,67 @@ function AppLayout() {
         </div>
 
         {/* 导航菜单 */}
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[selectedKey]}
-          onClick={({ key }) => {
-            if (key === "predict") navigate("/predict");
-            if (key === "visualization") navigate("/visualization");
-            if (key === "account") navigate("/account");
-            if (key === "ai_chat") navigate("/ai_chat");
-            if (key === "crawler") navigate("/crawler");
-            if (key === "metadata") navigate("/metadata");
-            if (key === "buyer") navigate("/buyer");
-            if (key === "admin_monitor") navigate("/admin/monitor");
-            if (key === "admin_users") navigate("/admin/users");
-            if (key === "forum") navigate("/forum");
-            if (key === "chat") navigate("/chat");
-            if (key === "intro") navigate("/intro");
-            if (key === "author") navigate("/author");
-          }}
-          items={menuItems}
+        <div
           style={{
-            background: "transparent",
-            border: "none",
-            flex: 1,
-            marginLeft: 48,
-            maxWidth: 800,
+            width: "100%",
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            display: "flex",
+            justifyContent: "center",
           }}
-        />
+        >
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[selectedKey]}
+            disabledOverflow
+            onClick={({ key }) => {
+              if (key === "predict") navigate("/predict");
+              if (key === "visualization") navigate("/visualization");
+              if (key === "visualization_screen") navigate("/visualization-screen");
+              if (key === "account") navigate("/account");
+              if (key === "ai_chat") navigate("/ai_chat");
+              if (key === "crawler") navigate("/crawler");
+              if (key === "metadata") navigate("/metadata");
+              if (key === "buyer") navigate("/buyer");
+              if (key === "admin_monitor") navigate("/admin/monitor");
+              if (key === "admin_users") navigate("/admin/users");
+              if (key === "forum") navigate("/forum");
+              if (key === "chat") navigate("/chat");
+              if (key === "intro") navigate("/intro");
+              if (key === "author") navigate("/author");
+            }}
+            items={menuItems}
+            style={{
+              background: "transparent",
+              border: "none",
+              minWidth: "max-content",
+            }}
+          />
+        </div>
 
         {/* 右侧操作区 */}
-        <Space size={24}>
-          <Button
-            type="text"
-            icon={<GithubOutlined style={{ color: "#94A3B8", fontSize: 20 }} />}
-            onClick={() =>
-              window.open("https://github.com/Zhiyu-gao/Carprice-fastapi-react", "_blank")
-            }
-          />
-          <Button
-            type="primary"
-            ghost
-            icon={<IdcardOutlined />}
-            onClick={() => navigate("/account")}
-            style={{
-              borderColor: "rgba(255,255,255,0.3)",
-              color: "white",
-            }}
+        <Space size={16} style={{ justifySelf: "end" }}>
+          <Dropdown
+            menu={{ items: userMenuItems }}
+            trigger={["click"]}
+            placement="bottomRight"
           >
-            我的
-          </Button>
-          <Button
-            type="primary"
-            danger
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-          >
-            退出
-          </Button>
+            <Button
+              type="text"
+              style={{ height: 42, paddingInline: 10, color: "#e2e8f0" }}
+            >
+              <Space size={8}>
+                <Avatar
+                  size={30}
+                  style={{ background: "linear-gradient(135deg, #22d3ee, #0ea5e9)" }}
+                  icon={<UserOutlined />}
+                />
+                <span style={{ fontSize: 13 }}>{me?.username || "用户中心"}</span>
+                <DownOutlined style={{ fontSize: 12, color: "#94a3b8" }} />
+              </Space>
+            </Button>
+          </Dropdown>
         </Space>
       </Header>
 
@@ -374,6 +400,7 @@ function App() {
           <Route path="/intro" element={<ProjectIntroPage />} />
           <Route path="/predict" element={<PredictPage />} />
           <Route path="/visualization" element={<VisualizationPage />} />
+          <Route path="/visualization-screen" element={<VisualizationScreenPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/ai_chat" element={<AiChatPage />} />
           <Route index element={<Navigate to="/intro" replace />} />

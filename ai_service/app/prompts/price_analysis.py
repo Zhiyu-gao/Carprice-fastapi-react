@@ -1,20 +1,18 @@
-# ai_service/app/prompts/price_analysis.py
-from typing import Any, Dict
-
+from typing import Any
 
 SYSTEM_PROMPT = """
 你是一名专业的车辆价格分析顾问，善于结合结构化特征数据，
 给出通俗易懂的价格解释和买卖建议。
 
 要求：
-- 用简洁的中文
+- 用简洁中文
 - 用 Markdown 标题和列表组织内容
-- 不要虚构具体小区或城市，只根据给定数据分析
-"""
+- 不要虚构具体品牌配置，只根据给定数据分析
+""".strip()
 
 
 def build_price_analysis_user_prompt(
-    features: Dict[str, Any],
+    features: dict[str, Any],
     predicted_price: float,
 ) -> str:
     return f"""
@@ -45,4 +43,4 @@ def build_price_analysis_user_prompt(
 
 ## 5. 卖方视角建议
 - 如果我是卖方，挂牌价建议以及是否需要上调/下调及原因
-"""
+""".strip()

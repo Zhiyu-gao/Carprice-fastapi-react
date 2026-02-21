@@ -1,14 +1,8 @@
-# ai_service/app/price_analysis_service.py
-from typing import Dict, Any
-
-from app.schemas import VehicleFeatures, AiProvider
-from app.prompts.price_analysis import (
-    SYSTEM_PROMPT,
-    build_price_analysis_user_prompt,
-)
+from app.prompts.price_analysis import SYSTEM_PROMPT, build_price_analysis_user_prompt
+from app.providers.deepseek_client import deepseek_chat
 from app.providers.kimi_client import kimi_chat
 from app.providers.qwen_client import qwen_chat_messages
-from app.providers.deepseek_client import deepseek_chat
+from app.schemas import AiProvider, VehicleFeatures
 
 
 def _call_provider(provider: AiProvider, messages: list[dict[str, str]]) -> str:
@@ -26,17 +20,13 @@ def analyze_price_with_ai(
     features: VehicleFeatures,
     predicted_price: float,
 ) -> str:
-    """
-    统一入口：给定 provider + 车辆特征 + 预测价格，返回 AI 分析结果（Markdown 文本）
-    """
-    features_dict: Dict[str, Any] = {
-        "area_sqm": features.area_sqm,
-        "bedrooms": features.bedrooms,
-        "age_years": features.age_years,
-    }
-
+    """Return markdown analysis for the predicted vehicle price."""
     user_prompt = build_price_analysis_user_prompt(
-        features=features_dict,
+        features={
+            "area_sqm": features.area_sqm,
+            "bedrooms": features.bedrooms,
+            "age_years": features.age_years,
+        },
         predicted_price=predicted_price,
     )
 
@@ -44,6 +34,4 @@ def analyze_price_with_ai(
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-
-    content = _call_provider(provider, messages)
-    return content.strip()
+    return _call_provider(provider, messages).strip()

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 from app.db import SessionLocal
 from app.services.crawl_car_service import save_crawl_car
 

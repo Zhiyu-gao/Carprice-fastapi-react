@@ -7,11 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc -b --pretty false",
     "preview": "vite preview"
   },
   "dependencies": {
     "antd": "^6.0.0",
     "axios": "^1.13.2",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "mapbox-gl": "^3.18.1",
     "maplibre-gl": "^5.18.0",
     "react": "^19.2.0",

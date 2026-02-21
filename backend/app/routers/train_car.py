@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+
 from app.db import get_db
-from app import models
 from app.services.train_car_service import list_train_cars as list_train_cars_svc
 
 router = APIRouter(prefix="/train-cars", tags=["train"])

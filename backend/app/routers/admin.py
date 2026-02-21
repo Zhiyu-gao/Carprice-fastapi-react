@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.db import get_db
 from app import models
+from app.db import get_db
 from app.routers.auth import get_current_admin
-from app.services.admin_service import list_users as list_users_svc, set_user_active, overview as overview_svc, metrics as metrics_svc
+from app.services.admin_service import list_users as list_users_svc
+from app.services.admin_service import metrics as metrics_svc
+from app.services.admin_service import overview as overview_svc
+from app.services.admin_service import set_user_active
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 

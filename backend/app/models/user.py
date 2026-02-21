@@ -1,9 +1,8 @@
 
-from sqlalchemy import Column, Integer, String, DateTime, JSON
-from datetime import datetime
+from sqlalchemy import Column, DateTime, Integer, String, func
+
 from app.db import Base
 
-from sqlalchemy import func
 
 class User(Base):
     __tablename__ = "users"

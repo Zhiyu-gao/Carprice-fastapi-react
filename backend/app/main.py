@@ -1,24 +1,42 @@
 # app/main.py
 from dotenv import load_dotenv
+
 load_dotenv()
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from prometheus_fastapi_instrumentator import Instrumentator
+from sqlalchemy.orm import Session
 
-from app.routers import auth, annotations, crawl_vehicle, crawl_task, predict, vehicle, admin, train_car, forum, user_profile, chat, oss_files
-from app.routers.auth import get_current_user
-from app.schemas import UserOut, UserUpdate, PasswordUpdate
 from app import models
 from app.db import get_db
-from sqlalchemy.orm import Session
-from app.services.user_service import update_profile, change_password
+from app.routers import (
+    admin,
+    annotations,
+    auth,
+    chat,
+    crawl_task,
+    crawl_vehicle,
+    forum,
+    oss_files,
+    predict,
+    train_car,
+    user_profile,
+)
+from app.routers.auth import get_current_user
+from app.schemas import PasswordUpdate, UserOut, UserUpdate
+from app.services.user_service import change_password, update_profile
 
 app = FastAPI(title="Vehicle Price API")
-from fastapi.staticfiles import StaticFiles
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 from pathlib import Path
+
+from fastapi.staticfiles import StaticFiles
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
+PROJECT_DIR = BASE_DIR.parent
 
 # 把 data 目录暴露成 /files
 app.mount(
@@ -26,6 +44,14 @@ app.mount(
     StaticFiles(directory=DATA_DIR),
     name="files",
 )
+
+
+@app.get("/public/preview/video")
+def preview_video():
+    video_path = PROJECT_DIR / "remotion" / "out" / "video.mp4"
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="预览视频不存在")
+    return FileResponse(video_path, media_type="video/mp4")
 
 # ======================
 # 路由注册

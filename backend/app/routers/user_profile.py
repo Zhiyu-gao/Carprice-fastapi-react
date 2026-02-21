@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from app.db import get_db
+
 from app import models
+from app.db import get_db
 from app.routers.auth import get_current_user
 from app.storage.local import save_avatar_local
 

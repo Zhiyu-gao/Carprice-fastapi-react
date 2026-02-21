@@ -1,15 +1,17 @@
-import joblib
-import pandas as pd
-from sqlalchemy.orm import Session
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-
-from app.db import SessionLocal
-from app import models
 import re
 from datetime import datetime
+
+import joblib
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sqlalchemy.orm import Session
+
+from app import models
+from app.db import SessionLocal
+
 
 def parse_float(val):
     if val is None:

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import or_
-from app.db import get_db
+from sqlalchemy.orm import Session
+
 from app import models
+from app.db import get_db
 from app.schemas.crawl_vehicle import CrawlVehicleOut
 
 router = APIRouter(prefix="/crawl-cars", tags=["crawl"])

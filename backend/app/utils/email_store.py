@@ -1,7 +1,7 @@
-import redis
-import random
-import time
 import os
+import random
+
+import redis
 
 r = redis.Redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
 

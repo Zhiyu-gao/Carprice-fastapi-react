@@ -12,20 +12,21 @@
 """
 
 import json
-import time
+import os
 import random
 import re
-from pathlib import Path
+import time
 from datetime import datetime
-from urllib.parse import urljoin
+from pathlib import Path
 from typing import Callable
-import os
+from urllib.parse import urljoin
+
 import requests
 from playwright.sync_api import sync_playwright
-from app.storage.local import save_image_local
+
 from app.db import get_session_by_target
 from app.services.crawl_car_service import save_crawl_car
-
+from app.storage.local import save_image_local
 
 # =========================
 # 配置区

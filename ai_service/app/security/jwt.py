@@ -1,25 +1,17 @@
+import logging
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
-# ⚠️ 必须和 backend 完全一致
-from app.config import SECRET_KEY, ALGORITHM
+from app.config import ALGORITHM, SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+logger = logging.getLogger(__name__)
 
-print("🔐 AI SECRET_KEY =", SECRET_KEY)
 
-
-def get_current_user_from_jwt(
-    token: str = Depends(oauth2_scheme),
-) -> dict:
-    print("🔥 AI 收到 Authorization token =", token)
-    """
-    AI 服务专用：
-    - 只验证 JWT
-    - 不查数据库
-    - 返回 user 基本信息 dict
-    """
+def get_current_user_from_jwt(token: str = Depends(oauth2_scheme)) -> dict[str, int | str | None]:
+    """Decode backend JWT and return user identity payload."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="无法验证凭证",
@@ -30,15 +22,12 @@ def get_current_user_from_jwt(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         email = payload.get("email")
-
         if user_id is None:
             raise credentials_exception
-
         return {
             "user_id": int(user_id),
             "email": email,
         }
-
-    except (JWTError, ValueError) as e:
-        print("❌ JWT decode error:", e)
+    except (JWTError, ValueError):
+        logger.warning("JWT decode failed")
         raise credentials_exception

@@ -1,7 +1,10 @@
 # app/models/crawl_car.py
-from sqlalchemy import Column, Integer, String, DateTime, JSON
 from datetime import datetime
+
+from sqlalchemy import JSON, Column, DateTime, Integer, String
+
 from app.db import Base
+
 
 class CrawlCar(Base):
     __tablename__ = "crawl_cars"

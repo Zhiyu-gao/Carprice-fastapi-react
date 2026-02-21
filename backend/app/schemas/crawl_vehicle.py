@@ -1,7 +1,9 @@
 # app/schemas/crawl_vehicle.py
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
 
 class CrawlVehicleOut(BaseModel):
     car_id: str = Field(alias="source_car_id")

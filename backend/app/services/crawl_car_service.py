@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
 from app.models.crawl_car import CrawlCar
-from datetime import datetime
+
 
 # app/services/crawl_car_service.py
 def save_crawl_car(db, data: dict) -> bool:

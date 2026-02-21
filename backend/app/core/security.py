@@ -1,9 +1,11 @@
 # app/core/security.py
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from jose import jwt, JWTError
+
+from jose import JWTError, jwt
+
 from app.schemas import TokenData
-import os
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = os.environ.get("ALGORITHM", "HS256")
@@ -16,6 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 天
 
 # app/core/security.py
 import bcrypt
+
 
 def get_password_hash(password: str) -> str:
     # bcrypt 要求 bytes

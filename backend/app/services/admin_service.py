@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 import psutil
+from sqlalchemy.orm import Session
 
 from app import models
 

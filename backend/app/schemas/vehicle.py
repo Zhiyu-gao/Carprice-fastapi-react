@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class VehicleCreate(BaseModel):
     area_sqm: float
     bedrooms: int

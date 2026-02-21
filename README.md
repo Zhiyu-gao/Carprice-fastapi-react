@@ -1,209 +1,149 @@
-# 🚗 Vehicle Intelligence Platform
+# Vehicle Intelligence Platform
 
-**React + FastAPI + MySQL + SQLAlchemy + Playwright + ML + AI Service (Kimi/Qwen/DeepSeek) + RAG/MCP**
+A full-stack platform for used-car data crawling, annotation, model prediction, AI assistant (multi-LLM), and operations monitoring.
 
-一个工程级的车辆智能平台，包含：爬虫采集、数据标注、训练集管理、价格预测、AI 多模型问答、系统管理与监控。
+## Stack
+- Frontend: React + Vite + Ant Design
+- Backend: FastAPI + SQLAlchemy + MySQL + Playwright + scikit-learn
+- AI Service: FastAPI + Kimi/Qwen/DeepSeek + RAG + MCP
+- Infra: Redis + Qdrant + ClickHouse + Prometheus + Grafana + Nginx
 
----
+## Repository Layout
+- `frontend/`: Web UI
+- `mobile2/`: Mobile web build (Expo Router export)
+- `backend/`: Core business APIs
+- `ai_service/`: AI chat, RAG, MCP
+- `nginx/`: reverse proxy config
+- `observability/`: Prometheus + Grafana config
+- `docker-compose.yml`: full deployment stack
+- `docker-compose.infra.yml`: infra-only stack
 
-## ✨ 项目亮点
+## Architecture
+- Frontend calls Backend for auth, data, crawler tasks, prediction, admin APIs.
+- Frontend calls AI Service for chat/RAG/MCP.
+- AI Service validates JWT with the same `SECRET_KEY` as Backend.
+- AI Service MCP tools call Backend APIs.
 
-- **真实爬虫数据**：懂车帝二手车数据采集
-- **标注 → 训练集**：标注完成的数据进入训练集 `train_cars`
-- **AI 多模型**：Kimi / Qwen / DeepSeek 可切换
-- **RAG / MCP**：支持上传文档检索 + MCP 工具调用
-- **权限分级**：买房 / 卖房 / 管理员
-- **管理后台**：用户管理、系统监控、资源统计
+## 1) Local Development
 
----
-
-## 🧭 系统架构
-
-```text
-┌────────────┐      ┌────────────┐
-│ Frontend   │─────▶│ Backend    │─────▶ MySQL
-│ (React)    │      │ (FastAPI)  │
-└────────────┘      └─────┬──────┘
-                           │
-                           ▼
-                  ┌────────────────┐
-                  │ AI Service     │
-                  │ (FastAPI)      │
-                  └────────────────┘
-                           ▲
-                           │
-                     ┌───────────┐
-                     │ Crawler   │
-                     │ (Playwright)
-                     └───────────┘
-```
-
----
-
-## 🧩 功能模块
-
-### ✅ Backend（FastAPI · 8000）
-
-- 用户注册 / 登录（JWT）
-- 角色权限（buyer / seller / admin）
-- 爬虫任务管理
-- 数据标注 + 训练集
-- 车辆价格预测
-- 管理员监控 & 用户管理
-
-### ✅ AI Service（FastAPI · 8080）
-
-- AI 聊天（可切换 Kimi/Qwen/DeepSeek）
-- 对话历史存储
-- RAG 文档上传检索
-- MCP 工具调用（任务/车辆查询）
-
-### ✅ Frontend（React · 5173）
-
-- 登录 / 注册（支持角色选择）
-- 爬虫任务管理
-- 数据标注
-- 训练集展示（买房角色可见）
-- AI 聊天（多模型 + RAG + MCP）
-- 系统监控 + 用户管理（管理员）
-
----
-
-## 🔐 权限说明
-
-| 角色 | 可见功能 |
-|------|----------|
-| buyer | 训练集（我要买房） |
-| seller | 基础功能（爬虫/标注/预测等） |
-| admin | 所有页面 + 系统监控 + 用户管理 |
-
-> 管理员账号不能注册，用户名固定 `admin`。
-
----
-
-## 🚀 启动方式
-
-### 1）后端（backend）
-
+### Backend
 ```bash
 cd backend
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-### 2）AI 服务（ai_service）
-
+### AI Service
 ```bash
 cd ai_service
 uv sync
-uv run uvicorn app.main:app --port 8080
+uv run uvicorn app.main:app --reload --port 8080
 ```
 
-### 3）前端（frontend）
-
+### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
----
-
-## ⚙️ 环境变量
-
-### backend/.env
-```
-MYSQL_USER=...
-MYSQL_PASSWORD=...
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_DB=vehicle_price_db
-
-SECRET_KEY=abc123
-ALGORITHM=HS256
-```
-
-### ai_service/.env
-```
-KIMI_API_KEY=...
-KIMI_BASE_URL=https://api.moonshot.cn/v1
-KIMI_MODEL=kimi-k2-turbo-preview
-
-QWEN_API_KEY=...
-QWEN_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-QWEN_MODEL=qwen-plus
-
-DEEPSEEK_API_KEY=...
-DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
-DEEPSEEK_MODEL=deepseek-chat
-
-SECRET_KEY=abc123
-ALGORITHM=HS256
-```
-
----
-
-## 🕷 爬虫（Playwright）
-
-入口脚本：
-```
-backend/app/spider/dongchedi/dongchedi_spider.py
-```
-
-运行方式：
+### Optional Infra for local
 ```bash
-cd backend
-python -m app.spider.dongchedi.dongchedi_spider
+docker compose -f docker-compose.infra.yml up -d
 ```
 
----
+## 2) Deployment with Docker Compose
 
-## 🧪 训练集说明
-
-- 标注数据写入：`train_cars`
-- 买房角色可看到训练集页面
-- 管理员可见所有
-
----
-
-## 🛡 管理员账号创建
-
+### Step A: Prepare env files
+1. Copy root env:
 ```bash
-cd backend
-python -m app.scripts.create_admin
+cp .env.example .env
 ```
+2. Update secrets and passwords in `.env`.
+3. Confirm service env files:
+- `backend/.env`
+- `ai_service/.env`
+- `frontend/.env` (for local Vite only)
+- `mobile2/.env` (for local Expo only)
 
----
-
-## 📎 数据库迁移（示例）
-
-如果需要新增字段：
-
-```sql
-ALTER TABLE users ADD COLUMN username VARCHAR(64);
-ALTER TABLE users ADD COLUMN role VARCHAR(16) NOT NULL DEFAULT 'buyer';
-```
-
----
-
-## 📂 项目结构
-
-```text
-Vehicle-Intelligence-Platform/
-├── backend/           # FastAPI + MySQL + Playwright
-├── ai_service/        # AI Service + RAG + MCP
-├── frontend/          # React + Ant Design
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-系统监控
-Prometheus + Grafana + node_exporter + cadvisor
-
-服务器命令：
-
-创建管理员
-docker exec -it vehicle_backend uv run python -m app.scripts.create_admin
+### Step B: Build and run full stack
+```bash
 docker compose up -d --build
+```
+
+### Step C: Validate
+```bash
+docker compose ps
+curl -f http://127.0.0.1:8000/metrics
+curl -f http://127.0.0.1:8080/metrics
+curl -f http://127.0.0.1:9090/-/healthy
+curl -f http://127.0.0.1:3000/api/health
+```
+
+### Step D: One-command deploy script
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+Optional:
+```bash
+DEPLOY_HOST=<your-server-ip> ./deploy.sh
+COMPOSE_FILE=docker-compose.yml ./deploy.sh
+```
+
+## 3) Docker Notes
+
+### Full stack (`docker-compose.yml`)
+- Includes nginx, mysql, redis, qdrant, clickhouse, backend, ai_service, frontend, frontend_mobile, prometheus, grafana.
+- Uses healthchecks and startup dependencies (`depends_on.condition`) to reduce boot race issues.
+- Persists data in docker volumes and bind mounts:
+  - `mysql_data`, `qdrant_data`, `clickhouse_data`, `prometheus_data`, `grafana_data`
+  - `./backend/data:/app/data`
+  - `./ai_service/data:/app/data`
+
+### Infra-only (`docker-compose.infra.yml`)
+- Starts Qdrant, ClickHouse, Prometheus, Grafana, node_exporter, cadvisor.
+- Suitable when Backend/AI run directly on host.
+
+## 4) Important Environment Variables
+
+### Root `.env` (used by compose)
+- `SECRET_KEY`, `ALGORITHM`
+- `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`
+- `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB`
+- `OSS_*`
+- `BACKEND_API_BASE_URL`, `QDRANT_URL`
+
+### `backend/.env`
+- Must match JWT settings used by AI Service:
+  - `SECRET_KEY`
+  - `ALGORITHM`
+
+### `ai_service/.env`
+- LLM provider config: `KIMI_*`, `QWEN_*`, `DEEPSEEK_*`
+- RAG config: `QDRANT_*`, `RAG_EMBEDDING_*`
+- JWT config must match backend.
+
+## 5) Nginx and TLS
+- Nginx config is in `nginx/conf.d/default.conf`.
+- Current config expects cert files under:
+  - `nginx/cert/live/nrydawang.shop/fullchain.pem`
+  - `nginx/cert/live/nrydawang.shop/privkey.pem`
+- If deploying to another domain, update `server_name` and cert paths accordingly.
+
+## 6) Monitoring
+- Prometheus: `http://<host>:9090`
+- Grafana: `http://<host>:3000` (`admin/admin` by default; change in production)
+
+## 7) Quality Checks
+```bash
+make check
+make format
+```
+See `CODE_QUALITY.md` for details.
+
+## 8) Common Deployment Pitfalls
+- JWT mismatch between Backend and AI Service (`SECRET_KEY`/`ALGORITHM`).
+- Missing TLS cert files for Nginx 443 config.
+- AI embedding API key missing (`RAG_EMBEDDING_API_KEY` or `QWEN_API_KEY`).
+- DNS/domain not matching nginx `server_name`.

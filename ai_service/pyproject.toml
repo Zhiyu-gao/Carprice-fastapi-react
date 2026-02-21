@@ -14,6 +14,32 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "python-jose>=3.5.0",
     "python-multipart>=0.0.22",
+    "prometheus-fastapi-instrumentator>=7.1.0",
     "qdrant-client>=1.15.1",
     "uvicorn>=0.38.0",
 ]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "ruff>=0.11.13",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E402", "E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+pretty = true

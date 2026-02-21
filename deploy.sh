@@ -1,68 +1,46 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_NAME="Vehicle Intelligence Platform"
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
+DEPLOY_HOST="${DEPLOY_HOST:-127.0.0.1}"
 
 echo "=========================================="
-echo " 🚀 HousePrice 全站部署开始"
+echo " Deploying ${PROJECT_NAME}"
+echo " compose file: ${COMPOSE_FILE}"
 echo "=========================================="
 
-set -e  # 出错立即停止脚本
+echo "[1/5] Pull latest code"
+git pull --ff-only
 
-SERVER_IP="20.2.82.150"
+echo "[2/5] Validate compose"
+docker compose -f "${COMPOSE_FILE}" config >/dev/null
 
-#############################################
-# 1. 更新代码
-#############################################
-echo "🔄 拉取 Git 最新代码..."
-git pull 
+echo "[3/5] Recreate services"
+docker compose -f "${COMPOSE_FILE}" down
+docker compose -f "${COMPOSE_FILE}" up -d --build
 
-echo ""
+echo "[4/5] Current container status"
+docker compose -f "${COMPOSE_FILE}" ps
+
+echo "[5/5] Health checks"
+check_url() {
+  local name="$1"
+  local url="$2"
+  if curl -fsS --max-time 10 "$url" >/dev/null; then
+    echo "  [OK] ${name}: ${url}"
+  else
+    echo "  [WARN] ${name} not ready: ${url}"
+  fi
+}
+
+sleep 5
+check_url "Backend" "http://${DEPLOY_HOST}:8000/metrics"
+check_url "AI Service" "http://${DEPLOY_HOST}:8080/metrics"
+check_url "Frontend" "http://${DEPLOY_HOST}/"
+check_url "Prometheus" "http://${DEPLOY_HOST}:9090/-/healthy"
+check_url "Grafana" "http://${DEPLOY_HOST}:3000/api/health"
+
 echo "=========================================="
-echo " 🐳 构建 Docker 容器"
-echo "=========================================="
-
-# 2. 停掉旧容器
-echo "🔄 停止旧服务..."
-docker compose down
-
-# 3. 重建镜像
-echo "🔨 构建新镜像..."
-docker compose up -d --build
-
-echo ""
-echo "=========================================="
-echo " 🔍 检查容器状态"
-echo "=========================================="
-
-docker ps
-
-echo ""
-echo "=========================================="
-echo " 🩺 后端健康检查"
-echo "=========================================="
-
-sleep 3
-curl -s http://$SERVER_IP:8000/docs >/dev/null \
-  && echo "✔ Backend 正常运行" \
-  || echo "❌ Backend 健康检查失败"
-
-echo ""
-echo "=========================================="
-echo " 🧠 AI Service 健康检查"
-echo "=========================================="
-
-curl -s http://$SERVER_IP:8080/docs >/dev/null \
-  && echo "✔ AI Service 正常运行" \
-  || echo "❌ AI Service 健康检查失败"
-
-echo ""
-echo "=========================================="
-echo " 🎨 前端健康检查"
-echo "=========================================="
-
-curl -s http://$SERVER_IP >/dev/null \
-  && echo "✔ Frontend 正常运行" \
-  || echo "❌ Frontend 健康检查失败"
-
-echo ""
-echo "=========================================="
-echo " 🚀 部署完成！项目已经成功运行！"
+echo " Deployment completed"
 echo "=========================================="

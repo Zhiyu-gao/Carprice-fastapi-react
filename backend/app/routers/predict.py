@@ -1,5 +1,6 @@
 import pandas as pd
 from fastapi import APIRouter
+
 from app.schemas.predict import CarPredictIn
 from app.train import load_model
 

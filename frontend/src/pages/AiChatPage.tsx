@@ -78,6 +78,8 @@ export default function AiChatPage() {
   const [ragEnabled, setRagEnabled] = useState(false);
   const [mcpEnabled, setMcpEnabled] = useState(false);
   const [docs, setDocs] = useState<{ id: string; filename: string }[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -93,34 +95,66 @@ export default function AiChatPage() {
   };
 
   const fetchDocs = async () => {
-    const res = await fetch(`${AI_BASE_URL}/ai/rag/docs`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    const data = await res.json();
-    setDocs(
-      Array.isArray(data)
-        ? data.map((d: any) => ({ id: d.id, filename: d.filename }))
-        : []
-    );
+    try {
+      const res = await fetch(`${AI_BASE_URL}/ai/rag/docs`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      setDocs(
+        Array.isArray(data)
+          ? data.map((d: any) => ({ id: d.id, filename: d.filename }))
+          : []
+      );
+    } catch {
+      message.error("获取文档列表失败");
+    }
   };
 
   const uploadDoc = async (file: File) => {
+    setUploadingDoc(true);
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch(`${AI_BASE_URL}/ai/rag/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-      body: form,
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      message.error(err.detail || "上传失败");
-      return;
+    try {
+      const res = await fetch(`${AI_BASE_URL}/ai/rag/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: form,
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        message.error(err.detail || "上传失败");
+        return;
+      }
+      message.success("上传成功");
+      fetchDocs();
+    } catch {
+      message.error("上传失败");
+    } finally {
+      setUploadingDoc(false);
     }
-    message.success("上传成功");
-    fetchDocs();
+  };
+
+  const deleteDoc = async (docId: string) => {
+    setDeletingDocId(docId);
+    try {
+      const res = await fetch(`${AI_BASE_URL}/ai/rag/docs/${docId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        message.error(err.detail || "删除文档失败");
+        return;
+      }
+      setDocs((prev) => prev.filter((d) => d.id !== docId));
+      message.success("文档已删除");
+    } catch {
+      message.error("删除文档失败");
+    } finally {
+      setDeletingDocId(null);
+    }
   };
 
   const fetchMessages = async (sessionId: string) => {
@@ -232,6 +266,11 @@ export default function AiChatPage() {
         mcp_enabled: mcpEnabled,
       }),
     });
+    if (!res.ok || !res.body) {
+      setLoading(false);
+      message.error("聊天请求失败");
+      return;
+    }
 
     const reader = res.body!.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -254,9 +293,15 @@ export default function AiChatPage() {
           return;
         }
         const parsed = JSON.parse(data);
+        if (parsed.error) {
+          setLoading(false);
+          message.error(parsed.error);
+          return;
+        }
         if (parsed.delta) appendAiToken(parsed.delta);
       }
     }
+    setLoading(false);
   };
 
   const providers = [
@@ -373,6 +418,7 @@ export default function AiChatPage() {
           <input
             type="file"
             accept=".pdf,.doc,.docx,.txt,.md"
+            disabled={uploadingDoc}
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) uploadDoc(f);
@@ -391,8 +437,34 @@ export default function AiChatPage() {
           <div style={{ marginTop: 8, fontSize: 12 }}>
             {docs.length ? (
               docs.map((d) => (
-                <div key={d.id} style={{ color: "#64748B", padding: "2px 0" }}>
-                  • {d.filename}
+                <div
+                  key={d.id}
+                  style={{
+                    color: "#64748B",
+                    padding: "2px 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 8,
+                  }}
+                >
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    • {d.filename}
+                  </span>
+                  <Popconfirm
+                    title="删除该文档？"
+                    okText="删除"
+                    cancelText="取消"
+                    onConfirm={() => deleteDoc(d.id)}
+                  >
+                    <Button
+                      type="text"
+                      size="small"
+                      loading={deletingDocId === d.id}
+                      icon={<DeleteOutlined style={{ color: "#f87171", fontSize: 12 }} />}
+                      style={{ padding: 0, minWidth: 20 }}
+                    />
+                  </Popconfirm>
                 </div>
               ))
             ) : (

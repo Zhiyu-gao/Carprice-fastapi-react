@@ -1,7 +1,8 @@
+import os
+
 from alibabacloud_dm20151123.client import Client as DmClient
 from alibabacloud_dm20151123.models import SingleSendMailRequest
 from alibabacloud_tea_openapi import models as open_api_models
-import os
 
 
 def send_email_code(email: str, code: str):

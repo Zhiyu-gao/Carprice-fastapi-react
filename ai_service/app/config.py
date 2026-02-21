@@ -1,9 +1,8 @@
-# ai_service/app/config.py
 import os
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProviderConfig:
     base_url: str
     api_key: str
@@ -18,9 +17,9 @@ def _get_env(name: str, default: str | None = None) -> str:
 
 
 KIMI_CONFIG = ProviderConfig(
-    base_url=_get_env("KIMI_BASE_URL", "https://api.kimi.example/v1"),  # TODO:换真实地址
+    base_url=_get_env("KIMI_BASE_URL", "https://api.moonshot.cn/v1"),
     api_key=_get_env("KIMI_API_KEY", "dummy-kimi-key"),
-    model=_get_env("KIMI_MODEL", "kimi-default-model"),
+    model=_get_env("KIMI_MODEL", "kimi-k2-turbo-preview"),
 )
 
 QWEN_CONFIG = ProviderConfig(
@@ -30,22 +29,11 @@ QWEN_CONFIG = ProviderConfig(
 )
 
 DEEPSEEK_CONFIG = ProviderConfig(
-    base_url=_get_env("DEEPSEEK_BASE_URL", "https://api.deepseek.example/v1"),
+    base_url=_get_env("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
     api_key=_get_env("DEEPSEEK_API_KEY", "dummy-deepseek-key"),
-    model=_get_env("DEEPSEEK_MODEL", "deepseek-default-model"),
+    model=_get_env("DEEPSEEK_MODEL", "deepseek-chat"),
 )
 
-# ======================
-# JWT 配置（必须和 backend 一致）
-# ======================
-
-SECRET_KEY = _get_env(
-    "SECRET_KEY",
-    "CHANGE_ME_PLEASE",  # 兜底，防止本地炸
-)
-
-ALGORITHM = _get_env(
-    "ALGORITHM",
-    "HS256",
-)
-
+# Must match backend JWT settings.
+SECRET_KEY = _get_env("SECRET_KEY", "CHANGE_ME_PLEASE")
+ALGORITHM = _get_env("ALGORITHM", "HS256")

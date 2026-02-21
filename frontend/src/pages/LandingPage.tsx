@@ -14,6 +14,7 @@ import {
   Col,
   Space,
   Tag,
+  Modal,
 } from "antd";
 import {
   BarChartOutlined,
@@ -63,6 +64,7 @@ const LandingPage: React.FC = () => {
   const [registerLoading, setRegisterLoading] = useState(false);
   const [registerSendingCode, setRegisterSendingCode] = useState(false);
   const [registerCountdown, setRegisterCountdown] = useState(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // 发送验证码（登录）
   const sendLoginCode = async () => {
@@ -204,6 +206,8 @@ const LandingPage: React.FC = () => {
     { name: "Kimi AI", color: "#c084fc" },
   ];
 
+  const previewVideoUrl = `${import.meta.env.VITE_API_BASE_URL}/public/preview/video`;
+
   return (
     <div
       style={{
@@ -244,16 +248,28 @@ const LandingPage: React.FC = () => {
             车辆智能平台
           </Text>
         </div>
-        <Button
-          type="text"
-          icon={<GithubOutlined style={{ color: "#94A3B8", fontSize: 20 }} />}
-          onClick={() =>
-            window.open(
-              "https://github.com/Zhiyu-gao/Carprice-fastapi-react",
-              "_blank"
-            )
-          }
-        />
+        <Space>
+          <Button
+            ghost
+            onClick={() => setPreviewOpen(true)}
+            style={{
+              borderColor: "rgba(34,211,238,0.5)",
+              color: "#67e8f9",
+            }}
+          >
+            2分钟快速预览
+          </Button>
+          <Button
+            type="text"
+            icon={<GithubOutlined style={{ color: "#94A3B8", fontSize: 20 }} />}
+            onClick={() =>
+              window.open(
+                "https://github.com/Zhiyu-gao/Carprice-fastapi-react",
+                "_blank"
+              )
+            }
+          />
+        </Space>
       </div>
 
       {/* 主内容区 */}
@@ -669,6 +685,23 @@ const LandingPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      <Modal
+        title="系统2分钟快速预览"
+        open={previewOpen}
+        onCancel={() => setPreviewOpen(false)}
+        footer={null}
+        width={960}
+        destroyOnClose
+      >
+        <video
+          key={previewVideoUrl}
+          src={previewVideoUrl}
+          controls
+          preload="metadata"
+          style={{ width: "100%", borderRadius: 8, background: "#000" }}
+        />
+      </Modal>
     </div>
   );
 };

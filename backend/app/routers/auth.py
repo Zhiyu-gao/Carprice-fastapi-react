@@ -1,24 +1,25 @@
 # app/routers/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt  # 新增
 from sqlalchemy.orm import Session
 
 from app import models
+from app.core.security import ALGORITHM, SECRET_KEY, get_password_hash
 from app.db import get_db
 from app.schemas import (
-    UserRead,
-    Token,
-    EmailCodeRequest,
     EmailCodeLoginRequest,
-    EmailRegisterRequest,
+    EmailCodeRequest,
     EmailPasswordResetRequest,
+    EmailRegisterRequest,
+    Token,
+    UserRead,
 )
-from jose import JWTError, jwt  # 新增
-from app.core.security import SECRET_KEY, ALGORITHM
-from app.services.auth_service import register_user as register_user_svc, authenticate_user, create_login_token
-from app.core.security import get_password_hash
+from app.services.auth_service import authenticate_user, create_login_token
+from app.services.auth_service import register_user as register_user_svc
 from app.utils.aliyun_email import send_email_code
 from app.utils.email_store import generate_and_store_code, verify_code
+
 print("🔐 BACKEND SECRET_KEY =", SECRET_KEY)
 router = APIRouter(prefix="/auth", tags=["auth"])
 

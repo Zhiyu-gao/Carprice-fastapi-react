@@ -1,9 +1,16 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from io import BytesIO
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from pydantic import BaseModel
+
 from app.security.jwt import get_current_user_from_jwt
-from app.storage.rag_store import save_document, list_docs, delete_doc, retrieve, save_upload_file
+from app.storage.rag_store import delete_doc, list_docs, retrieve, save_document, save_upload_file
 
 router = APIRouter()
+
+
+class RagSearchRequest(BaseModel):
+    query: str
 
 
 def _read_text_from_upload(file: UploadFile) -> tuple[str, bytes]:
@@ -20,18 +27,17 @@ def _read_text_from_upload(file: UploadFile) -> tuple[str, bytes]:
     if suffix == "pdf":
         try:
             from pypdf import PdfReader
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"PDF 解析库不可用: {e}")
+        except ImportError as exc:
+            raise HTTPException(status_code=400, detail=f"PDF 解析库不可用: {exc}")
         reader = PdfReader(BytesIO(data))
-        pages = [p.extract_text() or "" for p in reader.pages]
+        pages = [page.extract_text() or "" for page in reader.pages]
         return "\n".join(pages), data
 
     if suffix in {"docx", "doc"}:
         try:
             from docx import Document
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Word 解析库不可用: {e}")
-        # python-docx 不支持 .doc，先按 docx 尝试
+        except ImportError as exc:
+            raise HTTPException(status_code=400, detail=f"Word 解析库不可用: {exc}")
         doc = Document(BytesIO(data))
         return "\n".join(p.text for p in doc.paragraphs if p.text), data
 
@@ -41,38 +47,38 @@ def _read_text_from_upload(file: UploadFile) -> tuple[str, bytes]:
 @router.post("/ai/rag/upload")
 def upload_rag_file(
     file: UploadFile = File(...),
-    user=Depends(get_current_user_from_jwt),
+    user: dict[str, int | str | None] = Depends(get_current_user_from_jwt),
 ):
+    _ = user
+    filename = file.filename or "upload"
     content, raw = _read_text_from_upload(file)
     if not content.strip():
         raise HTTPException(status_code=400, detail="文件内容为空")
 
-    # 保存原文件（可选）
-    save_upload_file(file.filename or "upload", raw)
-    doc = save_document(file.filename or "upload", content)
-    return doc
+    upload_path = save_upload_file(filename, raw)
+    return save_document(filename, content, upload_path=upload_path)
 
 
 @router.get("/ai/rag/docs")
-def get_rag_docs(
-    user=Depends(get_current_user_from_jwt),
-):
+def get_rag_docs(user: dict[str, int | str | None] = Depends(get_current_user_from_jwt)):
+    _ = user
     return list_docs()
 
 
 @router.delete("/ai/rag/docs/{doc_id}")
 def delete_rag_doc(
     doc_id: str,
-    user=Depends(get_current_user_from_jwt),
+    user: dict[str, int | str | None] = Depends(get_current_user_from_jwt),
 ):
+    _ = user
     delete_doc(doc_id)
     return {"ok": True}
 
 
 @router.post("/ai/rag/search")
 def search_rag(
-    query: dict,
-    user=Depends(get_current_user_from_jwt),
+    body: RagSearchRequest,
+    user: dict[str, int | str | None] = Depends(get_current_user_from_jwt),
 ):
-    q = (query or {}).get("query", "")
-    return retrieve(q)
+    _ = user
+    return retrieve(body.query)

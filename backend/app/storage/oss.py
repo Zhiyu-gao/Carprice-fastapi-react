@@ -1,4 +1,5 @@
 import os
+
 import oss2
 
 OSS_ENABLED = os.getenv("OSS_ENABLED", "false").lower() in {"1", "true", "yes"}

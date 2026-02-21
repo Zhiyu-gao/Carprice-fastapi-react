@@ -2,13 +2,11 @@ import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 from uuid import uuid4
-
-_lock = None
 
 DATA_DIR = Path(os.getenv("AI_DATA_DIR", "data")).resolve()
 DB_PATH = DATA_DIR / "chat.db"
+RowDict = dict[str, str]
 
 
 def _now() -> str:
@@ -54,7 +52,7 @@ def init_db() -> None:
         conn.close()
 
 
-def create_session(user_id: str, title: str) -> dict[str, Any]:
+def create_session(user_id: str, title: str) -> RowDict:
     init_db()
     session_id = uuid4().hex
     now = _now()
@@ -75,7 +73,7 @@ def create_session(user_id: str, title: str) -> dict[str, Any]:
     }
 
 
-def list_sessions(user_id: str) -> list[dict[str, Any]]:
+def list_sessions(user_id: str) -> list[RowDict]:
     init_db()
     conn = _get_conn()
     try:
@@ -88,7 +86,7 @@ def list_sessions(user_id: str) -> list[dict[str, Any]]:
         conn.close()
 
 
-def get_session(user_id: str, session_id: str) -> dict[str, Any] | None:
+def get_session(user_id: str, session_id: str) -> RowDict | None:
     init_db()
     conn = _get_conn()
     try:
@@ -140,7 +138,7 @@ def add_message(session_id: str, role: str, content: str) -> None:
         conn.close()
 
 
-def list_messages(user_id: str, session_id: str) -> list[dict[str, Any]]:
+def list_messages(user_id: str, session_id: str) -> list[RowDict]:
     init_db()
     conn = _get_conn()
     try:

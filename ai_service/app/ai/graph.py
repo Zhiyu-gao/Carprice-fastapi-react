@@ -1,138 +1,110 @@
-from typing import TypedDict, Literal, List
-from langgraph.graph import StateGraph, END
-class ChatState(TypedDict):
-    question: str
-    answer: str
-from app.providers.qwen_client import qwen_chat
+from typing import Literal, TypedDict
 
-def qwen_node(state: ChatState) -> ChatState:
-    question = state["question"]
+from langgraph.graph import END, StateGraph
 
-    answer = qwen_chat(question)
+from app.providers.deepseek_client import deepseek_chat
+from app.providers.kimi_client import kimi_chat
+from app.providers.qwen_client import qwen_chat_messages
 
-    return {
-        "question": question,
-        "answer": answer,
-    }
+ProviderName = Literal["qwen", "kimi", "deepseek"]
+IntentName = Literal["who_am_i", "system_help", "price_analysis", "chat"]
+
 
 class ChatState(TypedDict):
-    # 输入
     question: str
     username: str | None
-
-    # 中间状态
-    intent: Literal[
-        "who_am_i",
-        "system_help",
-        "price_analysis",
-        "chat"
-    ]
-
-    # 输出
+    messages: list[dict[str, str]]
+    provider: ProviderName
+    intent: IntentName
     answer: str
 
-from app.providers.qwen_client import qwen_chat
 
-def run_intent_graph(question: str, username: str | None):
-    result = chat_graph.invoke({
-        "question": question,
-        "username": username,
-    })
-    return result["intent"]
+def _route_provider(state: ChatState) -> ProviderName:
+    provider = state.get("provider", "qwen")
+    if provider not in {"qwen", "kimi", "deepseek"}:
+        return "qwen"
+    return provider
 
 
-def intent_node(state: ChatState) -> ChatState:
-    """
-    只做一件事：判断用户想干什么
-    """
-    prompt = f"""
-你是一个意图分类器，只能返回下面 4 个之一：
+def _qwen_node(state: ChatState) -> ChatState:
+    answer = qwen_chat_messages(state["messages"]) or ""
+    return {**state, "answer": answer}
 
-- who_am_i（询问用户身份）
-- system_help（询问系统功能）
-- price_analysis（询问车辆价格、价格、贵不贵）
-- chat（普通聊天）
 
-用户问题：
-{state["question"]}
+def _kimi_node(state: ChatState) -> ChatState:
+    answer = kimi_chat(state["messages"]) or ""
+    return {**state, "answer": answer}
 
-只返回标签，不要解释。
-"""
 
-    intent = qwen_chat(prompt).strip()
+def _deepseek_node(state: ChatState) -> ChatState:
+    answer = deepseek_chat(state["messages"]) or ""
+    return {**state, "answer": answer}
 
-    # 兜底，防止模型乱返回
-    if intent not in {"who_am_i", "system_help", "price_analysis", "chat"}:
-        intent = "chat"
 
-    return {
-        **state,
-        "intent": intent,
-    }
-
-def who_am_i_node(state: ChatState) -> ChatState:
-    username = state.get("username")
-
-    if not username:
-        answer = "我暂时不知道你的身份，请先登录。"
+def _intent_node(state: ChatState) -> ChatState:
+    q = (state.get("question") or "").strip()
+    if any(k in q for k in ["我是谁", "我的身份", "我登录的是谁"]):
+        intent: IntentName = "who_am_i"
+    elif any(k in q for k in ["系统功能", "你能做什么", "这个系统能做什么", "帮助"]):
+        intent = "system_help"
+    elif any(k in q for k in ["价格分析", "预测价格", "贵不贵", "车价分析"]):
+        intent = "price_analysis"
     else:
-        answer = f"你当前登录的账户名是：{username}"
+        intent = "chat"
+    return {**state, "intent": intent}
 
-    return {
-        **state,
-        "answer": answer,
-    }
 
-def system_help_node(state: ChatState) -> ChatState:
+def _who_am_i_node(state: ChatState) -> ChatState:
+    username = state.get("username")
+    answer = f"你当前登录的账户名是：{username}" if username else "我暂时不知道你的身份，请先登录。"
+    return {**state, "answer": answer}
+
+
+def _system_help_node(state: ChatState) -> ChatState:
     return {
         **state,
         "answer": (
             "这是一个完整的全栈车辆价格预测与分析系统，技术栈包括：\n\n"
-            "React + FastAPI + MySQL + SQLAlchemy + Alembic + Machine Learning + AI Agent。\n\n"
-            "系统主要包含以下模块：\n"
-            "- 后端 RESTful API：车辆信息的增删改查（CRUD）、用户系统、传统机器学习车辆价格预测\n"
-            "- 独立 AI 服务：使用 Kimi / Qwen / DeepSeek 对车辆价格结果进行智能分析与问答\n"
-            "- 前端多页面应用：车辆价格预测、车辆管理、个人信息、数据可视化大屏\n"
-            "- 数据层：MySQL 持久化存储，Alembic 管理数据库迁移\n\n"
-            "你可以直接向我提问，例如：\n"
-            "- 这个系统能做什么？\n"
-            "- 车辆价格预测是怎么计算的？\n"
-            "- AI 分析和传统预测有什么区别？"
+            "React + FastAPI + MySQL + SQLAlchemy + Machine Learning + AI Agent。\n\n"
+            "系统主要包含：\n"
+            "- 后端 RESTful API：车辆信息 CRUD、用户系统、传统机器学习车辆价格预测\n"
+            "- 独立 AI 服务：Kimi / Qwen / DeepSeek 多模型问答\n"
+            "- RAG / MCP：文档检索增强与工具调用\n"
+            "- 前端可视化与多页面业务功能"
         ),
     }
 
 
-def price_analysis_node(state: ChatState) -> ChatState:
-    return {
-        **state,
-        "answer": "这里将接入车辆价格预测与分析逻辑（下一步实现）。",
-    }
+def _price_analysis_node(state: ChatState) -> ChatState:
+    return {**state, "answer": "这里将接入车辆价格预测与分析逻辑（下一步实现）。"}
 
-def chat_node(state: ChatState) -> ChatState:
-    answer = qwen_chat(state["question"])
-    return {
-        **state,
-        "answer": answer,
-    }
 
-from langgraph.graph import StateGraph, END
+def _chat_node(state: ChatState) -> ChatState:
+    provider = _route_provider(state)
+    if provider == "qwen":
+        return _qwen_node(state)
+    if provider == "kimi":
+        return _kimi_node(state)
+    return _deepseek_node(state)
+
+
+def _route_intent(state: ChatState) -> IntentName:
+    intent = state.get("intent", "chat")
+    if intent not in {"who_am_i", "system_help", "price_analysis", "chat"}:
+        return "chat"
+    return intent
+
 
 graph = StateGraph(ChatState)
-
-# ===== 注册节点 =====
-graph.add_node("intent", intent_node)
-graph.add_node("who_am_i", who_am_i_node)
-graph.add_node("system_help", system_help_node)
-graph.add_node("price_analysis", price_analysis_node)
-graph.add_node("chat", chat_node)
-
-# ===== 入口 =====
+graph.add_node("intent", _intent_node)
+graph.add_node("who_am_i", _who_am_i_node)
+graph.add_node("system_help", _system_help_node)
+graph.add_node("price_analysis", _price_analysis_node)
+graph.add_node("chat", _chat_node)
 graph.set_entry_point("intent")
-
-# ===== 条件路由（核心）=====
 graph.add_conditional_edges(
     "intent",
-    lambda s: s["intent"],
+    _route_intent,
     {
         "who_am_i": "who_am_i",
         "system_help": "system_help",
@@ -140,14 +112,27 @@ graph.add_conditional_edges(
         "chat": "chat",
     },
 )
-
-# ===== 结束 =====
 graph.add_edge("who_am_i", END)
 graph.add_edge("system_help", END)
 graph.add_edge("price_analysis", END)
 graph.add_edge("chat", END)
-
 chat_graph = graph.compile()
 
 
-chat_graph = graph.compile()
+def run_chat_with_langgraph(
+    messages: list[dict[str, str]],
+    provider: str,
+    question: str,
+    username: str | None = None,
+) -> str:
+    state = chat_graph.invoke(
+        {
+            "question": question,
+            "username": username,
+            "messages": messages,
+            "provider": provider,
+            "intent": "chat",
+            "answer": "",
+        }
+    )
+    return state.get("answer", "")

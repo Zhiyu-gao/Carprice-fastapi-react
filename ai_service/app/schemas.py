@@ -1,5 +1,5 @@
-# ai_service/app/schemas.py
 from enum import Enum
+
 from pydantic import BaseModel
 
 
