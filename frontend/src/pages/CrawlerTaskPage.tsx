@@ -26,6 +26,8 @@ interface CrawlerTask {
   log_url?: string;
   write_local_db?: boolean;
   write_cloud_db?: boolean;
+  use_cookie_json?: boolean;
+  cookie_json_path?: string;
 }
 
 type CityOption = { label: string; value: string };
@@ -82,13 +84,13 @@ export default function CrawlerTaskPage() {
 
   const [startModalOpen, setStartModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const selectedCityCodes: string[] = Form.useWatch("city_codes", form) || [];
+  const selectedCityNames: string[] = Form.useWatch("city_names", form) || [];
   const [cityKeyword, setCityKeyword] = useState("");
   const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
-  const selectedSet = new Set(selectedCityCodes);
+  const selectedSet = new Set(selectedCityNames);
   const allSelected =
-    cityOptions.length > 0 && cityOptions.every((opt) => selectedSet.has(opt.value));
-  const hasAnySelected = cityOptions.some((opt) => selectedSet.has(opt.value));
+    cityOptions.length > 0 && cityOptions.every((opt) => selectedSet.has(opt.label));
+  const hasAnySelected = cityOptions.some((opt) => selectedSet.has(opt.label));
 
   const statusConfig = {
     pending: { color: "#64748B", icon: <ClockCircleOutlined />, text: "待处理" },
@@ -96,6 +98,21 @@ export default function CrawlerTaskPage() {
     success: { color: "#10b981", icon: <CheckCircleOutlined />, text: "成功" },
     failed: { color: "#ef4444", icon: <CloseCircleOutlined />, text: "失败" },
     canceled: { color: "#f59e0b", icon: <PauseCircleOutlined />, text: "已取消" },
+  };
+
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const waitTaskFinished = async (taskId: string, timeoutMs = 1000 * 60 * 30) => {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const res = await api.get(`/crawl-tasks/${taskId}`);
+      const status = res.data?.status as string | undefined;
+      if (status && status !== "running" && status !== "pending") {
+        return status;
+      }
+      await sleep(2000);
+    }
+    return "timeout";
   };
 
   const fetchTasks = async () => {
@@ -342,31 +359,46 @@ export default function CrawlerTaskPage() {
       message.warning("至少开启一个数据库写入开关");
       return;
     }
-    const selectedCodes: string[] = Array.isArray(values.city_codes) ? values.city_codes : [];
-    if (!selectedCodes.length) {
+    const selectedNames: string[] = Array.isArray(values.city_names) ? values.city_names : [];
+    if (!selectedNames.length) {
       message.warning("请至少选择一个城市");
       return;
     }
-    const orderedCodes = cityOptions.filter((c) => selectedCodes.includes(c.value));
+    const orderedCities = cityOptions.filter((c) => selectedNames.includes(c.label));
 
     let successCount = 0;
     const failedCities: string[] = [];
     try {
-      for (const city of orderedCodes) {
+      for (const city of orderedCities) {
         if (city.value.startsWith("MISSING:")) {
           failedCities.push(`${city.label}(缺少编码)`);
           continue;
         }
         try {
-          await api.post("/crawl-tasks/start", {
+          const startRes = await api.post("/crawl-tasks/start", {
             city_code: city.value,
             city_name: city.label,
             start_page: Number(values.start_page || 1),
             end_page: Number(values.end_page || 1),
             write_local_db: Boolean(values.write_local_db),
             write_cloud_db: Boolean(values.write_cloud_db),
+            use_cookie_json: Boolean(values.use_cookie_json),
+            cookie_json_path: values.cookie_json_path?.trim() || null,
           });
-          successCount += 1;
+          const taskId = startRes.data?.id as string | undefined;
+          if (!taskId) {
+            failedCities.push(`${city.label}(任务ID缺失)`);
+            continue;
+          }
+
+          const finalStatus = await waitTaskFinished(taskId);
+          if (finalStatus === "success") {
+            successCount += 1;
+          } else {
+            failedCities.push(`${city.label}(${finalStatus || "unknown"})`);
+          }
+
+          fetchTasks();
         } catch {
           failedCities.push(city.label);
         }
@@ -497,44 +529,52 @@ export default function CrawlerTaskPage() {
           form={form}
           onFinish={onStartTask}
           layout="vertical"
-          initialValues={{ start_page: 1, end_page: 1, write_local_db: true, write_cloud_db: false, city_codes: [] }}
+          initialValues={{
+            start_page: 1,
+            end_page: 1,
+            write_local_db: true,
+            write_cloud_db: false,
+            use_cookie_json: false,
+            cookie_json_path: "",
+            city_names: [],
+          }}
         >
           <Form.Item
             label={<Text style={{ color: "#94a3b8" }}>城市（支持多选）</Text>}
             required
           >
-            <Form.Item
-              noStyle
-              name="city_codes"
-              rules={[{ required: true, type: "array", min: 1, message: "请选择至少一个城市" }]}
-            >
-              <Checkbox.Group
-                style={{ width: "100%" }}
-                onChange={(vals) => {
-                  form.setFieldValue("city_codes", Array.from(new Set(vals as string[])));
+            <Space direction="vertical" style={{ width: "100%" }} size={8}>
+              <Input
+                value={cityKeyword}
+                onChange={(e) => setCityKeyword(e.target.value)}
+                placeholder="搜索城市（例如：北京 / 阿拉善 / 黔南）"
+                allowClear
+                style={{ background: "rgba(15, 23, 42, 0.6)" }}
+              />
+              <Checkbox
+                indeterminate={hasAnySelected && !allSelected}
+                checked={allSelected}
+                onChange={(e) => {
+                  form.setFieldValue(
+                    "city_names",
+                    e.target.checked ? cityOptions.map((item) => item.label) : []
+                  );
                 }}
+                style={{ color: "#dbeafe" }}
               >
-                <Space direction="vertical" style={{ width: "100%" }} size={8}>
-                  <Input
-                    value={cityKeyword}
-                    onChange={(e) => setCityKeyword(e.target.value)}
-                    placeholder="搜索城市（例如：北京 / 阿拉善 / 黔南）"
-                    allowClear
-                    style={{ background: "rgba(15, 23, 42, 0.6)" }}
-                  />
-                  <Checkbox
-                    indeterminate={hasAnySelected && !allSelected}
-                    checked={allSelected}
-                    onChange={(e) => {
-                      form.setFieldValue(
-                        "city_codes",
-                        e.target.checked ? cityOptions.map((item) => item.value) : []
-                      );
-                    }}
-                    style={{ color: "#dbeafe" }}
-                  >
-                    全选
-                  </Checkbox>
+                全选
+              </Checkbox>
+              <Form.Item
+                noStyle
+                name="city_names"
+                rules={[{ required: true, type: "array", min: 1, message: "请选择至少一个城市" }]}
+              >
+                <Checkbox.Group
+                  style={{ width: "100%" }}
+                  onChange={(vals) => {
+                    form.setFieldValue("city_names", Array.from(new Set(vals as string[])));
+                  }}
+                >
                   <div
                     style={{
                       maxHeight: 220,
@@ -563,8 +603,8 @@ export default function CrawlerTaskPage() {
                           <Text style={{ color: "#7dd3fc", fontWeight: 600 }}>{group.title}</Text>
                           <Row gutter={[8, 8]} style={{ marginTop: 6 }}>
                             {optionsInGroup.map((city) => (
-                              <Col xs={12} sm={8} md={6} key={`${group.key}-${city.value}-${city.label}`}>
-                                <Checkbox value={city.value} style={{ color: "#cbd5e1" }}>
+                              <Col xs={12} sm={8} md={6} key={`${group.key}-${city.label}`}>
+                                <Checkbox value={city.label} style={{ color: "#cbd5e1" }}>
                                   {city.label}
                                 </Checkbox>
                               </Col>
@@ -574,9 +614,9 @@ export default function CrawlerTaskPage() {
                       );
                     })}
                   </div>
-                </Space>
-              </Checkbox.Group>
-            </Form.Item>
+                </Checkbox.Group>
+              </Form.Item>
+            </Space>
           </Form.Item>
 
           <Form.Item name="start_page" label={<Text style={{ color: "#94a3b8" }}>开始页</Text>}>
@@ -601,6 +641,31 @@ export default function CrawlerTaskPage() {
             valuePropName="checked"
           >
             <Switch checkedChildren="开" unCheckedChildren="关" />
+          </Form.Item>
+
+          <Form.Item
+            name="use_cookie_json"
+            label={<Text style={{ color: "#94a3b8" }}>启用 JSON Cookie 文件</Text>}
+            valuePropName="checked"
+          >
+            <Switch checkedChildren="开" unCheckedChildren="关" />
+          </Form.Item>
+
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.use_cookie_json !== cur.use_cookie_json}>
+            {({ getFieldValue }) =>
+              getFieldValue("use_cookie_json") ? (
+                <Form.Item
+                  name="cookie_json_path"
+                  label={<Text style={{ color: "#94a3b8" }}>Cookie JSON 路径（可选）</Text>}
+                  tooltip="留空则使用后端默认路径 data/crawl/cookies/dongchedi_storage_state.json"
+                >
+                  <Input
+                    placeholder="例如: data/crawl/cookies/dongchedi_storage_state.json"
+                    style={{ background: "rgba(15, 23, 42, 0.6)" }}
+                  />
+                </Form.Item>
+              ) : null
+            }
           </Form.Item>
 
           <Form.Item>

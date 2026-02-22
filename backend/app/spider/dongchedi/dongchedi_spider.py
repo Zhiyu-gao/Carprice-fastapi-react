@@ -33,7 +33,7 @@ from app.storage.local import save_image_local
 # =========================
 
 # 服务器环境下建议使用 Playwright 自己拉起浏览器
-HEADLESS = True
+HEADLESS = False
 BROWSER_ARGS = [
     "--disable-blink-features=AutomationControlled",
     "--no-sandbox",
@@ -58,6 +58,7 @@ DATA_DIR = Path(os.getenv("DATA_DIR", "data")).resolve()
 CRAWL_DIR = DATA_DIR / "crawl"
 JSON_DIR = CRAWL_DIR / "json"
 IMG_DIR = CRAWL_DIR / "images"
+DEFAULT_COOKIE_JSON = CRAWL_DIR / "cookies" / "dongchedi_storage_state.json"
 
 JSON_DIR.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -198,6 +199,8 @@ def run(
     log_fn: Callable[[str], None] | None = None,
     save_to_db: bool = False,
     db_targets: list[str] | None = None,
+    use_cookie_json: bool = False,
+    cookie_json_path: str | None = None,
     should_stop: Callable[[], bool] | None = None,
 ):
     log = log_fn or (lambda msg: print(msg, flush=True))
@@ -217,13 +220,37 @@ def run(
         with sync_playwright() as p:
             log("[INFO] 启动 Playwright Chromium")
             browser = p.chromium.launch(headless=HEADLESS, args=BROWSER_ARGS)
-            context = browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/120.0.0.0 Safari/537.36"
-                )
+            user_agent = (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
             )
+            cookie_path = Path(cookie_json_path).expanduser() if cookie_json_path else DEFAULT_COOKIE_JSON
+
+            if use_cookie_json and cookie_path.exists():
+                try:
+                    raw_state = json.loads(cookie_path.read_text(encoding="utf-8"))
+                    if isinstance(raw_state, dict) and isinstance(raw_state.get("cookies"), list):
+                        context = browser.new_context(
+                            user_agent=user_agent,
+                            storage_state=str(cookie_path),
+                        )
+                        log(f"[COOKIE] 已加载 storage_state: {cookie_path}")
+                    else:
+                        context = browser.new_context(user_agent=user_agent)
+                        cookies = raw_state if isinstance(raw_state, list) else []
+                        if not cookies:
+                            log(f"[COOKIE] 文件格式不支持，按无 cookie 继续: {cookie_path}")
+                        else:
+                            context.add_cookies(cookies)
+                            log(f"[COOKIE] 已加载 cookies: {cookie_path}")
+                except Exception as e:
+                    log(f"[COOKIE] 读取失败，按无 cookie 继续: {cookie_path} ({e})")
+                    context = browser.new_context(user_agent=user_agent)
+            else:
+                if use_cookie_json:
+                    log(f"[COOKIE] 开关已开启，但文件不存在: {cookie_path}")
+                context = browser.new_context(user_agent=user_agent)
 
             page = context.new_page()
 
@@ -235,7 +262,7 @@ def run(
                 list_url = LIST_URL_TEMPLATE.format(city_code, page_no)
                 log(f"\n[PAGE] {list_url}")
 
-                page.goto(list_url, timeout=30000)
+                page.goto(list_url, timeout=30000, wait_until="domcontentloaded")
                 time.sleep(random.uniform(*SLEEP_PER_PAGE))
 
                 cards = page.locator("a.usedcar-card_card__3vUrx")
@@ -287,7 +314,7 @@ def run(
 
                     # === 进入详情页 ===
                     detail_url = urljoin(BASE_URL, href)
-                    page.goto(detail_url, timeout=30000)
+                    page.goto(detail_url, timeout=30000, wait_until="domcontentloaded")
                     page.wait_for_load_state("domcontentloaded")
                     time.sleep(random.uniform(*SLEEP_DETAIL))
 
@@ -347,7 +374,7 @@ def run(
                     log(f"[OK] {car_id} | {title}")
 
                     # 回到列表页（重要）
-                    page.go_back()
+                    page.go_back(wait_until="domcontentloaded")
                     page.wait_for_load_state("domcontentloaded")
                     time.sleep(0.6)
 

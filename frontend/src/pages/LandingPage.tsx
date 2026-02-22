@@ -285,21 +285,20 @@ const LandingPage: React.FC = () => {
             padding: "48px 64px",
           }}
         >
-          <div style={{ maxWidth: 640 }}>
+          <div style={{ maxWidth: "100%" }}>
             <Title
               level={1}
               style={{
                 color: "white",
-                fontSize: 48,
-                marginBottom: 24,
+                fontSize: "clamp(28px, 2.9vw, 48px)",
+                marginTop: -10,
+                marginBottom: 20,
                 lineHeight: 1.2,
               }}
             >
-              基于机器学习的
+              基于机器学习的二手车
               <br />
-              <span style={{ color: "#22d3ee" }}>二手车价格预测</span>
-              <br />
-              与智能分析系统
+              <span style={{ color: "#22d3ee" }}>价格预测与智能分析系统</span>
             </Title>
 
             <Paragraph
@@ -596,8 +595,8 @@ const LandingPage: React.FC = () => {
                       >
                         <Select
                           options={[
-                            { label: "我要买房", value: "buyer" },
-                            { label: "我要卖房", value: "seller" },
+                            { label: "我要买车", value: "buyer" },
+                            { label: "我要卖车", value: "seller" },
                           ]}
                           placeholder="请选择角色"
                           style={{

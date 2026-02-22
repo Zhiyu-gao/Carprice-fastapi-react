@@ -22,6 +22,8 @@ import {
   UserOutlined,
   FundProjectionScreenOutlined,
   DownOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 
 import LandingPage from "./pages/LandingPage";
@@ -49,7 +51,6 @@ import HealthcareDashboardPage from "./uiux-page/HealthcareDashboardPage";
 import PortfolioPage from "./uiux-page/PortfolioPage";
 import EcommerceMobilePage from "./uiux-page/EcommerceMobilePage";
 import FintechBankingPage from "./uiux-page/FintechBankingPage";
-import TestPage from "./pages/Test";
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -60,8 +61,11 @@ function AppLayout() {
   const navigate = useNavigate();
   const [me, setMe] = useState<{ role: string; username?: string } | null>(null);
   const [loadingMe, setLoadingMe] = useState(true);
+  const [screenMenuVisible, setScreenMenuVisible] = useState(false);
 
   const path = location.pathname;
+  const isVisualizationScreen = path.startsWith("/visualization-screen");
+  const showTopHeader = !isVisualizationScreen || screenMenuVisible;
 
   const pathKeyMap: Record<string, string> = {
     "/intro": "intro",
@@ -109,6 +113,10 @@ function AppLayout() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    setScreenMenuVisible(!isVisualizationScreen);
+  }, [isVisualizationScreen]);
 
   if (loadingMe) {
     return (
@@ -158,7 +166,7 @@ function AppLayout() {
           {
             key: "buyer",
             icon: <DatabaseOutlined />,
-            label: "我要买房",
+            label: "我要买车",
           },
         ]
       : []),
@@ -188,7 +196,7 @@ function AppLayout() {
     {
       key: "account",
       icon: <IdcardOutlined />,
-      label: "我的",
+      label: "个人信息",
       onClick: () => navigate("/account"),
     },
     {
@@ -215,119 +223,140 @@ function AppLayout() {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      {/* 顶部导航栏 */}
-      <Header
-        style={{
-          background: "#0F172A",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
-          display: "grid",
-          gridTemplateColumns: "220px 1fr 220px",
-          alignItems: "center",
-          padding: "0 48px",
-          height: 64,
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-        }}
-      >
-        {/* Logo */}
-        <div
+      {showTopHeader && (
+        <Header
           style={{
-            display: "flex",
+            background: "#0F172A",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            display: "grid",
+            gridTemplateColumns: "220px 1fr 220px",
             alignItems: "center",
-            gap: "12px",
-            cursor: "pointer",
-          }}
-          onClick={() => navigate("/intro")}
-        >
-          <span
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #22d3ee, #f97316)",
-              boxShadow: "0 0 12px rgba(34, 211, 238, 0.6)",
-            }}
-          />
-          <Text style={{ color: "white", fontSize: 18, fontWeight: 700 }}>
-            车辆智能平台
-          </Text>
-        </div>
-
-        {/* 导航菜单 */}
-        <div
-          style={{
-            width: "100%",
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            display: "flex",
-            justifyContent: "center",
+            padding: "0 48px",
+            height: 64,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
           }}
         >
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            selectedKeys={[selectedKey]}
-            disabledOverflow
-            onClick={({ key }) => {
-              if (key === "predict") navigate("/predict");
-              if (key === "visualization") navigate("/visualization");
-              if (key === "visualization_screen") navigate("/visualization-screen");
-              if (key === "account") navigate("/account");
-              if (key === "ai_chat") navigate("/ai_chat");
-              if (key === "crawler") navigate("/crawler");
-              if (key === "metadata") navigate("/metadata");
-              if (key === "buyer") navigate("/buyer");
-              if (key === "admin_monitor") navigate("/admin/monitor");
-              if (key === "admin_users") navigate("/admin/users");
-              if (key === "forum") navigate("/forum");
-              if (key === "chat") navigate("/chat");
-              if (key === "intro") navigate("/intro");
-              if (key === "author") navigate("/author");
-            }}
-            items={menuItems}
+          {/* Logo */}
+          <div
             style={{
-              background: "transparent",
-              border: "none",
-              minWidth: "max-content",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              cursor: "pointer",
             }}
-          />
-        </div>
-
-        {/* 右侧操作区 */}
-        <Space size={16} style={{ justifySelf: "end" }}>
-          <Dropdown
-            menu={{ items: userMenuItems }}
-            trigger={["click"]}
-            placement="bottomRight"
+            onClick={() => navigate("/intro")}
           >
-            <Button
-              type="text"
-              style={{ height: 42, paddingInline: 10, color: "#e2e8f0" }}
+            <span
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #22d3ee, #f97316)",
+                boxShadow: "0 0 12px rgba(34, 211, 238, 0.6)",
+              }}
+            />
+            <Text style={{ color: "white", fontSize: 18, fontWeight: 700 }}>
+              车辆智能平台
+            </Text>
+          </div>
+
+          {/* 导航菜单 */}
+          <div
+            style={{
+              width: "100%",
+              overflowX: "auto",
+              scrollbarWidth: "none",
+              display: "flex",
+              justifyContent: "center",
+            }}
             >
-              <Space size={8}>
-                <Avatar
-                  size={30}
-                  style={{ background: "linear-gradient(135deg, #22d3ee, #0ea5e9)" }}
-                  icon={<UserOutlined />}
-                />
-                <span style={{ fontSize: 13 }}>{me?.username || "用户中心"}</span>
-                <DownOutlined style={{ fontSize: 12, color: "#94a3b8" }} />
-              </Space>
-            </Button>
-          </Dropdown>
-        </Space>
-      </Header>
+              <Menu
+                theme="dark"
+                mode="horizontal"
+                selectedKeys={[selectedKey]}
+                disabledOverflow
+                onClick={({ key }) => {
+                  if (key === "predict") navigate("/predict");
+                  if (key === "visualization") navigate("/visualization");
+                  if (key === "visualization_screen") navigate("/visualization-screen");
+                  if (key === "account") navigate("/account");
+                  if (key === "ai_chat") navigate("/ai_chat");
+                  if (key === "crawler") navigate("/crawler");
+                  if (key === "metadata") navigate("/metadata");
+                  if (key === "buyer") navigate("/buyer");
+                  if (key === "admin_monitor") navigate("/admin/monitor");
+                  if (key === "admin_users") navigate("/admin/users");
+                  if (key === "forum") navigate("/forum");
+                  if (key === "chat") navigate("/chat");
+                  if (key === "intro") navigate("/intro");
+                  if (key === "author") navigate("/author");
+                }}
+                items={menuItems}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  minWidth: "max-content",
+                }}
+              />
+            </div>
+
+          {/* 右侧操作区 */}
+          <Space size={16} style={{ justifySelf: "end" }}>
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <Button
+                type="text"
+                style={{ height: 42, paddingInline: 10, color: "#e2e8f0" }}
+              >
+                <Space size={8}>
+                  <Avatar
+                    size={30}
+                    style={{ background: "linear-gradient(135deg, #22d3ee, #0ea5e9)" }}
+                    icon={<UserOutlined />}
+                  />
+                  <span style={{ fontSize: 13 }}>{me?.username || "用户中心"}</span>
+                  <DownOutlined style={{ fontSize: 12, color: "#94a3b8" }} />
+                </Space>
+              </Button>
+            </Dropdown>
+          </Space>
+        </Header>
+      )}
+
+      {isVisualizationScreen && (
+        <Button
+          type="primary"
+          shape="round"
+          icon={showTopHeader ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+          onClick={() => setScreenMenuVisible((prev) => !prev)}
+          style={{
+            position: "fixed",
+            right: 16,
+            top: showTopHeader ? 74 : 12,
+            zIndex: 1300,
+            background: "rgba(13, 52, 94, 0.92)",
+            borderColor: "rgba(109, 212, 255, 0.72)",
+            boxShadow: "0 0 14px rgba(84, 198, 255, 0.36)",
+          }}
+        >
+          {showTopHeader ? "隐藏菜单" : "显示菜单"}
+        </Button>
+      )}
 
       {/* 主内容区 */}
       <Content
         style={{
           background: "#020617",
           padding: 0,
-          marginTop: 64,
-          minHeight: "calc(100vh - 64px)",
+          marginTop: showTopHeader ? 64 : 0,
+          minHeight: showTopHeader ? "calc(100vh - 64px)" : "100vh",
         }}
       >
         <Outlet />
@@ -386,9 +415,6 @@ function App() {
         <Route path="/ui/portfolio" element={<PortfolioPage />} />
         <Route path="/ui/ecommerce-mobile" element={<EcommerceMobilePage />} />
         <Route path="/ui/fintech-banking" element={<FintechBankingPage />} />
-
-        {/* 测试页面（无需登录） */}
-        <Route path="/test" element={<TestPage />} />
 
         {/* 登录/注册/介绍合并页 */}
         <Route path="/landing" element={<LandingPage />} />

@@ -142,7 +142,24 @@ make format
 ```
 See `CODE_QUALITY.md` for details.
 
-## 8) Common Deployment Pitfalls
+## 8) Crawler Cookie JSON (Manual Login)
+- Script path: `backend/app/scripts/create_cookie_json.py`
+- Default output file: `backend/data/crawl/cookies/dongchedi_storage_state.json`
+
+Run:
+```bash
+cd backend
+uv run python -m app.scripts.create_cookie_json
+```
+
+After browser opens, manually log in to Dongchedi, then press Enter in terminal to save JSON.
+
+In the crawler task UI:
+- Turn on `启用 JSON Cookie 文件`
+- Optional: set custom JSON path (`cookie_json_path`)
+- If left empty, backend uses default path above.
+
+## 9) Common Deployment Pitfalls
 - JWT mismatch between Backend and AI Service (`SECRET_KEY`/`ALGORITHM`).
 - Missing TLS cert files for Nginx 443 config.
 - AI embedding API key missing (`RAG_EMBEDDING_API_KEY` or `QWEN_API_KEY`).

@@ -141,8 +141,8 @@ const RegisterPage: React.FC = () => {
           >
             <Select
               options={[
-                { label: "我要买房", value: "buyer" },
-                { label: "我要卖房", value: "seller" },
+                { label: "我要买车", value: "buyer" },
+                { label: "我要卖车", value: "seller" },
               ]}
               placeholder="请选择角色"
             />

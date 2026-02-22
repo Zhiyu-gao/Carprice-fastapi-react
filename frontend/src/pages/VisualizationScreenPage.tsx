@@ -9,12 +9,19 @@ import {
   MinusOutlined,
 } from "@ant-design/icons";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
   Pie,
   PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -44,6 +51,13 @@ type MetricRow = {
 };
 
 const COLORS = ["#3dd6ff", "#53f0c7", "#8ca8ff", "#ffd06b", "#6de1ff", "#44b8ff"];
+const AXIS_TICK_STYLE = { fill: "#9ec5e4", fontSize: 11 };
+const GRID_STROKE = "rgba(122,169,212,0.16)";
+const TOOLTIP_STYLE = {
+  background: "rgba(5, 21, 43, 0.96)",
+  border: "1px solid rgba(83, 197, 255, 0.45)",
+  borderRadius: 8,
+};
 
 const CITY_COORDS: Record<string, [number, number]> = {
   北京: [116.405285, 39.904989],
@@ -247,6 +261,10 @@ export default function VisualizationScreenPage() {
       backgroundColor: "transparent",
       tooltip: {
         trigger: "item",
+        backgroundColor: "rgba(3, 18, 41, 0.95)",
+        borderColor: "rgba(76, 197, 255, 0.58)",
+        borderWidth: 1,
+        textStyle: { color: "#dbf3ff" },
         formatter: (params: any) => {
           const count = Array.isArray(params.value) ? params.value[2] : params.value;
           return `${params.name}<br/>车源: ${count || 0} 台`;
@@ -274,16 +292,18 @@ export default function VisualizationScreenPage() {
           color: "#d4eeff",
         },
         itemStyle: {
-          areaColor: "#0c2f55",
-          borderColor: "#53bbff",
+          areaColor: "#0f3e6a",
+          borderColor: "#68cbff",
           borderWidth: 1,
-          shadowColor: "rgba(63,197,255,0.45)",
-          shadowBlur: 8,
+          shadowColor: "rgba(63,197,255,0.62)",
+          shadowBlur: 12,
         },
         emphasis: {
           label: { show: false },
           itemStyle: {
-            areaColor: "#1f66a1",
+            areaColor: "#2f7fbe",
+            borderColor: "#8ce3ff",
+            shadowBlur: 20,
           },
         },
       },
@@ -365,6 +385,15 @@ export default function VisualizationScreenPage() {
     }));
   }, [rows]);
 
+  const brandMax = useMemo(
+    () => Math.max(...dashboard.brandRank.map((item) => item.count), 1),
+    [dashboard.brandRank]
+  );
+  const cityMax = useMemo(
+    () => Math.max(...dashboard.topCities.map((item) => item.value), 1),
+    [dashboard.topCities]
+  );
+
   return (
     <div className="viz-screen-wrap">
       {contextHolder}
@@ -440,7 +469,12 @@ export default function VisualizationScreenPage() {
                   {dashboard.brandRank.slice(0, 6).map((item, index) => (
                     <div key={item.name} className="viz-brand-row">
                       <span className="viz-rank">NO.{index + 1}</span>
-                      <span className="viz-brand-name">{item.name}</span>
+                      <div className="viz-brand-main">
+                        <span className="viz-brand-name">{item.name}</span>
+                        <div className="viz-meter">
+                          <span style={{ width: `${(item.count / brandMax) * 100}%` }} />
+                        </div>
+                      </div>
                       <span className="viz-brand-meta">{item.count}台 | 均价{item.avgPrice}万</span>
                     </div>
                   ))}
@@ -449,24 +483,35 @@ export default function VisualizationScreenPage() {
 
               <Card className="viz-panel panel-enter-2" title="变速箱占比">
                 <div className="viz-chart-box">
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={196}>
                     <PieChart>
+                      <defs>
+                        <filter id="pieGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feGaussianBlur stdDeviation="2.2" result="coloredBlur" />
+                          <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                          </feMerge>
+                        </filter>
+                      </defs>
                       <Pie
                         data={dashboard.gearboxDist}
                         dataKey="value"
                         nameKey="name"
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
-                        innerRadius={46}
+                        outerRadius={82}
+                        innerRadius={44}
                         paddingAngle={2}
-                        label
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                        style={{ filter: "url(#pieGlow)" }}
                       >
                         {dashboard.gearboxDist.map((entry, index) => (
                           <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={TOOLTIP_STYLE} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -500,21 +545,24 @@ export default function VisualizationScreenPage() {
                 <div className="viz-double-chart-box">
                   <div className="viz-subchart">
                     <Text className="viz-subchart-title">价格分布</Text>
-                    <ResponsiveContainer width="100%" height={160}>
+                    <ResponsiveContainer width="100%" height={142}>
                       <BarChart data={priceDistribution}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(122,169,212,0.15)" />
-                        <XAxis dataKey="name" tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <YAxis tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <Tooltip
-                          contentStyle={{
-                            background: "rgba(5, 21, 43, 0.94)",
-                            border: "1px solid rgba(83, 197, 255, 0.45)",
-                            borderRadius: 8,
-                          }}
-                        />
+                        <defs>
+                          <linearGradient id="priceBarFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#7ee7ff" stopOpacity={0.95} />
+                            <stop offset="100%" stopColor="#2286e6" stopOpacity={0.58} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                        <XAxis dataKey="name" tick={AXIS_TICK_STYLE} />
+                        <YAxis tick={AXIS_TICK_STYLE} />
+                        <Tooltip contentStyle={TOOLTIP_STYLE} />
                         <Bar dataKey="value" radius={[5, 5, 0, 0]}>
                           {priceDistribution.map((entry, index) => (
-                            <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                              key={`${entry.name}-${index}`}
+                              fill={index === 2 ? "url(#priceBarFill)" : COLORS[index % COLORS.length]}
+                            />
                           ))}
                         </Bar>
                       </BarChart>
@@ -522,46 +570,61 @@ export default function VisualizationScreenPage() {
                   </div>
                   <div className="viz-subchart">
                     <Text className="viz-subchart-title">车龄分布</Text>
-                    <ResponsiveContainer width="100%" height={160}>
-                      <BarChart data={ageDistribution}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(122,169,212,0.16)" />
-                        <XAxis dataKey="name" tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <YAxis tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <Tooltip
-                          contentStyle={{
-                            background: "rgba(5, 21, 43, 0.94)",
-                            border: "1px solid rgba(83, 197, 255, 0.45)",
-                            borderRadius: 8,
-                          }}
+                    <ResponsiveContainer width="100%" height={142}>
+                      <AreaChart data={ageDistribution}>
+                        <defs>
+                          <linearGradient id="ageAreaFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#67e4ff" stopOpacity={0.55} />
+                            <stop offset="100%" stopColor="#67e4ff" stopOpacity={0.04} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                        <XAxis dataKey="name" tick={AXIS_TICK_STYLE} />
+                        <YAxis tick={AXIS_TICK_STYLE} />
+                        <Tooltip contentStyle={TOOLTIP_STYLE} />
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#7be8ff"
+                          strokeWidth={2.3}
+                          fill="url(#ageAreaFill)"
+                          dot={{ r: 2, stroke: "#9de7ff", fill: "#9de7ff" }}
+                          activeDot={{ r: 5, stroke: "#d6fbff", strokeWidth: 1, fill: "#d6fbff" }}
                         />
-                        <Bar dataKey="value" radius={[5, 5, 0, 0]}>
-                          {ageDistribution.map((entry, index) => (
-                            <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Bar>
-                      </BarChart>
+                      </AreaChart>
                     </ResponsiveContainer>
                   </div>
                   <div className="viz-subchart">
                     <Text className="viz-subchart-title">省价分布</Text>
-                    <ResponsiveContainer width="100%" height={160}>
-                      <BarChart data={saveDistribution}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(122,169,212,0.16)" />
-                        <XAxis dataKey="name" tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <YAxis tick={{ fill: "#98b9d8", fontSize: 11 }} />
-                        <Tooltip
-                          contentStyle={{
-                            background: "rgba(5, 21, 43, 0.94)",
-                            border: "1px solid rgba(83, 197, 255, 0.45)",
-                            borderRadius: 8,
-                          }}
+                    <ResponsiveContainer width="100%" height={142}>
+                      <RadarChart cx="50%" cy="52%" outerRadius="72%" data={saveDistribution}>
+                        <defs>
+                          <linearGradient id="saveRadarFill" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor="#72ffd6" stopOpacity={0.52} />
+                            <stop offset="100%" stopColor="#2ec9ff" stopOpacity={0.2} />
+                          </linearGradient>
+                          <filter id="saveRadarGlow" x="-25%" y="-25%" width="150%" height="150%">
+                            <feGaussianBlur stdDeviation="2.4" result="coloredBlur" />
+                            <feMerge>
+                              <feMergeNode in="coloredBlur" />
+                              <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                          </filter>
+                        </defs>
+                        <PolarGrid stroke="rgba(122,169,212,0.3)" radialLines={false} />
+                        <PolarAngleAxis dataKey="name" tick={{ fill: "#9dc8e6", fontSize: 10 }} />
+                        <PolarRadiusAxis tick={{ fill: "#6f9ec0", fontSize: 10 }} axisLine={false} />
+                        <Tooltip contentStyle={TOOLTIP_STYLE} />
+                        <Radar
+                          dataKey="value"
+                          stroke="#7afee1"
+                          fill="url(#saveRadarFill)"
+                          fillOpacity={1}
+                          strokeWidth={2.2}
+                          dot={{ r: 2.6, fill: "#c4fff0", stroke: "#7afee1", strokeWidth: 1 }}
+                          style={{ filter: "url(#saveRadarGlow)" }}
                         />
-                        <Bar dataKey="value" radius={[5, 5, 0, 0]}>
-                          {saveDistribution.map((entry, index) => (
-                            <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Bar>
-                      </BarChart>
+                      </RadarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
@@ -571,21 +634,24 @@ export default function VisualizationScreenPage() {
             <div className="viz-col-right">
               <Card className="viz-panel panel-enter-5" title="过户次数分布">
                 <div className="viz-chart-box">
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={196}>
                     <BarChart data={dashboard.transferDist}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(122,169,212,0.16)" />
-                      <XAxis dataKey="name" tick={{ fill: "#98b9d8", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "#98b9d8", fontSize: 12 }} />
-                      <Tooltip
-                        contentStyle={{
-                          background: "rgba(5, 21, 43, 0.94)",
-                          border: "1px solid rgba(83, 197, 255, 0.45)",
-                          borderRadius: 8,
-                        }}
-                      />
+                      <defs>
+                        <linearGradient id="transferBarFill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#73f5d4" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#1f95da" stopOpacity={0.55} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                      <XAxis dataKey="name" tick={{ ...AXIS_TICK_STYLE, fontSize: 12 }} />
+                      <YAxis tick={{ ...AXIS_TICK_STYLE, fontSize: 12 }} />
+                      <Tooltip contentStyle={TOOLTIP_STYLE} />
                       <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                         {dashboard.transferDist.map((entry, index) => (
-                          <Cell key={`${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`${entry.name}-${index}`}
+                            fill={index === 1 ? "url(#transferBarFill)" : COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -598,7 +664,12 @@ export default function VisualizationScreenPage() {
                   {dashboard.topCities.slice(0, 8).map((item, idx) => (
                     <div key={item.name} className="viz-city-row">
                       <span className="viz-rank">{String(idx + 1).padStart(2, "0")}</span>
-                      <span className="viz-city-name">{item.name}</span>
+                      <div className="viz-city-main">
+                        <span className="viz-city-name">{item.name}</span>
+                        <div className="viz-meter">
+                          <span style={{ width: `${(item.value / cityMax) * 100}%` }} />
+                        </div>
+                      </div>
                       <span className="viz-city-value">{item.value} 台</span>
                     </div>
                   ))}
