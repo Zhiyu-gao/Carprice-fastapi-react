@@ -26,39 +26,26 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # 用于从 Authorization 头里抽 token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")  # 注意路径要跟登录接口对应
 
+
 @router.post("/register", response_model=UserRead)
 def register_user(user_in: EmailRegisterRequest, db: Session = Depends(get_db)):
     if not verify_code(user_in.email, user_in.code):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="验证码错误或已过期"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="验证码错误或已过期")
 
     # 检查邮箱是否已存在
     existing = db.query(models.User).filter(models.User.email == user_in.email).first()
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱已注册"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱已注册")
 
     if user_in.username.strip().lower() == "admin":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用")
 
     if user_in.role == "admin":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="管理员账号禁止注册"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="管理员账号禁止注册")
 
-    existing_name = (
-        db.query(models.User)
-        .filter(models.User.username == user_in.username)
-        .first()
-    )
+    existing_name = db.query(models.User).filter(models.User.username == user_in.username).first()
     if existing_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已被占用")
 
     user = register_user_svc(
         db,
@@ -79,14 +66,10 @@ def login(
     # OAuth2PasswordRequestForm 里 username 字段就当 email 用
     user = authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱或密码错误"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱或密码错误")
 
     if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用")
 
     access_token = create_login_token(user=user)
 
@@ -119,9 +102,7 @@ def email_code_login(
         )
 
     if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用")
 
     access_token = create_login_token(user=user)
     return Token(access_token=access_token, token_type="bearer")
@@ -147,7 +128,9 @@ def reset_password_with_code(
     db.commit()
     return {"ok": True}
 
+
 # ------------ 依赖：通过 token 获取当前用户 ------------
+
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -166,7 +149,7 @@ async def get_current_user(
         if sub is None:
             raise credentials_exception
         user_id = int(sub)
-    except (JWTError, ValueError):
+    except JWTError, ValueError:
         # JWT 格式错误 / sub 不是数字
         raise credentials_exception
 
@@ -192,6 +175,7 @@ def get_current_admin(
             detail="需要管理员权限",
         )
     return current_user
+
 
 # @router.post("/email/code")
 # def send_email_code_api(data: EmailCodeRequest):

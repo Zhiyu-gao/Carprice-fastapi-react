@@ -43,7 +43,7 @@ const RegisterPage: React.FC = () => {
           return c - 1;
         });
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       message.error(getErrorMessage(err, "发送验证码失败"));
     } finally {
       setSendingCode(false);
@@ -70,7 +70,7 @@ const RegisterPage: React.FC = () => {
 
       message.success("注册成功，请登录");
       navigate("/login", { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       message.error(getErrorMessage(err, "注册失败，请稍后再试"));
     } finally {

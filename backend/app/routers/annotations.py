@@ -26,10 +26,12 @@ def _parse_year(text: str | None) -> int | None:
     if not text:
         return None
     import re
+
     m = re.search(r"(19|20)\d{2}", text)
     if m:
         return int(m.group(0))
     return None
+
 
 router = APIRouter(prefix="/annotations", tags=["annotations"])
 
@@ -45,19 +47,11 @@ def create_annotation(
     - 写入 train_cars 表（作为训练数据）
     """
 
-    exists = (
-        db.query(TrainCar)
-        .filter(TrainCar.source_car_id == data.source_car_id)
-        .first()
-    )
+    exists = db.query(TrainCar).filter(TrainCar.source_car_id == data.source_car_id).first()
     if exists:
         raise HTTPException(status_code=400, detail="该车辆已标注")
 
-    crawl = (
-        db.query(CrawlCar)
-        .filter(CrawlCar.source_car_id == data.source_car_id)
-        .first()
-    )
+    crawl = db.query(CrawlCar).filter(CrawlCar.source_car_id == data.source_car_id).first()
     info = crawl.info if crawl and isinstance(crawl.info, dict) else None
 
     brand = data.brand or _pick_info_value(info, ["品牌"])
@@ -74,7 +68,6 @@ def create_annotation(
     car = TrainCar(
         source_car_id=data.source_car_id,
         price_wan=data.price_wan,
-
         # 可选字段（先跑通）
         brand=brand,
         model=model,

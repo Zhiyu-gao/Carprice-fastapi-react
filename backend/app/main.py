@@ -53,6 +53,7 @@ def preview_video():
         raise HTTPException(status_code=404, detail="预览视频不存在")
     return FileResponse(video_path, media_type="video/mp4")
 
+
 # ======================
 # 路由注册
 # ======================
@@ -83,11 +84,11 @@ app.add_middleware(
         "http://nrydawang.shop",
         "https://nrydawang.shop",
     ],
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ======================
 # 当前用户
@@ -110,11 +111,7 @@ def update_me(
     current_user: models.User = Depends(get_current_user),
 ):
     if payload.email != current_user.email:
-        exists = (
-            db.query(models.User)
-            .filter(models.User.email == payload.email)
-            .first()
-        )
+        exists = db.query(models.User).filter(models.User.email == payload.email).first()
         if exists:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

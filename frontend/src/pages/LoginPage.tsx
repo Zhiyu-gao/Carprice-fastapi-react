@@ -56,8 +56,8 @@ const LoginPage: React.FC = () => {
           return c - 1;
         });
       }, 1000);
-    } catch (err: any) {
-      message.error(err?.response?.data?.detail || "发送验证码失败");
+    } catch (err: unknown) {
+      message.error(getErrorMessage(err, "发送验证码失败"));
     } finally {
       setSendingCode(false);
     }
@@ -95,7 +95,7 @@ const LoginPage: React.FC = () => {
       setToken(access_token);
       message.success("登录成功");
       navigate(AFTER_LOGIN_REDIRECT, { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       message.error(getErrorMessage(err, "登录失败"));
     } finally {
       setLoading(false);

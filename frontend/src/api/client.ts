@@ -14,11 +14,15 @@ export type ApiError = {
   message?: string;
 };
 
-export function getErrorMessage(err: any, fallback = "请求失败") {
+export function getErrorMessage(err: unknown, fallback = "请求失败") {
+  const maybeError = err as {
+    response?: { data?: ApiError };
+    message?: string;
+  };
   return (
-    err?.response?.data?.detail ||
-    err?.response?.data?.message ||
-    err?.message ||
+    maybeError?.response?.data?.detail ||
+    maybeError?.response?.data?.message ||
+    maybeError?.message ||
     fallback
   );
 }

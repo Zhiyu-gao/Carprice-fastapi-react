@@ -1,5 +1,5 @@
 // src/pages/AccountPage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Card, Form, Input, Button, Typography, Space, Tag, message, Divider, Upload, Avatar, Row, Col, Tabs } from "antd";
 import type { UploadProps } from "antd";
 import {
@@ -52,7 +52,7 @@ const AccountPage: React.FC = () => {
   const [countdown, setCountdown] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const fetchMe = async () => {
+  const fetchMe = useCallback(async () => {
     try {
       setLoadingProfile(true);
       const res = await api.get<UserMe>("/me");
@@ -62,17 +62,17 @@ const AccountPage: React.FC = () => {
         email: data.email,
         full_name: data.full_name,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       messageApi.error(getErrorMessage(err, "获取用户信息失败"));
     } finally {
       setLoadingProfile(false);
     }
-  };
+  }, [messageApi, profileForm]);
 
   useEffect(() => {
-    fetchMe();
-  }, []);
+    void fetchMe();
+  }, [fetchMe]);
 
   const handleProfileSave = async (values: { email: string; full_name: string }) => {
     try {
@@ -81,7 +81,7 @@ const AccountPage: React.FC = () => {
       const data = res.data;
       setUser(data);
       messageApi.success("个人信息已更新");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       messageApi.error(getErrorMessage(err, "更新资料失败"));
     } finally {
@@ -104,7 +104,7 @@ const AccountPage: React.FC = () => {
       });
       passwordForm.resetFields();
       messageApi.success("密码已修改");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       messageApi.error(getErrorMessage(err, "修改密码失败"));
     } finally {
@@ -132,7 +132,7 @@ const AccountPage: React.FC = () => {
           return c - 1;
         });
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       messageApi.error(getErrorMessage(err, "发送验证码失败"));
     } finally {
       setSendingCode(false);
@@ -151,10 +151,10 @@ const AccountPage: React.FC = () => {
         });
         messageApi.success("头像已更新");
         setUser((prev) => (prev ? { ...prev, avatar_path: res.data.avatar_path } : prev));
-        options.onSuccess?.({}, options.file as any);
-      } catch (e: any) {
+        options.onSuccess?.({});
+      } catch (e: unknown) {
         messageApi.error(getErrorMessage(e, "上传失败"));
-        options.onError?.(e);
+        options.onError?.(new Error(getErrorMessage(e, "上传失败")));
       }
     },
   };

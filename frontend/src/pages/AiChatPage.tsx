@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Input, Button, Select, Switch, message, Popconfirm, Typography, Space } from "antd";
 import {
   ArrowUpOutlined,
@@ -27,6 +27,11 @@ type ChatSession = {
   title: string;
   created_at: string;
   updated_at: string;
+};
+
+type RagDoc = {
+  id: string;
+  filename: string;
 };
 
 // 样式常量
@@ -83,7 +88,7 @@ export default function AiChatPage() {
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     const res = await fetch(`${AI_BASE_URL}/ai/chat/sessions`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
@@ -92,9 +97,9 @@ export default function AiChatPage() {
     if (!activeSessionId && Array.isArray(data) && data[0]) {
       setActiveSessionId(data[0].id);
     }
-  };
+  }, [activeSessionId]);
 
-  const fetchDocs = async () => {
+  const fetchDocs = useCallback(async () => {
     try {
       const res = await fetch(`${AI_BASE_URL}/ai/rag/docs`, {
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -102,13 +107,16 @@ export default function AiChatPage() {
       const data = await res.json();
       setDocs(
         Array.isArray(data)
-          ? data.map((d: any) => ({ id: d.id, filename: d.filename }))
+          ? data.map((d: unknown) => {
+              const doc = d as Partial<RagDoc>;
+              return { id: String(doc.id || ""), filename: String(doc.filename || "") };
+            }).filter((doc) => doc.id && doc.filename)
           : []
       );
     } catch {
       message.error("获取文档列表失败");
     }
-  };
+  }, []);
 
   const uploadDoc = async (file: File) => {
     setUploadingDoc(true);
@@ -128,7 +136,7 @@ export default function AiChatPage() {
         return;
       }
       message.success("上传成功");
-      fetchDocs();
+      void fetchDocs();
     } catch {
       message.error("上传失败");
     } finally {
@@ -157,7 +165,7 @@ export default function AiChatPage() {
     }
   };
 
-  const fetchMessages = async (sessionId: string) => {
+  const fetchMessages = useCallback(async (sessionId: string) => {
     const res = await fetch(
       `${AI_BASE_URL}/ai/chat/sessions/${sessionId}/messages`,
       {
@@ -165,12 +173,16 @@ export default function AiChatPage() {
       }
     );
     const data = await res.json();
-    const mapped = (Array.isArray(data) ? data : []).map((m: any) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    const mapped = (Array.isArray(data) ? data : []).map((m: unknown) => {
+      const item = m as Partial<Message>;
+      const role: Message["role"] = item.role === "ai" ? "ai" : "user";
+      return {
+        role,
+        content: String(item.content || ""),
+      };
+    });
     setMessages(mapped);
-  };
+  }, []);
 
   const createSession = async () => {
     const res = await fetch(`${AI_BASE_URL}/ai/chat/sessions`, {
@@ -201,17 +213,19 @@ export default function AiChatPage() {
       setActiveSessionId(null);
       setMessages([]);
     }
-    fetchSessions();
+    void fetchSessions();
   };
 
   useEffect(() => {
-    fetchSessions();
-    fetchDocs();
-  }, []);
+    void fetchSessions();
+    void fetchDocs();
+  }, [fetchDocs, fetchSessions]);
 
   useEffect(() => {
-    if (activeSessionId) fetchMessages(activeSessionId);
-  }, [activeSessionId]);
+    if (activeSessionId) {
+      void fetchMessages(activeSessionId);
+    }
+  }, [activeSessionId, fetchMessages]);
 
   useEffect(() => {
     if (messages.length === 0) return;

@@ -47,9 +47,9 @@ def metrics():
     return {
         "cpu_percent": cpu,
         "memory_percent": vm.percent,
-        "memory_total_gb": round(vm.total / 1024 ** 3, 2),
-        "memory_used_gb": round(vm.used / 1024 ** 3, 2),
+        "memory_total_gb": round(vm.total / 1024**3, 2),
+        "memory_used_gb": round(vm.used / 1024**3, 2),
         "disk_percent": disk.percent,
-        "disk_total_gb": round(disk.total / 1024 ** 3, 2),
-        "disk_used_gb": round(disk.used / 1024 ** 3, 2),
+        "disk_total_gb": round(disk.total / 1024**3, 2),
+        "disk_used_gb": round(disk.used / 1024**3, 2),
     }

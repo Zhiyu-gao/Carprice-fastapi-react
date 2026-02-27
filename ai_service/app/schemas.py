@@ -18,13 +18,14 @@ class AiProvider(str, Enum):
 class PriceAnalysisRequest(BaseModel):
     provider: AiProvider
     features: VehicleFeatures
-    predicted_price: float   # 由 backend 算好，前端传进来
+    predicted_price: float  # 由 backend 算好，前端传进来
 
 
 class PriceAnalysisResponse(BaseModel):
     provider: AiProvider
     predicted_price: float
     analysis_markdown: str
+
 
 class ChatRequest(BaseModel):
     question: str

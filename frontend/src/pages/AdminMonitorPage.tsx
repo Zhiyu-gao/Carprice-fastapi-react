@@ -43,7 +43,7 @@ export default function AdminMonitorPage() {
         ]);
         setOverview(ov.data);
         setMetrics(mt.data);
-      } catch (e: any) {
+      } catch (e: unknown) {
         message.error(getErrorMessage(e, "获取监控数据失败"));
       }
     };

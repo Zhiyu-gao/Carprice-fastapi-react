@@ -68,7 +68,7 @@ export default function ForumPage() {
       setLoading(true);
       const res = await api.get<ForumPost[]>("/forum/posts");
       setPosts(res.data || []);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取帖子失败"));
     } finally {
       setLoading(false);
@@ -89,7 +89,7 @@ export default function ForumPage() {
       setContent("");
       fetchPosts();
       message.success("发布成功");
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "发帖失败"));
     }
   };
@@ -98,7 +98,7 @@ export default function ForumPage() {
     try {
       const res = await api.get<ForumComment[]>(`/forum/posts/${postId}/comments`);
       setCommentMap((prev) => ({ ...prev, [postId]: res.data || [] }));
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取评论失败"));
     }
   };
@@ -114,7 +114,7 @@ export default function ForumPage() {
       setCommentInput((prev) => ({ ...prev, [postId]: "" }));
       loadComments(postId);
       message.success("评论成功");
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "评论失败"));
     }
   };
@@ -124,7 +124,7 @@ export default function ForumPage() {
       const res = await api.get<UserProfile>(`/users/${userId}`);
       setProfile(res.data);
       setProfileOpen(true);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取用户信息失败"));
     }
   };

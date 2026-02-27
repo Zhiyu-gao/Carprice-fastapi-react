@@ -8,6 +8,7 @@ from app.schemas.crawl_vehicle import CrawlVehicleOut
 
 router = APIRouter(prefix="/crawl-cars", tags=["crawl"])
 
+
 @router.get("")
 def list_crawl_cars(
     page: int = Query(1, ge=1),
@@ -31,10 +32,7 @@ def list_crawl_cars(
         .limit(page_size)
         .all()
     )
-    items_out = [
-        CrawlVehicleOut.model_validate(item).model_dump(by_alias=True)
-        for item in items
-    ]
+    items_out = [CrawlVehicleOut.model_validate(item).model_dump(by_alias=True) for item in items]
     return {
         "items": items_out,
         "page": page,
@@ -48,11 +46,7 @@ def get_crawl_car(
     source_car_id: str,
     db: Session = Depends(get_db),
 ):
-    item = (
-        db.query(models.CrawlCar)
-        .filter(models.CrawlCar.source_car_id == source_car_id)
-        .first()
-    )
+    item = db.query(models.CrawlCar).filter(models.CrawlCar.source_car_id == source_car_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="未找到车辆")
     return CrawlVehicleOut.model_validate(item)
@@ -63,18 +57,12 @@ def delete_crawl_car(
     source_car_id: str,
     db: Session = Depends(get_db),
 ):
-    item = (
-        db.query(models.CrawlCar)
-        .filter(models.CrawlCar.source_car_id == source_car_id)
-        .first()
-    )
+    item = db.query(models.CrawlCar).filter(models.CrawlCar.source_car_id == source_car_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="未找到车辆")
 
     # 删除关联标注，避免残留训练数据
-    db.query(models.TrainCar).filter(
-        models.TrainCar.source_car_id == source_car_id
-    ).delete()
+    db.query(models.TrainCar).filter(models.TrainCar.source_car_id == source_car_id).delete()
     db.delete(item)
     db.commit()
     return {"ok": True}

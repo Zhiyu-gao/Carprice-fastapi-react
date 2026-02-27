@@ -104,6 +104,7 @@ def get_session_by_target(target: str):
 
 def get_db():
     from sqlalchemy.orm import Session
+
     db: Session = SessionLocal()
     try:
         yield db

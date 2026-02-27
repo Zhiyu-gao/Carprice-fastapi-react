@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   List,
   Button,
@@ -87,30 +87,35 @@ const CarAnnotationPage: React.FC = () => {
 
   const [form] = Form.useForm<AnnotationForm>();
   const [messageApi, contextHolder] = message.useMessage();
+  const keywordRef = useRef(keyword);
 
-  const fetchCars = async (pageNo: number, kw?: string) => {
+  useEffect(() => {
+    keywordRef.current = keyword;
+  }, [keyword]);
+
+  const fetchCars = useCallback(async (pageNo: number, kw?: string) => {
     try {
       setLoading(true);
-      const keywordValue = (kw ?? keyword).trim();
+      const keywordValue = (kw ?? keywordRef.current).trim();
       const res = await api.get<PageResp<CrawlCar>>("/crawl-cars", {
         params: { page: pageNo, page_size: pageSize, keyword: keywordValue || undefined },
       });
       const data = res.data;
       const items = Array.isArray(data?.items) ? data.items : [];
-      const normalized = items.map((item: any) => ({
+      const normalized = items.map((item) => ({
         ...item,
         car_id: item.car_id || item.source_car_id,
       }));
       setCars(normalized);
       setTotal(Number(data?.total || 0));
       setPage(Number(data?.page || pageNo));
-    } catch (e: any) {
+    } catch (e: unknown) {
       messageApi.error(getErrorMessage(e, "获取爬虫车辆失败"));
       setCars([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [messageApi, pageSize]);
 
   const fetchAnnotatedIds = async (items: CrawlCar[]) => {
     if (!items.length) {
@@ -131,14 +136,14 @@ const CarAnnotationPage: React.FC = () => {
       });
       const ids = res.data;
       setAnnotatedIds(new Set(ids));
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.warn(getErrorMessage(e, "获取已标注车辆失败"));
     }
   };
 
   useEffect(() => {
-    fetchCars(1);
-  }, []);
+    void fetchCars(1);
+  }, [fetchCars]);
   useEffect(() => {
     fetchAnnotatedIds(cars);
   }, [cars]);
@@ -171,7 +176,7 @@ const CarAnnotationPage: React.FC = () => {
       setSelected(null);
       form.resetFields();
       fetchAnnotatedIds(cars);
-    } catch (e: any) {
+    } catch (e: unknown) {
       messageApi.error(getErrorMessage(e, "标注失败"));
     }
   };
@@ -183,7 +188,7 @@ const CarAnnotationPage: React.FC = () => {
       await api.delete(`/crawl-cars/${id}`);
       messageApi.success("数据已删除");
       await fetchCars(page);
-    } catch (e: any) {
+    } catch (e: unknown) {
       messageApi.error(getErrorMessage(e, "删除失败"));
     }
   };

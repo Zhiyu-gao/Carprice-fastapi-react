@@ -46,7 +46,7 @@ export default function AdminUsersPage() {
       setUsers(Array.isArray(data.items) ? data.items : []);
       setPage(data.page || pageNo);
       setTotal(data.total || 0);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取用户失败"));
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ export default function AdminUsersPage() {
       await api.post(`/admin/users/${id}/ban`);
       message.success("已封禁");
       fetchUsers(page);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "封禁失败"));
     }
   };
@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
       await api.post(`/admin/users/${id}/unban`);
       message.success("已解封");
       fetchUsers(page);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "解封失败"));
     }
   };
@@ -145,7 +145,7 @@ export default function AdminUsersPage() {
     {
       title: "操作",
       width: 200,
-      render: (_: any, row: AdminUser) => (
+      render: (_: unknown, row: AdminUser) => (
         <Space>
           <Button
             size="small"

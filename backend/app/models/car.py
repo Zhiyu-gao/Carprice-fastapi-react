@@ -15,12 +15,12 @@ class TrainCar(Base):
     brand = Column(String(64), nullable=True)
     model = Column(String(128), nullable=True)
 
-    year = Column(Integer, nullable=True)          # 上牌年
-    mileage_km = Column(Float)                      # 行驶里程（后续可加）
-    displacement = Column(Float)                    # 排量（3.6）
-    gearbox = Column(String(32))                    # 自动 / 手动
+    year = Column(Integer, nullable=True)  # 上牌年
+    mileage_km = Column(Float)  # 行驶里程（后续可加）
+    displacement = Column(Float)  # 排量（3.6）
+    gearbox = Column(String(32))  # 自动 / 手动
 
-    transfer_count = Column(Integer)                # 过户次数
-    city = Column(String(64))                       # 车源地
+    transfer_count = Column(Integer)  # 过户次数
+    city = Column(String(64))  # 车源地
 
     price_wan = Column(Float, nullable=False)

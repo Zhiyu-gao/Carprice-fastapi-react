@@ -1,5 +1,5 @@
 // src/pages/VehicleCrudPage.tsx
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getToken } from "../auth/token";
+import { getErrorMessage } from "../api/client";
 
 const { Title, Text } = Typography;
 
@@ -41,7 +42,7 @@ const VehicleCrudPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   // 加载车辆列表
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     try {
       setLoading(true);
       const token = getToken();
@@ -55,17 +56,17 @@ const VehicleCrudPage: React.FC = () => {
 
       const data = await res.json();
       setVehicles(data);
-    } catch (err: any) {
-      messageApi.error(err.message || "获取车辆列表失败");
+    } catch (err: unknown) {
+      messageApi.error(getErrorMessage(err, "获取车辆列表失败"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [messageApi]);
 
   // 初始化加载
   useEffect(() => {
-    fetchVehicles();
-  }, []);
+    void fetchVehicles();
+  }, [fetchVehicles]);
 
   // 打开新增/编辑弹窗
   const openModal = (vehicle?: Vehicle) => {
@@ -108,9 +109,9 @@ const VehicleCrudPage: React.FC = () => {
 
       messageApi.success(editingVehicle ? "更新车辆成功" : "添加车辆成功");
       closeModal();
-      fetchVehicles(); // 重新加载列表
-    } catch (err: any) {
-      messageApi.error(err.message || "操作失败");
+      void fetchVehicles(); // 重新加载列表
+    } catch (err: unknown) {
+      messageApi.error(getErrorMessage(err, "操作失败"));
     }
   };
 
@@ -132,9 +133,9 @@ const VehicleCrudPage: React.FC = () => {
           if (!res.ok) throw new Error("删除车辆失败");
 
           messageApi.success("删除车辆成功");
-          fetchVehicles(); // 重新加载列表
-        } catch (err: any) {
-          messageApi.error(err.message || "删除失败");
+          void fetchVehicles(); // 重新加载列表
+        } catch (err: unknown) {
+          messageApi.error(getErrorMessage(err, "删除失败"));
         }
       },
     });
@@ -173,7 +174,7 @@ const VehicleCrudPage: React.FC = () => {
     {
       title: "操作",
       key: "action",
-      render: (_: any, record: Vehicle) => (
+      render: (_: unknown, record: Vehicle) => (
         <Space size="middle">
           <Button
             type="primary"

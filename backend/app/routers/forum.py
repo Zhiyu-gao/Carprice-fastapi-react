@@ -19,11 +19,7 @@ class CommentCreate(BaseModel):
 
 @router.get("/posts")
 def list_posts(db: Session = Depends(get_db)):
-    posts = (
-        db.query(models.ForumPost)
-        .order_by(models.ForumPost.created_at.desc())
-        .all()
-    )
+    posts = db.query(models.ForumPost).order_by(models.ForumPost.created_at.desc()).all()
     return [
         {
             "id": p.id,
@@ -91,16 +87,10 @@ def create_comment(
     content = payload.content.strip()
     if not content:
         raise HTTPException(status_code=400, detail="内容不能为空")
-    exists = (
-        db.query(models.ForumPost)
-        .filter(models.ForumPost.id == post_id)
-        .first()
-    )
+    exists = db.query(models.ForumPost).filter(models.ForumPost.id == post_id).first()
     if not exists:
         raise HTTPException(status_code=404, detail="帖子不存在")
-    comment = models.ForumComment(
-        post_id=post_id, user_id=current_user.id, content=content
-    )
+    comment = models.ForumComment(post_id=post_id, user_id=current_user.id, content=content)
     db.add(comment)
     db.commit()
     db.refresh(comment)

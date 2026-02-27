@@ -117,14 +117,14 @@ const VisualizationPage: React.FC = () => {
         const data = res.data;
         const items = Array.isArray(data?.items) ? data.items : [];
         setCars(items);
-      } catch (e: any) {
+      } catch (e: unknown) {
         messageApi.error(getErrorMessage(e, "获取二手车数据失败"));
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    void fetchData();
+  }, [messageApi]);
 
   /* ================= 派生字段 ================= */
 

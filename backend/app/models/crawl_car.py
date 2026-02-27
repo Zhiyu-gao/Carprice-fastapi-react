@@ -17,8 +17,8 @@ class CrawlCar(Base):
     title = Column(String(255))
     source_url = Column(String(512))
 
-    image_url = Column(String(512))    # 原始图片 URL
-    image_path = Column(String(512))   # 本地 / Blob 路径
+    image_url = Column(String(512))  # 原始图片 URL
+    image_path = Column(String(512))  # 本地 / Blob 路径
 
     tags = Column(JSON)
     info = Column(JSON)

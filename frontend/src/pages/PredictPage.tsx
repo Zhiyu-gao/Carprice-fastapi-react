@@ -26,6 +26,7 @@ import {
 import { getToken } from "../auth/token";
 import { aiAPI } from "../api/ai";
 import type { AiProvider } from "../api/ai";
+import { getErrorMessage } from "../api/client";
 
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -100,9 +101,9 @@ const PredictPage: React.FC = () => {
       const data = await res.json();
       setPredictedPrice(data.predicted_price);
       messageApi.success("车辆价格预测成功");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      messageApi.error(err.message || "预测失败");
+      messageApi.error(getErrorMessage(err, "预测失败"));
     } finally {
       setPredicting(false);
     }
@@ -142,9 +143,9 @@ const PredictPage: React.FC = () => {
 
       setAiAnalysis(resp.data.analysis_markdown);
       messageApi.success("AI 分析完成");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      messageApi.error(err.message || "AI 分析失败");
+      messageApi.error(getErrorMessage(err, "AI 分析失败"));
     } finally {
       setAiLoading(false);
     }

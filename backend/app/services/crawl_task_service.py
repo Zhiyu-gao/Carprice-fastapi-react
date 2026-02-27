@@ -69,6 +69,7 @@ def _task_logger(task_id: str, log_path: Path):
         line = f"[{_now()}] {msg}"
         with log_path.open("a", encoding="utf-8") as f:
             f.write(line + "\n")
+
     return _log
 
 

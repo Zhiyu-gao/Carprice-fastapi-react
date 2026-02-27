@@ -11,14 +11,17 @@ class UserBase(BaseModel):
     full_name: Optional[str] = None
     avatar_path: Optional[str] = None
 
+
 class UserCreate(UserBase):
     password: str
+
 
 class UserRead(UserBase):
     id: int
     is_active: int
 
     model_config = {"from_attributes": True}
+
 
 class UserOut(UserBase):
     id: int
@@ -27,9 +30,11 @@ class UserOut(UserBase):
 
     model_config = {"from_attributes": True}
 
+
 class UserUpdate(BaseModel):
     email: EmailStr
     full_name: str | None = None
+
 
 class PasswordUpdate(BaseModel):
     old_password: str

@@ -26,6 +26,7 @@ def get_password_hash(password: str) -> str:
     # 存到数据库里用 str
     return hashed.decode("utf-8")
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(
         plain_password.encode("utf-8"),
@@ -41,9 +42,7 @@ def create_access_token(
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

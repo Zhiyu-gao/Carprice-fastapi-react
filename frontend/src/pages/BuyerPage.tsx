@@ -35,7 +35,7 @@ export default function BuyerPage() {
       setItems(Array.isArray(data.items) ? data.items : []);
       setPage(data.page || pageNo);
       setTotal(data.total || 0);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取训练集失败"));
     } finally {
       setLoading(false);

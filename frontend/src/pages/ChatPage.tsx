@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Card,
@@ -63,74 +63,78 @@ export default function ChatPage() {
   const [content, setContent] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const loadMe = async () => {
-    try {
-      const res = await api.get<UserProfile>("/me");
-      setMe(res.data);
-    } catch (e: any) {
-      message.error(getErrorMessage(e, "获取用户信息失败"));
-    }
-  };
-
-  const loadInbox = async () => {
-    try {
-      const res = await api.get<ChatInboxItem[]>("/chat/inbox");
-      setInbox(res.data || []);
-    } catch (e: any) {
-      message.error(getErrorMessage(e, "获取聊天列表失败"));
-    }
-  };
-
-  const loadUsers = async () => {
-    try {
-      const res = await api.get<UserLite[]>("/users");
-      setUsers(res.data || []);
-    } catch (e: any) {
-      message.error(getErrorMessage(e, "获取用户列表失败"));
-    }
-  };
-
-  const loadProfile = async () => {
-    try {
-      const res = await api.get<UserProfile>(`/users/${targetId}`);
-      setProfile(res.data);
-    } catch (e: any) {
-      message.error(getErrorMessage(e, "获取用户信息失败"));
-    }
-  };
-
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
+    if (!targetId) return;
     try {
       const res = await api.get<ChatMessage[]>(`/chat/${targetId}`);
       setMessages(res.data || []);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取聊天记录失败"));
     }
-  };
+  }, [targetId]);
 
   const send = async () => {
     if (!content.trim()) return;
     try {
       await api.post(`/chat/${targetId}`, { content });
       setContent("");
-      loadMessages();
-    } catch (e: any) {
+      void loadMessages();
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "发送失败"));
     }
   };
 
   useEffect(() => {
-    loadMe();
-    loadInbox();
-    loadUsers();
+    let mounted = true;
+    const bootstrap = async () => {
+      try {
+        const [meRes, inboxRes, usersRes] = await Promise.all([
+          api.get<UserProfile>("/me"),
+          api.get<ChatInboxItem[]>("/chat/inbox"),
+          api.get<UserLite[]>("/users"),
+        ]);
+        if (!mounted) return;
+        setMe(meRes.data);
+        setInbox(inboxRes.data || []);
+        setUsers(usersRes.data || []);
+      } catch (e: unknown) {
+        if (!mounted) return;
+        message.error(getErrorMessage(e, "初始化聊天数据失败"));
+      }
+    };
+    void bootstrap();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
     if (!targetId) return;
-    loadProfile();
-    loadMessages();
-    const timer = setInterval(loadMessages, 3000);
-    return () => clearInterval(timer);
+    let mounted = true;
+    const fetchChat = async () => {
+      try {
+        const [profileRes, messagesRes] = await Promise.all([
+          api.get<UserProfile>(`/users/${targetId}`),
+          api.get<ChatMessage[]>(`/chat/${targetId}`),
+        ]);
+        if (!mounted) return;
+        setProfile(profileRes.data);
+        setMessages(messagesRes.data || []);
+      } catch (e: unknown) {
+        if (!mounted) return;
+        message.error(getErrorMessage(e, "获取聊天数据失败"));
+      }
+    };
+
+    void fetchChat();
+    const timer = setInterval(() => {
+      void fetchChat();
+    }, 3000);
+
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
   }, [targetId]);
 
   useEffect(() => {

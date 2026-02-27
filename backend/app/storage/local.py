@@ -30,6 +30,7 @@ def _resolve_storage_ref(relative_path: str) -> str:
         return object_url(relative_path) or relative_path
     return relative_path
 
+
 def save_image_local(image_bytes: bytes, filename: str) -> str:
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     path = IMAGE_DIR / filename

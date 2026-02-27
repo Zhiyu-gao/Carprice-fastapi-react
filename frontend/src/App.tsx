@@ -65,7 +65,7 @@ function AppLayout() {
 
   const path = location.pathname;
   const isVisualizationScreen = path.startsWith("/visualization-screen");
-  const showTopHeader = !isVisualizationScreen || screenMenuVisible;
+  const showTopHeader = isVisualizationScreen ? screenMenuVisible : true;
 
   const pathKeyMap: Record<string, string> = {
     "/intro": "intro",
@@ -113,10 +113,6 @@ function AppLayout() {
       mounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    setScreenMenuVisible(!isVisualizationScreen);
-  }, [isVisualizationScreen]);
 
   if (loadingMe) {
     return (
@@ -282,7 +278,10 @@ function AppLayout() {
                 onClick={({ key }) => {
                   if (key === "predict") navigate("/predict");
                   if (key === "visualization") navigate("/visualization");
-                  if (key === "visualization_screen") navigate("/visualization-screen");
+                  if (key === "visualization_screen") {
+                    setScreenMenuVisible(false);
+                    navigate("/visualization-screen");
+                  }
                   if (key === "account") navigate("/account");
                   if (key === "ai_chat") navigate("/ai_chat");
                   if (key === "crawler") navigate("/crawler");

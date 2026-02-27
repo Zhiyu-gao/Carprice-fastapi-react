@@ -33,6 +33,15 @@ interface CrawlerTask {
 type CityOption = { label: string; value: string };
 type CityGroup = { key: string; title: string; cities: string[] };
 type RawCityItem = { raw: string; norm: string; adcode: string };
+type StartCrawlerFormValues = {
+  city_names?: string[];
+  start_page?: number;
+  end_page?: number;
+  write_local_db?: boolean;
+  write_cloud_db?: boolean;
+  use_cookie_json?: boolean;
+  cookie_json_path?: string;
+};
 
 const CITY_GROUPS: CityGroup[] = [
   { key: "HOT", title: "热门", cities: ["北京", "上海", "广州", "深圳", "重庆", "天津", "成都", "杭州", "武汉", "苏州", "西安", "南京"] },
@@ -83,7 +92,7 @@ export default function CrawlerTaskPage() {
   const [logTitle, setLogTitle] = useState("");
 
   const [startModalOpen, setStartModalOpen] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<StartCrawlerFormValues>();
   const selectedCityNames: string[] = Form.useWatch("city_names", form) || [];
   const [cityKeyword, setCityKeyword] = useState("");
   const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
@@ -120,7 +129,7 @@ export default function CrawlerTaskPage() {
     try {
       const res = await api.get("/crawl-tasks");
       setTasks(res.data || []);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "获取任务失败"));
     } finally {
       setLoading(false);
@@ -176,8 +185,9 @@ export default function CrawlerTaskPage() {
         const res = await fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json");
         const geoJson = await res.json();
         const features = Array.isArray(geoJson?.features) ? geoJson.features : [];
-        const rawItems: RawCityItem[] = features.map((feature: any) => {
-          const props = feature?.properties || {};
+        const rawItems: RawCityItem[] = features.map((feature: unknown) => {
+          const featureRecord = feature as { properties?: Record<string, unknown> };
+          const props = featureRecord?.properties || {};
           const name = String(props?.name || "");
           const adcode = String(props?.adcode || "");
           return {
@@ -233,7 +243,7 @@ export default function CrawlerTaskPage() {
       setLogTitle(`${task.name} — 日志`);
       setLogText(res.data?.log || "");
       setLogModalOpen(true);
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "读取日志失败"));
     }
   };
@@ -243,7 +253,7 @@ export default function CrawlerTaskPage() {
       await api.post(`/crawl-tasks/${task.id}/cancel`);
       message.success("任务已取消");
       fetchTasks();
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "取消失败"));
     }
   };
@@ -253,7 +263,7 @@ export default function CrawlerTaskPage() {
       await api.delete(`/crawl-tasks/${task.id}`);
       message.success("任务已删除");
       fetchTasks();
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "删除失败"));
     }
   };
@@ -318,7 +328,7 @@ export default function CrawlerTaskPage() {
     {
       title: "操作",
       width: 200,
-      render: (_: any, task: CrawlerTask) => (
+      render: (_: unknown, task: CrawlerTask) => (
         <Space>
           <Button
             size="small"
@@ -354,7 +364,7 @@ export default function CrawlerTaskPage() {
     },
   ];
 
-  const onStartTask = async (values: any) => {
+  const onStartTask = async (values: StartCrawlerFormValues) => {
     if (!values.write_local_db && !values.write_cloud_db) {
       message.warning("至少开启一个数据库写入开关");
       return;
@@ -415,7 +425,7 @@ export default function CrawlerTaskPage() {
       setStartModalOpen(false);
       form.resetFields();
       fetchTasks();
-    } catch (e: any) {
+    } catch (e: unknown) {
       message.error(getErrorMessage(e, "启动失败"));
     }
   };

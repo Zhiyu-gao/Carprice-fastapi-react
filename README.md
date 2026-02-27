@@ -1,166 +1,210 @@
 # Vehicle Intelligence Platform
 
-A full-stack platform for used-car data crawling, annotation, model prediction, AI assistant (multi-LLM), and operations monitoring.
+A full-stack platform for used-car data collection, labeling, prediction, AI analysis, and operational monitoring.
 
-## Stack
-- Frontend: React + Vite + Ant Design
-- Backend: FastAPI + SQLAlchemy + MySQL + Playwright + scikit-learn
-- AI Service: FastAPI + Kimi/Qwen/DeepSeek + RAG + MCP
-- Infra: Redis + Qdrant + ClickHouse + Prometheus + Grafana + Nginx
+## Project Overview
 
-## Repository Layout
-- `frontend/`: Web UI
-- `mobile2/`: Mobile web build (Expo Router export)
-- `backend/`: Core business APIs
-- `ai_service/`: AI chat, RAG, MCP
-- `nginx/`: reverse proxy config
-- `observability/`: Prometheus + Grafana config
-- `docker-compose.yml`: full deployment stack
-- `docker-compose.infra.yml`: infra-only stack
+### Core capabilities
+- Vehicle data crawling and task orchestration
+- Human-in-the-loop price annotation
+- Price prediction and AI explanation
+- User auth, forum, and direct messaging
+- Large-screen analytics dashboard
+- Observability with Prometheus + Grafana
 
-## Architecture
-- Frontend calls Backend for auth, data, crawler tasks, prediction, admin APIs.
-- Frontend calls AI Service for chat/RAG/MCP.
-- AI Service validates JWT with the same `SECRET_KEY` as Backend.
-- AI Service MCP tools call Backend APIs.
+### Tech stack
+- `frontend/`: React 19 + Vite + Ant Design + ECharts/Recharts
+- `mobile2/`: Expo Router (web/mobile runtime)
+- `backend/`: FastAPI + SQLAlchemy + Alembic + MySQL + Redis
+- `ai_service/`: FastAPI + multi-LLM routing + RAG (Qdrant)
+- Infra: Nginx, ClickHouse, Prometheus, Grafana, cAdvisor, node_exporter
 
-## 1) Local Development
+## Repository Structure
 
-### Backend
-```bash
-cd backend
-uv sync
-uv run uvicorn app.main:app --reload --port 8000
+```text
+.
+├── frontend/               # Web application
+├── mobile2/                # Expo application
+├── backend/                # Main business API service
+├── ai_service/             # AI chat/RAG/analysis service
+├── nginx/                  # Reverse proxy and TLS config
+├── observability/          # Prometheus + Grafana provisioning
+├── scripts/quality/        # Unified quality scripts
+├── docker-compose.yml      # Full-stack deployment
+├── docker-compose.infra.yml# Infra-only deployment
+├── Makefile                # Root quality commands
+└── README.md
 ```
 
-### AI Service
+## Installation
+
+### Prerequisites
+- Python 3.11+
+- [uv](https://docs.astral.sh/uv/)
+- Node.js 20+ and npm
+- Docker + Docker Compose (for containerized or infra mode)
+
+### 1) Clone and bootstrap
+
 ```bash
-cd ai_service
-uv sync
-uv run uvicorn app.main:app --reload --port 8080
+git clone <your-repo-url>
+cd Vehicle-Intelligence-Platform
+cp .env.example .env
 ```
 
-### Frontend
+### 2) Install service dependencies
+
 ```bash
-cd frontend
-npm install
-npm run dev
+# backend
+uv sync --project backend --group dev
+
+# ai_service
+uv sync --project ai_service --group dev
+
+# frontend
+npm --prefix frontend install
+
+# mobile2
+npm --prefix mobile2 install
 ```
 
-### Optional Infra for local
+## Usage
+
+### Option A: Local development (recommended for coding)
+
+1. Start infra dependencies (optional but recommended):
+
 ```bash
 docker compose -f docker-compose.infra.yml up -d
 ```
 
-## 2) Deployment with Docker Compose
+2. Start backend:
 
-### Step A: Prepare env files
-1. Copy root env:
 ```bash
-cp .env.example .env
+cd backend
+uv run uvicorn app.main:app --reload --port 8000
 ```
-2. Update secrets and passwords in `.env`.
-3. Confirm service env files:
-- `backend/.env`
-- `ai_service/.env`
-- `frontend/.env` (for local Vite only)
-- `mobile2/.env` (for local Expo only)
 
-### Step B: Build and run full stack
+3. Start AI service:
+
+```bash
+cd ai_service
+uv run uvicorn app.main:app --reload --port 8080
+```
+
+4. Start frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+### Option B: Full Docker deployment
+
 ```bash
 docker compose up -d --build
 ```
 
-### Step C: Validate
+### Access points
+- Frontend (via Nginx): `http://localhost`
+- Backend API: `http://localhost:8000`
+- AI service: `http://localhost:8080`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000` (default `admin/admin`)
+
+## Usage Examples
+
+### Check service health
+
 ```bash
-docker compose ps
 curl -f http://127.0.0.1:8000/metrics
 curl -f http://127.0.0.1:8080/metrics
 curl -f http://127.0.0.1:9090/-/healthy
 curl -f http://127.0.0.1:3000/api/health
 ```
 
-### Step D: One-command deploy script
+### Run project-wide quality checks
+
 ```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-Optional:
-```bash
-DEPLOY_HOST=<your-server-ip> ./deploy.sh
-COMPOSE_FILE=docker-compose.yml ./deploy.sh
-```
-
-## 3) Docker Notes
-
-### Full stack (`docker-compose.yml`)
-- Includes nginx, mysql, redis, qdrant, clickhouse, backend, ai_service, frontend, frontend_mobile, prometheus, grafana.
-- Uses healthchecks and startup dependencies (`depends_on.condition`) to reduce boot race issues.
-- Persists data in docker volumes and bind mounts:
-  - `mysql_data`, `qdrant_data`, `clickhouse_data`, `prometheus_data`, `grafana_data`
-  - `./backend/data:/app/data`
-  - `./ai_service/data:/app/data`
-
-### Infra-only (`docker-compose.infra.yml`)
-- Starts Qdrant, ClickHouse, Prometheus, Grafana, node_exporter, cadvisor.
-- Suitable when Backend/AI run directly on host.
-
-## 4) Important Environment Variables
-
-### Root `.env` (used by compose)
-- `SECRET_KEY`, `ALGORITHM`
-- `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`
-- `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB`
-- `OSS_*`
-- `BACKEND_API_BASE_URL`, `QDRANT_URL`
-
-### `backend/.env`
-- Must match JWT settings used by AI Service:
-  - `SECRET_KEY`
-  - `ALGORITHM`
-
-### `ai_service/.env`
-- LLM provider config: `KIMI_*`, `QWEN_*`, `DEEPSEEK_*`
-- RAG config: `QDRANT_*`, `RAG_EMBEDDING_*`
-- JWT config must match backend.
-
-## 5) Nginx and TLS
-- Nginx config is in `nginx/conf.d/default.conf`.
-- Current config expects cert files under:
-  - `nginx/cert/live/nrydawang.shop/fullchain.pem`
-  - `nginx/cert/live/nrydawang.shop/privkey.pem`
-- If deploying to another domain, update `server_name` and cert paths accordingly.
-
-## 6) Monitoring
-- Prometheus: `http://<host>:9090`
-- Grafana: `http://<host>:3000` (`admin/admin` by default; change in production)
-
-## 7) Quality Checks
-```bash
-make check
 make format
+make check
 ```
-See `CODE_QUALITY.md` for details.
 
-## 8) Crawler Cookie JSON (Manual Login)
-- Script path: `backend/app/scripts/create_cookie_json.py`
-- Default output file: `backend/data/crawl/cookies/dongchedi_storage_state.json`
+### Generate crawler cookie JSON (manual login flow)
 
-Run:
 ```bash
 cd backend
 uv run python -m app.scripts.create_cookie_json
 ```
 
-After browser opens, manually log in to Dongchedi, then press Enter in terminal to save JSON.
+Default output:
+- `backend/data/crawl/cookies/dongchedi_storage_state.json`
 
-In the crawler task UI:
-- Turn on `启用 JSON Cookie 文件`
-- Optional: set custom JSON path (`cookie_json_path`)
-- If left empty, backend uses default path above.
+## Configuration Guidelines
 
-## 9) Common Deployment Pitfalls
-- JWT mismatch between Backend and AI Service (`SECRET_KEY`/`ALGORITHM`).
-- Missing TLS cert files for Nginx 443 config.
-- AI embedding API key missing (`RAG_EMBEDDING_API_KEY` or `QWEN_API_KEY`).
-- DNS/domain not matching nginx `server_name`.
+### Root `.env` (compose-level)
+Key variables include:
+- `SECRET_KEY`, `ALGORITHM`
+- `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`
+- `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB`
+- `OSS_ENABLED`, `OSS_AUTH_MODE`, `OSS_BUCKET`, `OSS_ENDPOINT`, `OSS_PREFIX`
+- `BACKEND_API_BASE_URL`, `QDRANT_URL`
+
+### Service env alignment
+- `backend/.env` and `ai_service/.env` must use the same JWT settings:
+  - `SECRET_KEY`
+  - `ALGORITHM`
+- AI provider keys should be configured in `ai_service/.env` (`KIMI_*`, `QWEN_*`, `DEEPSEEK_*`).
+
+### Nginx/TLS notes
+- Active config: `nginx/conf.d/default.conf`
+- If deploying your own domain, update `server_name` and certificate paths in Nginx config.
+
+## Contribution Guidelines
+
+1. Create a branch from `main`.
+2. Keep changes focused and atomic.
+3. Run formatting and checks before opening a PR:
+
+```bash
+make format
+make check
+```
+
+4. Add or update tests when behavior changes.
+5. Include migration notes for schema/config changes.
+6. Use clear commit messages and describe verification steps in PR description.
+
+## Troubleshooting
+
+### 1) `401` between frontend/backend/ai service
+- Verify token exists in frontend storage.
+- Ensure `SECRET_KEY` and `ALGORITHM` match in backend and ai service env files.
+
+### 2) AI features unavailable
+- Check AI provider keys in `ai_service/.env`.
+- Verify Qdrant is reachable (`QDRANT_URL`).
+
+### 3) Crawler tasks fail immediately
+- Confirm cookie JSON path exists and file is valid.
+- Verify crawler city code mapping and network reachability.
+
+### 4) Nginx HTTPS startup failure
+- Recheck certificate paths mounted under `nginx/cert`.
+- Validate config with `nginx -t` in container.
+
+### 5) Database connection errors
+- Confirm MySQL and ClickHouse containers are healthy.
+- Recheck DB credentials in `.env` and service env files.
+
+## Quality and Standards
+
+- Formatting and static checks are centralized under `scripts/quality/`.
+- Root commands:
+  - `make format`
+  - `make check`
+  - `make check-python`
+  - `make check-web`
+  - `make check-types`
+
+For more detail, see [`CODE_QUALITY.md`](./CODE_QUALITY.md).

@@ -7,11 +7,7 @@ def save_crawl_car(db, data: dict) -> bool:
     if not car_id:
         return False
 
-    exists = (
-        db.query(CrawlCar)
-        .filter(CrawlCar.source_car_id == car_id)
-        .first()
-    )
+    exists = db.query(CrawlCar).filter(CrawlCar.source_car_id == car_id).first()
     if exists:
         return False
 
@@ -28,4 +24,3 @@ def save_crawl_car(db, data: dict) -> bool:
 
     db.add(obj)
     return True
-

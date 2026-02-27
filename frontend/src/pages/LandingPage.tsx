@@ -87,8 +87,8 @@ const LandingPage: React.FC = () => {
           return c - 1;
         });
       }, 1000);
-    } catch (err: any) {
-      message.error(err?.response?.data?.detail || "发送验证码失败");
+    } catch (err: unknown) {
+      message.error(getErrorMessage(err, "发送验证码失败"));
     } finally {
       setSendingCode(false);
     }
@@ -115,7 +115,7 @@ const LandingPage: React.FC = () => {
           return c - 1;
         });
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       message.error(getErrorMessage(err, "发送验证码失败"));
     } finally {
       setRegisterSendingCode(false);
@@ -144,7 +144,7 @@ const LandingPage: React.FC = () => {
       setToken(access_token);
       message.success("登录成功");
       navigate(AFTER_LOGIN_REDIRECT, { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       message.error(getErrorMessage(err, "登录失败"));
     } finally {
       setLoginLoading(false);
@@ -170,7 +170,7 @@ const LandingPage: React.FC = () => {
       message.success("注册成功，请登录");
       setActiveTab("login");
       registerForm.resetFields();
-    } catch (err: any) {
+    } catch (err: unknown) {
       message.error(getErrorMessage(err, "注册失败，请稍后再试"));
     } finally {
       setRegisterLoading(false);

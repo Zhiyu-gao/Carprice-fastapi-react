@@ -66,8 +66,14 @@ def get_messages(
     msgs = (
         db.query(models.DirectMessage)
         .filter(
-            ((models.DirectMessage.sender_id == current_user.id) & (models.DirectMessage.receiver_id == user_id))
-            | ((models.DirectMessage.sender_id == user_id) & (models.DirectMessage.receiver_id == current_user.id))
+            (
+                (models.DirectMessage.sender_id == current_user.id)
+                & (models.DirectMessage.receiver_id == user_id)
+            )
+            | (
+                (models.DirectMessage.sender_id == user_id)
+                & (models.DirectMessage.receiver_id == current_user.id)
+            )
         )
         .order_by(models.DirectMessage.created_at.asc())
         .all()

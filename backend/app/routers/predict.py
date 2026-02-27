@@ -6,6 +6,7 @@ from app.train import load_model
 
 router = APIRouter(tags=["predict"])
 
+
 @router.post("/predict")
 def predict_car_price(data: CarPredictIn):
     model = load_model()

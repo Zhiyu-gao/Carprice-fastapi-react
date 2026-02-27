@@ -163,8 +163,8 @@ export default function VisualizationScreenPage() {
     const registerChinaMap = async () => {
       try {
         const res = await fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json");
-        const geoJson = await res.json();
-        echarts.registerMap("china", geoJson as any);
+        const geoJson = (await res.json()) as Record<string, unknown>;
+        echarts.registerMap("china", geoJson as never);
         setMapReady(true);
       } catch {
         setMapReady(false);
@@ -265,9 +265,9 @@ export default function VisualizationScreenPage() {
         borderColor: "rgba(76, 197, 255, 0.58)",
         borderWidth: 1,
         textStyle: { color: "#dbf3ff" },
-        formatter: (params: any) => {
+        formatter: (params: { name?: string; value?: unknown }) => {
           const count = Array.isArray(params.value) ? params.value[2] : params.value;
-          return `${params.name}<br/>车源: ${count || 0} 台`;
+          return `${params.name || "未知"}<br/>车源: ${count || 0} 台`;
         },
       },
       visualMap: {

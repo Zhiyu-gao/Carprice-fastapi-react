@@ -32,7 +32,9 @@ def _build_ch_url(base: str, query: str) -> str:
     if password:
         params["password"] = password
     new_query = urllib.parse.urlencode(params)
-    return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, parsed.path or "/", new_query, ""))
+    return urllib.parse.urlunsplit(
+        (parsed.scheme, parsed.netloc, parsed.path or "/", new_query, "")
+    )
 
 
 def _ch_exec(base: str, sql: str, data: bytes | None = None) -> None:

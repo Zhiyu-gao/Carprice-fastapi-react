@@ -38,11 +38,11 @@
 #     db_vehicle = db.query(models.Vehicle).filter(models.Vehicle.id == vehicle_id).first()
 #     if db_vehicle is None:
 #         raise HTTPException(status_code=404, detail="Vehicle not found")
-    
+
 #     for field, value in vehicle.model_dump().items():
 #         if value is not None:
 #             setattr(db_vehicle, field, value)
-    
+
 #     db.commit()
 #     db.refresh(db_vehicle)
 #     return db_vehicle
@@ -53,7 +53,7 @@
 #     db_vehicle = db.query(models.Vehicle).filter(models.Vehicle.id == vehicle_id).first()
 #     if db_vehicle is None:
 #         raise HTTPException(status_code=404, detail="Vehicle not found")
-    
+
 #     db.delete(db_vehicle)
 #     db.commit()
 #     return db_vehicle

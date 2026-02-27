@@ -11,7 +11,9 @@ from app.core.security import (
 )
 
 
-def register_user(db: Session, *, email: str, username: str, role: str, full_name: str | None, password: str) -> models.User:
+def register_user(
+    db: Session, *, email: str, username: str, role: str, full_name: str | None, password: str
+) -> models.User:
     user = models.User(
         email=email,
         username=username,

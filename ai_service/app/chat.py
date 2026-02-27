@@ -108,7 +108,9 @@ def chat_stream(
         if chunks:
             context = "\n\n".join([f"来源: {c['filename']}\n{c['content']}" for c in chunks])
             messages.insert(0, {"role": "system", "content": RAG_SYSTEM_PROMPT})
-            messages.insert(1, {"role": "system", "content": f"以下是可用资料，请优先基于它回答：\n\n{context}"})
+            messages.insert(
+                1, {"role": "system", "content": f"以下是可用资料，请优先基于它回答：\n\n{context}"}
+            )
 
     provider = str(req.provider)
 

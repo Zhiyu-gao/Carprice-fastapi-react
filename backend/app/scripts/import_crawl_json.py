@@ -23,7 +23,7 @@ def import_json_folder(folder: str):
             except Exception as e:
                 print(f"[ERROR] {path}: {e}")
 
-        db.commit()   # 🔥🔥🔥 关键就在这
+        db.commit()  # 🔥🔥🔥 关键就在这
     except Exception:
         db.rollback()
         raise
@@ -34,4 +34,6 @@ def import_json_folder(folder: str):
 
 
 if __name__ == "__main__":
-    import_json_folder("/Users/zhiyu/Documents/Vehicle-Intelligence-Platform/backend/data/crawl/json")
+    import_json_folder(
+        "/Users/zhiyu/Documents/Vehicle-Intelligence-Platform/backend/data/crawl/json"
+    )

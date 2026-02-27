@@ -42,8 +42,7 @@ BROWSER_ARGS = [
 
 BASE_URL = "https://www.dongchedi.com"
 LIST_URL_TEMPLATE = (
-    "https://www.dongchedi.com/usedcar/"
-    "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-{}-{}-x-x-x-x-x"
+    "https://www.dongchedi.com/usedcar/x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-{}-{}-x-x-x-x-x"
 )
 
 START_PAGE = 1
@@ -66,6 +65,7 @@ IMG_DIR.mkdir(parents=True, exist_ok=True)
 # =========================
 # 工具函数
 # =========================
+
 
 def normalize_img_url(url: str | None) -> str | None:
     if not url:
@@ -93,6 +93,7 @@ def normalize_img_url(url: str | None) -> str | None:
 # 推荐分割线判断
 # =========================
 
+
 def is_card_after_recommend(page, card):
     """
     判断 card 是否位于“为您推荐全国优质二手车”之后
@@ -106,8 +107,9 @@ def is_card_after_recommend(page, card):
           return !!(h1.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING);
         }
         """,
-        card
+        card,
     )
+
 
 def parse_price_block(page) -> dict:
     """
@@ -123,9 +125,7 @@ def parse_price_block(page) -> dict:
         "price_unit": "万",
     }
 
-    ps = page.locator("p").filter(
-        has_text=re.compile("新车|比新车省|售价")
-    )
+    ps = page.locator("p").filter(has_text=re.compile("新车|比新车省|售价"))
     count = ps.count()
 
     for i in range(count):
@@ -155,9 +155,7 @@ def parse_price_block(page) -> dict:
         and price["price_new_car"] is not None
         and price["price_discount"] is not None
     ):
-        price["price_after_discount"] = round(
-            price["price_new_car"] - price["price_discount"], 2
-        )
+        price["price_after_discount"] = round(price["price_new_car"] - price["price_discount"], 2)
 
     return price
 
@@ -165,6 +163,7 @@ def parse_price_block(page) -> dict:
 # =========================
 # 详情页解析（核心）
 # =========================
+
 
 def parse_car_archives(page) -> dict:
     """
@@ -191,6 +190,7 @@ def parse_car_archives(page) -> dict:
 # =========================
 # 主流程
 # =========================
+
 
 def run(
     city_code: str,
@@ -225,7 +225,9 @@ def run(
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             )
-            cookie_path = Path(cookie_json_path).expanduser() if cookie_json_path else DEFAULT_COOKIE_JSON
+            cookie_path = (
+                Path(cookie_json_path).expanduser() if cookie_json_path else DEFAULT_COOKIE_JSON
+            )
 
             if use_cookie_json and cookie_path.exists():
                 try:
@@ -322,12 +324,14 @@ def run(
                     price_info = parse_price_block(page)
 
                     # 🔥 把价格字段塞进 info
-                    info.update({
-                        "新车指导价": price_info.get("price_new_car"),
-                        "比新车省": price_info.get("price_discount"),
-                        "当前售价": price_info.get("price_after_discount"),
-                        "价格单位": price_info.get("price_unit"),
-                    })
+                    info.update(
+                        {
+                            "新车指导价": price_info.get("price_new_car"),
+                            "比新车省": price_info.get("price_discount"),
+                            "当前售价": price_info.get("price_after_discount"),
+                            "价格单位": price_info.get("price_unit"),
+                        }
+                    )
 
                     image_path = None
                     data = {
@@ -346,10 +350,14 @@ def run(
                     if img_url:
                         try:
                             img_url = normalize_img_url(img_url)
-                            r = requests.get(img_url, headers={
-                                "User-Agent": "Mozilla/5.0",
-                                "Referer": "https://www.dongchedi.com/",
-                            }, timeout=20)
+                            r = requests.get(
+                                img_url,
+                                headers={
+                                    "User-Agent": "Mozilla/5.0",
+                                    "Referer": "https://www.dongchedi.com/",
+                                },
+                                timeout=20,
+                            )
                             r.raise_for_status()
 
                             image_path = save_image_local(
@@ -363,8 +371,7 @@ def run(
 
                     # 写 JSON
                     json_path.write_text(
-                        json.dumps(data, ensure_ascii=False, indent=2),
-                        encoding="utf-8"
+                        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
                     )
 
                     for _target, db in db_sessions:

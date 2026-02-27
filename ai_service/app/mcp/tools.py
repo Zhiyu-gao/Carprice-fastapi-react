@@ -24,7 +24,10 @@ def tool_latest_tasks() -> str:
     if not data:
         return "暂无爬虫任务。"
 
-    lines = [f"- {task.get('name')} | {task.get('status')} | {task.get('updated_at')}" for task in data[:5]]
+    lines = [
+        f"- {task.get('name')} | {task.get('status')} | {task.get('updated_at')}"
+        for task in data[:5]
+    ]
     return "最近任务：\n" + "\n".join(lines)
 
 
