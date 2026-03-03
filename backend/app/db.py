@@ -94,6 +94,14 @@ def _get_session_factory(target: str) -> sessionmaker:
     return _session_factories[t]
 
 
+# Backward-compatible exports used by Alembic/scripts.
+SQLALCHEMY_DATABASE_URL = _build_db_url(_resolve_db_conf("local"))
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=SQL_ECHO,
+    future=True,
+)
+
 SessionLocal = _get_session_factory("local")
 Base = declarative_base()
 
