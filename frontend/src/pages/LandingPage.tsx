@@ -1,6 +1,6 @@
 // src/pages/LandingPage.tsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Form,
   Input,
@@ -25,15 +25,18 @@ import {
   LineChartOutlined,
   ApiOutlined,
   SafetyOutlined,
+  WechatOutlined,
 } from "@ant-design/icons";
 import { api, getErrorMessage } from "../api/client";
 import { setToken } from "../auth/token";
 import { AFTER_LOGIN_REDIRECT } from "../config/routes";
 
 const { Title, Text, Paragraph } = Typography;
+const WECHAT_LOGIN_ENABLED = import.meta.env.VITE_WECHAT_LOGIN_ENABLED === "true";
 
 interface LoginFormValues {
-  email: string;
+  account?: string;
+  email?: string;
   password?: string;
   code?: string;
 }
@@ -50,12 +53,14 @@ interface RegisterFormValues {
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("login");
 
   // 登录表单状态
   const [loginForm] = Form.useForm<LoginFormValues>();
   const [loginMode, setLoginMode] = useState<"password" | "code">("password");
   const [loginLoading, setLoginLoading] = useState(false);
+  const [wechatLoading, setWechatLoading] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
@@ -65,6 +70,24 @@ const LandingPage: React.FC = () => {
   const [registerSendingCode, setRegisterSendingCode] = useState(false);
   const [registerCountdown, setRegisterCountdown] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (!WECHAT_LOGIN_ENABLED) return;
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const loginType = params.get("login");
+    const wxError = params.get("wx_error");
+
+    if (wxError) {
+      message.error(`微信登录失败: ${wxError}`);
+      return;
+    }
+    if (token && loginType === "wechat") {
+      setToken(token);
+      message.success("微信登录成功");
+      navigate(AFTER_LOGIN_REDIRECT, { replace: true });
+    }
+  }, [location.search, navigate]);
 
   // 发送验证码（登录）
   const sendLoginCode = async () => {
@@ -129,14 +152,14 @@ const LandingPage: React.FC = () => {
       let res;
       if (loginMode === "password") {
         const formData = new URLSearchParams();
-        formData.append("username", values.email);
+        formData.append("username", values.account || "");
         formData.append("password", values.password!);
         res = await api.post("/auth/login", formData, {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         });
       } else {
         res = await api.post("/auth/email/code-login", {
-          email: values.email,
+          email: values.email!,
           code: values.code,
         });
       }
@@ -148,6 +171,25 @@ const LandingPage: React.FC = () => {
       message.error(getErrorMessage(err, "登录失败"));
     } finally {
       setLoginLoading(false);
+    }
+  };
+
+  const handleWechatLogin = async () => {
+    try {
+      setWechatLoading(true);
+      const state = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      const res = await api.get<{ authorize_url: string }>("/auth/wechat/url", {
+        params: { state },
+      });
+      const url = res.data?.authorize_url;
+      if (!url) {
+        message.error("未获取到微信授权地址");
+        return;
+      }
+      window.location.href = url;
+    } catch (err: unknown) {
+      message.error(getErrorMessage(err, "拉起微信登录失败"));
+      setWechatLoading(false);
     }
   };
 
@@ -296,9 +338,9 @@ const LandingPage: React.FC = () => {
                 lineHeight: 1.2,
               }}
             >
-              基于机器学习的二手车
+              基于多智能体与大模型
               <br />
-              <span style={{ color: "#22d3ee" }}>价格预测与智能分析系统</span>
+              <span style={{ color: "#22d3ee" }}>协同的价格预测与智能分析系统</span>
             </Title>
 
             <Paragraph
@@ -426,23 +468,42 @@ const LandingPage: React.FC = () => {
                       onFinish={onLoginFinish}
                       autoComplete="off"
                     >
-                      <Form.Item
-                        label={<Text style={{ color: "#94A3B8" }}>邮箱</Text>}
-                        name="email"
-                        rules={[
-                          { required: true, message: "请输入邮箱" },
-                          { type: "email", message: "邮箱格式不正确" },
-                        ]}
-                      >
-                        <Input
-                          placeholder="请输入邮箱"
-                          style={{
-                            background: "rgba(255,255,255,0.05)",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            color: "white",
-                          }}
-                        />
-                      </Form.Item>
+                      {loginMode === "password" ? (
+                        <Form.Item
+                          label={<Text style={{ color: "#94A3B8" }}>账号（用户名或邮箱）</Text>}
+                          name="account"
+                          rules={[{ required: true, message: "请输入账号" }]}
+                        >
+                          <Input
+                            placeholder="请输入用户名或邮箱"
+                            autoComplete="username"
+                            style={{
+                              background: "rgba(255,255,255,0.05)",
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              color: "white",
+                            }}
+                          />
+                        </Form.Item>
+                      ) : (
+                        <Form.Item
+                          label={<Text style={{ color: "#94A3B8" }}>邮箱</Text>}
+                          name="email"
+                          rules={[
+                            { required: true, message: "请输入邮箱" },
+                            { type: "email", message: "邮箱格式不正确" },
+                          ]}
+                        >
+                          <Input
+                            placeholder="请输入邮箱"
+                            autoComplete="email"
+                            style={{
+                              background: "rgba(255,255,255,0.05)",
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              color: "white",
+                            }}
+                          />
+                        </Form.Item>
+                      )}
 
                       {loginMode === "password" && (
                         <Form.Item
@@ -451,10 +512,10 @@ const LandingPage: React.FC = () => {
                           rules={[{ required: true, message: "请输入密码" }]}
                         >
                           <Input.Password
+                            className="landing-password-input"
                             placeholder="请输入密码"
                             style={{
-                              background: "rgba(255,255,255,0.05)",
-                              border: "1px solid rgba(255,255,255,0.1)",
+                              width: "100%",
                             }}
                           />
                         </Form.Item>
@@ -503,6 +564,25 @@ const LandingPage: React.FC = () => {
                         >
                           登录
                         </Button>
+                      </Form.Item>
+
+                      <Form.Item style={{ marginTop: -6 }}>
+                        {WECHAT_LOGIN_ENABLED ? (
+                          <Button
+                            block
+                            icon={<WechatOutlined />}
+                            loading={wechatLoading}
+                            onClick={handleWechatLogin}
+                            style={{
+                              height: 42,
+                              background: "rgba(5, 150, 105, 0.12)",
+                              color: "#34d399",
+                              border: "1px solid rgba(16, 185, 129, 0.45)",
+                            }}
+                          >
+                            微信扫码登录
+                          </Button>
+                        ) : null}
                       </Form.Item>
 
                       <div style={{ textAlign: "center", marginTop: 16 }}>
@@ -626,10 +706,10 @@ const LandingPage: React.FC = () => {
                         hasFeedback
                       >
                         <Input.Password
+                          className="landing-password-input"
                           placeholder="请输入密码"
                           style={{
-                            background: "rgba(255,255,255,0.05)",
-                            border: "1px solid rgba(255,255,255,0.1)",
+                            width: "100%",
                           }}
                         />
                       </Form.Item>
@@ -652,10 +732,10 @@ const LandingPage: React.FC = () => {
                         ]}
                       >
                         <Input.Password
+                          className="landing-password-input"
                           placeholder="请再次输入密码"
                           style={{
-                            background: "rgba(255,255,255,0.05)",
-                            border: "1px solid rgba(255,255,255,0.1)",
+                            width: "100%",
                           }}
                         />
                       </Form.Item>

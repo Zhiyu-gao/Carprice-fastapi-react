@@ -27,8 +27,16 @@ def register_user(
     return user
 
 
-def authenticate_user(db: Session, *, email: str, password: str) -> models.User | None:
-    user = db.query(models.User).filter(models.User.email == email).first()
+def authenticate_user(db: Session, *, identifier: str, password: str) -> models.User | None:
+    account = (identifier or "").strip()
+    if not account:
+        return None
+
+    user = (
+        db.query(models.User)
+        .filter((models.User.email == account) | (models.User.username == account))
+        .first()
+    )
     if not user:
         return None
     if not verify_password(password, user.hashed_password):

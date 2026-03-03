@@ -1,5 +1,12 @@
 # app/routers/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
+import os
+import secrets
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt  # 新增
 from sqlalchemy.orm import Session
@@ -25,6 +32,42 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 # 用于从 Authorization 头里抽 token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")  # 注意路径要跟登录接口对应
+
+WECHAT_APP_ID = os.getenv("WECHAT_APP_ID", "").strip()
+WECHAT_APP_SECRET = os.getenv("WECHAT_APP_SECRET", "").strip()
+WECHAT_REDIRECT_URI = os.getenv("WECHAT_REDIRECT_URI", "").strip()
+WECHAT_FRONTEND_REDIRECT = os.getenv(
+    "WECHAT_FRONTEND_REDIRECT", "http://localhost:5173/login"
+).strip()
+WECHAT_PROVIDER = "wechat"
+
+
+def _http_get_json(url: str) -> dict:
+    try:
+        with urlopen(url, timeout=12) as resp:
+            body = resp.read().decode("utf-8")
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"微信服务请求失败: {exc}",
+        ) from exc
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="微信服务返回解析失败",
+        ) from exc
+
+
+def _make_unique_username(db: Session, preferred: str) -> str:
+    base = (preferred or "wechat_user").strip()[:24] or "wechat_user"
+    for i in range(100):
+        candidate = base if i == 0 else f"{base}_{i}"
+        exists = db.query(models.User).filter(models.User.username == candidate).first()
+        if not exists:
+            return candidate
+    return f"wechat_{secrets.token_hex(6)}"
 
 
 @router.post("/register", response_model=UserRead)
@@ -63,10 +106,10 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    # OAuth2PasswordRequestForm 里 username 字段就当 email 用
-    user = authenticate_user(db, email=form_data.username, password=form_data.password)
+    # OAuth2PasswordRequestForm 的 username 字段承载“账号”（邮箱或用户名）
+    user = authenticate_user(db, identifier=form_data.username, password=form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="邮箱或密码错误")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="账号或密码错误")
 
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户已被禁用")
@@ -74,6 +117,147 @@ def login(
     access_token = create_login_token(user=user)
 
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/wechat/url")
+def get_wechat_login_url(state: str = Query(default="")):
+    if not WECHAT_APP_ID or not WECHAT_REDIRECT_URI:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="微信登录未配置，请设置 WECHAT_APP_ID 和 WECHAT_REDIRECT_URI",
+        )
+    wx_state = (state or secrets.token_urlsafe(16))[:64]
+    query = urlencode(
+        {
+            "appid": WECHAT_APP_ID,
+            "redirect_uri": WECHAT_REDIRECT_URI,
+            "response_type": "code",
+            "scope": "snsapi_login",
+            "state": wx_state,
+        }
+    )
+    authorize_url = f"https://open.weixin.qq.com/connect/qrconnect?{query}#wechat_redirect"
+    return {"authorize_url": authorize_url, "state": wx_state}
+
+
+@router.get("/wechat/callback")
+def wechat_callback(
+    code: str,
+    state: str = "",
+    db: Session = Depends(get_db),
+):
+    if not WECHAT_APP_ID or not WECHAT_APP_SECRET or not WECHAT_REDIRECT_URI:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="微信登录未配置，请设置 WECHAT_APP_ID/WECHAT_APP_SECRET/WECHAT_REDIRECT_URI",
+        )
+
+    token_url = (
+        "https://api.weixin.qq.com/sns/oauth2/access_token?"
+        + urlencode(
+            {
+                "appid": WECHAT_APP_ID,
+                "secret": WECHAT_APP_SECRET,
+                "code": code,
+                "grant_type": "authorization_code",
+            }
+        )
+    )
+    token_payload = _http_get_json(token_url)
+    if token_payload.get("errcode"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"微信授权失败: {token_payload.get('errmsg', 'unknown error')}",
+        )
+
+    access_token = str(token_payload.get("access_token") or "")
+    openid = str(token_payload.get("openid") or "")
+    unionid = str(token_payload.get("unionid") or "")
+    if not access_token or not openid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="微信授权结果缺失")
+
+    userinfo_url = (
+        "https://api.weixin.qq.com/sns/userinfo?"
+        + urlencode(
+            {
+                "access_token": access_token,
+                "openid": openid,
+                "lang": "zh_CN",
+            }
+        )
+    )
+    userinfo = _http_get_json(userinfo_url)
+    if userinfo.get("errcode"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"微信用户信息获取失败: {userinfo.get('errmsg', 'unknown error')}",
+        )
+
+    nickname = str(userinfo.get("nickname") or "微信用户").strip()
+    wx_email = f"wx_{(unionid or openid).lower()}@wechat.local"
+
+    # 兜底自动建表，避免环境未执行 migration 时无法绑定账号
+    models.OAuthAccount.__table__.create(bind=db.get_bind(), checkfirst=True)
+
+    oauth_query = db.query(models.OAuthAccount).filter(
+        models.OAuthAccount.provider == WECHAT_PROVIDER
+    )
+    if unionid:
+        oauth_query = oauth_query.filter(
+            (models.OAuthAccount.openid == openid) | (models.OAuthAccount.unionid == unionid)
+        )
+    else:
+        oauth_query = oauth_query.filter(models.OAuthAccount.openid == openid)
+    oauth = oauth_query.first()
+
+    user = None
+    if oauth:
+        user = db.query(models.User).filter(models.User.id == oauth.user_id).first()
+
+    # 账号绑定逻辑：
+    # 1) 先尝试复用“同一微信标识”历史绑定账号
+    # 2) 无绑定则尝试复用 wechat 占位邮箱账号
+    # 3) 都不存在则创建新账号并写入 oauth_accounts 绑定
+    if not user:
+        user = db.query(models.User).filter(models.User.email == wx_email).first()
+        if not user:
+            username = _make_unique_username(db, f"wx_{(unionid or openid)[:10]}")
+            user = models.User(
+                email=wx_email,
+                username=username,
+                role="buyer",
+                full_name=nickname,
+                hashed_password=get_password_hash(secrets.token_urlsafe(24)),
+                is_active=1,
+            )
+            db.add(user)
+            db.flush()
+
+        if not oauth:
+            oauth = models.OAuthAccount(
+                provider=WECHAT_PROVIDER,
+                openid=openid,
+                unionid=unionid or None,
+                user_id=user.id,
+            )
+            db.add(oauth)
+        else:
+            oauth.user_id = user.id
+            oauth.unionid = unionid or oauth.unionid
+
+        db.commit()
+        db.refresh(user)
+
+    jwt_token = create_login_token(user=user)
+
+    redirect_query = urlencode(
+        {
+            "token": jwt_token,
+            "login": "wechat",
+            "state": state or "",
+        }
+    )
+    return RedirectResponse(url=f"{WECHAT_FRONTEND_REDIRECT}?{redirect_query}", status_code=302)
 
 
 @router.post("/email/code")

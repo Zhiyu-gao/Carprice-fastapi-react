@@ -137,6 +137,37 @@ body {
   border-radius: 10px !important;
 }
 
+.ant-input-affix-wrapper,
+.ant-input-affix-wrapper-focused {
+  display: flex !important;
+  width: 100% !important;
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 10px !important;
+}
+
+/* Password/Input 前后缀容器里的真实输入框应透明，避免出现“内嵌色块” */
+.ant-input-affix-wrapper .ant-input {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.ant-input-affix-wrapper .ant-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.ant-input-affix-wrapper .ant-input:focus,
+.ant-input-affix-wrapper .ant-input:focus-visible {
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .ant-input:focus,
 .ant-select-selector:focus,
 .ant-input-number:focus {
@@ -146,6 +177,36 @@ body {
 
 .ant-input::placeholder {
   color: rgba(148, 163, 184, 0.7);
+}
+
+/* AI 聊天自定义输入容器内，保持 textarea 透明由外层承接背景 */
+.ai-chat-input.ant-input {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.ai-chat-input.ant-input:hover,
+.ai-chat-input.ant-input:focus,
+.ai-chat-input.ant-input:focus-visible {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* landing 登录/注册密码框：去掉“内嵌色块” */
+.landing-password-input.ant-input-affix-wrapper,
+.landing-password-input.ant-input-affix-wrapper-focused,
+.landing-password-input.ant-input-affix-wrapper:hover {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.landing-password-input.ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* 按钮样式 */

@@ -197,6 +197,7 @@ export default function AiChatPage() {
     await fetchSessions();
     setActiveSessionId(data.id);
     setMessages([]);
+    setQuestion("");
   };
 
   const deleteSession = async (sessionId: string) => {
@@ -245,77 +246,104 @@ export default function AiChatPage() {
   const handleAsk = async () => {
     if (!question.trim() || loading) return;
 
-    let sessionId = activeSessionId;
-    if (!sessionId) {
-      const res = await fetch(`${AI_BASE_URL}/ai/chat/sessions`, {
+    try {
+      const q = question.trim();
+      let sessionId = activeSessionId;
+      if (!sessionId) {
+        const res = await fetch(`${AI_BASE_URL}/ai/chat/sessions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({ title: q.slice(0, 20) || "新对话" }),
+        });
+        const data = await res.json();
+        sessionId = data.id;
+        setActiveSessionId(sessionId);
+        await fetchSessions();
+      }
+
+      setQuestion("");
+      setLoading(true);
+      setMessages((prev) => [...prev, { role: "user", content: q }]);
+
+      const res = await fetch(`${AI_BASE_URL}/ai/chat/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ title: "新对话" }),
+        body: JSON.stringify({
+          question: q,
+          session_id: sessionId,
+          provider,
+          rag_enabled: ragEnabled,
+          mcp_enabled: mcpEnabled,
+        }),
       });
-      const data = await res.json();
-      sessionId = data.id;
-      setActiveSessionId(sessionId);
-      await fetchSessions();
-    }
-
-    const q = question;
-    setQuestion("");
-    setLoading(true);
-    setMessages((prev) => [...prev, { role: "user", content: q }]);
-
-    const res = await fetch(`${AI_BASE_URL}/ai/chat/stream`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-      body: JSON.stringify({
-        question: q,
-        session_id: sessionId,
-        provider,
-        rag_enabled: ragEnabled,
-        mcp_enabled: mcpEnabled,
-      }),
-    });
-    if (!res.ok || !res.body) {
-      setLoading(false);
-      message.error("聊天请求失败");
-      return;
-    }
-
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop() || "";
-
-      for (const part of parts) {
-        if (!part.startsWith("data:")) continue;
-        const data = part.replace("data:", "").trim();
-        if (data === "[DONE]") {
-          setLoading(false);
-          fetchSessions();
-          return;
-        }
-        const parsed = JSON.parse(data);
-        if (parsed.error) {
-          setLoading(false);
-          message.error(parsed.error);
-          return;
-        }
-        if (parsed.delta) appendAiToken(parsed.delta);
+      if (!res.ok || !res.body) {
+        setLoading(false);
+        message.error("聊天请求失败");
+        return;
       }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let doneReceived = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          if (!part.startsWith("data:")) continue;
+          const data = part.replace("data:", "").trim();
+          if (data === "[DONE]") {
+            doneReceived = true;
+            setLoading(false);
+            fetchSessions();
+            return;
+          }
+
+          let parsed: {
+            error?: string;
+            delta?: string;
+            status?: string;
+            progress?: number;
+            session_id?: string;
+          };
+          try {
+            parsed = JSON.parse(data);
+          } catch {
+            continue;
+          }
+
+          if (parsed.error) {
+            setLoading(false);
+            message.error(parsed.error);
+            return;
+          }
+          if (parsed.session_id && !activeSessionId) {
+            setActiveSessionId(parsed.session_id);
+          }
+          if (parsed.delta) appendAiToken(parsed.delta);
+        }
+      }
+
+      if (!doneReceived) {
+        message.warning("连接中断，回答可能不完整");
+      }
+    } catch {
+      message.error("请求中断，请稍后重试");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const providers = [
@@ -606,6 +634,7 @@ export default function AiChatPage() {
               }}
             >
               <TextArea
+                className="ai-chat-input"
                 value={question}
                 autoSize={{ minRows: 1, maxRows: 6 }}
                 onChange={(e) => setQuestion(e.target.value)}
