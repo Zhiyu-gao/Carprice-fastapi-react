@@ -105,6 +105,14 @@ npm run dev
 docker compose up -d --build
 ```
 
+For production update on a server, use a single compose file flow:
+
+```bash
+bash deploy.sh
+```
+
+`deploy.sh` defaults to `docker-compose.yml`. Keep `QDRANT_URL=http://qdrant:6333` in root `.env`.
+
 ### Access points
 - Frontend (via Nginx): `http://localhost`
 - Backend API: `http://localhost:8000`
@@ -149,12 +157,14 @@ Key variables include:
 - `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB`
 - `OSS_ENABLED`, `OSS_AUTH_MODE`, `OSS_BUCKET`, `OSS_ENDPOINT`, `OSS_PREFIX`
 - `BACKEND_API_BASE_URL`, `QDRANT_URL`
+- In docker-compose deployment, root `.env` is the source of truth for shared vars.
 
 ### Service env alignment
 - `backend/.env` and `ai_service/.env` must use the same JWT settings:
   - `SECRET_KEY`
   - `ALGORITHM`
 - AI provider keys should be configured in `ai_service/.env` (`KIMI_*`, `QWEN_*`, `DEEPSEEK_*`).
+- `backend/.env` and `ai_service/.env` are mainly for service-local settings/overrides in local runs.
 
 ### Nginx/TLS notes
 - Active config: `nginx/conf.d/default.conf`
