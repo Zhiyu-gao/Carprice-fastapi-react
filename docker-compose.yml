@@ -59,11 +59,11 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
     healthcheck:
-      # qdrant image does not ship wget/curl; use native binary presence check
-      test: ["CMD-SHELL", "qdrant --version >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:6333/healthz || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
+      start_period: 30s
 
   backend:
     build: ./backend
