@@ -200,7 +200,7 @@ const CarAnnotationPage: React.FC = () => {
   }).length;
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="page-shell">
       {contextHolder}
 
       {/* 页面标题 */}

@@ -1,7 +1,8 @@
-import { Card, Button, Typography, Row, Col, Image, Space, Input, Badge } from "antd";
+import { Card, Button, Typography, Row, Col, Image, Space, Input, Badge, Grid } from "antd";
 import { SearchOutlined, ShoppingCartOutlined, HeartOutlined, StarOutlined, FilterOutlined, MenuOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 interface ProductType {
   key: string;
@@ -78,18 +79,21 @@ const products: ProductType[] = [
 ];
 
 export default function EcommerceMobilePage() {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+
   return (
-    <div style={{ background: "#ECFDF5", minHeight: "100vh", padding: "0" }}>
+    <div style={{ background: "#ECFDF5", minHeight: "100vh", padding: 0, overflowX: "hidden" }}>
       {/* Mobile Header */}
-      <div style={{ background: "white", padding: "16px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-        <Row align="middle" gutter={[16, 16]}>
-          <Col xs={2}>
+      <div style={{ background: "white", padding: isMobile ? "12px 12px" : "16px 24px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+        <Row align="middle" gutter={[isMobile ? 8 : 16, isMobile ? 8 : 16]}>
+          <Col xs={3} sm={2}>
             <Button 
               type="text" 
               icon={<MenuOutlined style={{ fontSize: "24px", color: "#064E3B" }} />}
             />
           </Col>
-          <Col xs={20}>
+          <Col xs={17} sm={20}>
             <Input 
               placeholder="搜索商品..." 
               prefix={<SearchOutlined style={{ color: "#064E3B" }} />}
@@ -102,8 +106,8 @@ export default function EcommerceMobilePage() {
               }}
             />
           </Col>
-          <Col xs={2}>
-            <Badge count={5} showZero color="#F97316">
+          <Col xs={4} sm={2}>
+            <Badge count={5} showZero color="#F97316" offset={[-2, 4]}>
               <Button 
                 type="text" 
                 icon={<ShoppingCartOutlined style={{ fontSize: "24px", color: "#064E3B" }} />}
@@ -114,7 +118,7 @@ export default function EcommerceMobilePage() {
       </div>
 
       {/* Hero Section */}
-      <div style={{ background: "#059669", padding: "32px 24px", marginBottom: "24px" }}>
+      <div style={{ background: "#059669", padding: isMobile ? "24px 12px" : "32px 24px", marginBottom: "24px" }}>
         <Title level={2} style={{ color: "white", marginBottom: "16px", fontSize: "32px" }}>
           夏季大促
         </Title>
@@ -137,7 +141,7 @@ export default function EcommerceMobilePage() {
       </div>
 
       {/* Categories Section */}
-      <div style={{ padding: "0 24px 24px" }}>
+      <div style={{ padding: isMobile ? "0 12px 16px" : "0 24px 24px" }}>
         <Title level={3} style={{ color: "#064E3B", marginBottom: "24px", fontSize: "24px" }}>
           商品分类
         </Title>
@@ -171,7 +175,7 @@ export default function EcommerceMobilePage() {
       </div>
 
       {/* Featured Products Section */}
-      <div style={{ padding: "0 24px 24px" }}>
+      <div style={{ padding: isMobile ? "0 12px 16px" : "0 24px 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <Title level={3} style={{ color: "#064E3B", margin: 0, fontSize: "24px" }}>
             精选商品

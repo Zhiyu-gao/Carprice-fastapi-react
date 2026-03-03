@@ -173,7 +173,7 @@ const AccountPage: React.FC = () => {
   const roleInfo = getRoleColor(user?.role);
 
   return (
-    <div style={{ padding: "24px 48px", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="page-shell page-shell--lg">
       {contextHolder}
 
       {/* 页面标题 */}

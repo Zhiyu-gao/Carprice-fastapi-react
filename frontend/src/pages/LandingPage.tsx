@@ -15,6 +15,7 @@ import {
   Space,
   Tag,
   Modal,
+  Grid,
 } from "antd";
 import {
   BarChartOutlined,
@@ -32,6 +33,7 @@ import { setToken } from "../auth/token";
 import { AFTER_LOGIN_REDIRECT } from "../config/routes";
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 const WECHAT_LOGIN_ENABLED = import.meta.env.VITE_WECHAT_LOGIN_ENABLED === "true";
 
 interface LoginFormValues {
@@ -70,6 +72,9 @@ const LandingPage: React.FC = () => {
   const [registerSendingCode, setRegisterSendingCode] = useState(false);
   const [registerCountdown, setRegisterCountdown] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+  const isTablet = screens.md && !screens.xl;
 
   useEffect(() => {
     if (!WECHAT_LOGIN_ENABLED) return;
@@ -252,6 +257,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div
+      className="landing-page"
       style={{
         minHeight: "100vh",
         background:
@@ -269,7 +275,7 @@ const LandingPage: React.FC = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 48px",
+          padding: isMobile ? "0 12px" : isTablet ? "0 24px" : "0 48px",
           background: "rgba(2, 6, 23, 0.8)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
@@ -286,20 +292,21 @@ const LandingPage: React.FC = () => {
               boxShadow: "0 0 12px rgba(34, 211, 238, 0.6)",
             }}
           />
-          <Text style={{ color: "white", fontSize: 18, fontWeight: 700 }}>
+          <Text style={{ color: "white", fontSize: isMobile ? 16 : 18, fontWeight: 700 }}>
             车辆智能平台
           </Text>
         </div>
-        <Space>
+        <Space size={isMobile ? 8 : 12}>
           <Button
             ghost
             onClick={() => setPreviewOpen(true)}
             style={{
               borderColor: "rgba(34,211,238,0.5)",
               color: "#67e8f9",
+              paddingInline: isMobile ? 10 : 16,
             }}
           >
-            2分钟快速预览
+            {isMobile ? "预览" : "2分钟快速预览"}
           </Button>
           <Button
             type="text"
@@ -324,7 +331,7 @@ const LandingPage: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "48px 64px",
+            padding: isMobile ? "24px 16px" : isTablet ? "32px 24px" : "48px 64px",
           }}
         >
           <div style={{ maxWidth: "100%" }}>
@@ -346,7 +353,7 @@ const LandingPage: React.FC = () => {
             <Paragraph
               style={{
                 color: "#94A3B8",
-                fontSize: 18,
+                fontSize: isMobile ? 15 : 18,
                 lineHeight: 1.8,
                 marginBottom: 32,
               }}
@@ -439,7 +446,7 @@ const LandingPage: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "48px",
+            padding: isMobile ? "16px 16px 28px" : isTablet ? "28px 24px 40px" : "48px",
           }}
         >
           <Card
@@ -451,7 +458,7 @@ const LandingPage: React.FC = () => {
               borderRadius: 16,
               backdropFilter: "blur(12px)",
             }}
-            bodyStyle={{ padding: 32 }}
+            bodyStyle={{ padding: isMobile ? 18 : 32 }}
           >
             <Tabs
               activeKey={activeTab}
@@ -770,7 +777,7 @@ const LandingPage: React.FC = () => {
         open={previewOpen}
         onCancel={() => setPreviewOpen(false)}
         footer={null}
-        width={960}
+        width={isMobile ? "94%" : 960}
         destroyOnClose
       >
         <video

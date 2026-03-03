@@ -1,8 +1,9 @@
-import { Card, Button, Typography, Row, Col, Statistic, Table, Space, Select, DatePicker } from "antd";
+import { Card, Button, Typography, Row, Col, Statistic, Table, Space, Select, DatePicker, Grid } from "antd";
 import { LineChartOutlined, BarChartOutlined, PieChartOutlined, FilterOutlined, ExportOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 
 const { Title, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 
 interface PatientDataType {
   key: string;
@@ -32,12 +33,18 @@ const data: PatientDataType[] = [
 ];
 
 export default function HealthcareDashboardPage() {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+  const tableColumns = isMobile
+    ? columns.map(({ width: _width, ...rest }) => rest)
+    : columns;
+
   return (
-    <div style={{ background: "#F8FAFC", minHeight: "100vh", padding: "24px" }}>
+    <div style={{ background: "#F8FAFC", minHeight: "100vh", padding: isMobile ? "12px" : "24px", overflowX: "hidden" }}>
       {/* Header Section */}
       <div style={{ maxWidth: "1400px", margin: "0 auto 24px" }}>
         <Row justify="space-between" align="middle">
-          <Col>
+          <Col xs={24} md={16}>
             <Title level={2} style={{ color: "#1E3A8A", margin: 0 }}>
               医疗健康数据分析仪表板
             </Title>
@@ -45,8 +52,8 @@ export default function HealthcareDashboardPage() {
               实时患者监测与健康数据分析
             </Paragraph>
           </Col>
-          <Col>
-            <Space>
+          <Col xs={24} md={8} style={{ marginTop: isMobile ? 12 : 0 }}>
+            <Space wrap>
               <Button 
                 type="primary" 
                 style={{ 
@@ -230,25 +237,27 @@ export default function HealthcareDashboardPage() {
           }}
           title="最近患者"
           extra={
-            <Space>
-              <Select defaultValue="all" style={{ width: 120 }}>
+            <Space wrap style={{ width: isMobile ? "100%" : undefined }}>
+              <Select defaultValue="all" style={{ width: isMobile ? "100%" : 120 }}>
                 <Select.Option value="all">全部状态</Select.Option>
                 <Select.Option value="stable">稳定</Select.Option>
                 <Select.Option value="monitoring">监测中</Select.Option>
                 <Select.Option value="treatment">治疗中</Select.Option>
               </Select>
-              <DatePicker.RangePicker style={{ width: 250 }} />
+              <DatePicker.RangePicker style={{ width: isMobile ? "100%" : 250 }} />
             </Space>
           }
         >
-          <Table 
-            columns={columns} 
-            dataSource={data} 
-            pagination={{ pageSize: 10 }} 
-            scroll={{ x: 800 }} 
-            rowKey="key"
-            style={{ background: "white", borderRadius: "8px" }}
-          />
+          <div style={{ width: "100%", overflowX: "auto" }}>
+            <Table
+              columns={tableColumns}
+              dataSource={data}
+              pagination={{ pageSize: 10 }}
+              scroll={{ x: isMobile ? 640 : 800 }}
+              rowKey="key"
+              style={{ background: "white", borderRadius: "8px" }}
+            />
+          </div>
         </Card>
       </div>
     </div>

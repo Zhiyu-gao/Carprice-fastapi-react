@@ -8,7 +8,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { Layout, Menu, Button, Typography, Space, Spin, Dropdown, Avatar } from "antd";
+import { Layout, Menu, Button, Typography, Space, Spin, Dropdown, Avatar, Grid } from "antd";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -54,11 +54,13 @@ import FintechBankingPage from "./uiux-page/FintechBankingPage";
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 /** 登录后主布局 - 顶部导航栏 */
 function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const screens = useBreakpoint();
   const [me, setMe] = useState<{ role: string; username?: string } | null>(null);
   const [loadingMe, setLoadingMe] = useState(true);
   const [screenMenuVisible, setScreenMenuVisible] = useState(false);
@@ -66,6 +68,9 @@ function AppLayout() {
   const path = location.pathname;
   const isVisualizationScreen = path.startsWith("/visualization-screen");
   const showTopHeader = isVisualizationScreen ? screenMenuVisible : true;
+  const isMobile = !screens.md;
+  const isTablet = screens.md && !screens.xl;
+  const headerHeight = isMobile ? 112 : 64;
 
   const pathKeyMap: Record<string, string> = {
     "/intro": "intro",
@@ -225,10 +230,13 @@ function AppLayout() {
             background: "#0F172A",
             borderBottom: "1px solid rgba(255,255,255,0.1)",
             display: "grid",
-            gridTemplateColumns: "220px 1fr 220px",
+            gridTemplateColumns: isMobile ? "1fr auto" : "220px 1fr auto",
+            gridTemplateRows: isMobile ? "44px 52px" : "1fr",
             alignItems: "center",
-            padding: "0 48px",
-            height: 64,
+            columnGap: isMobile ? 12 : 16,
+            rowGap: isMobile ? 6 : 0,
+            padding: isMobile ? "8px 12px" : isTablet ? "0 20px" : "0 48px",
+            height: headerHeight,
             position: "fixed",
             top: 0,
             left: 0,
@@ -243,6 +251,7 @@ function AppLayout() {
               alignItems: "center",
               gap: "12px",
               cursor: "pointer",
+              minWidth: 0,
             }}
             onClick={() => navigate("/intro")}
           >
@@ -255,7 +264,14 @@ function AppLayout() {
                 boxShadow: "0 0 12px rgba(34, 211, 238, 0.6)",
               }}
             />
-            <Text style={{ color: "white", fontSize: 18, fontWeight: 700 }}>
+            <Text
+              style={{
+                color: "white",
+                fontSize: isMobile ? 16 : 18,
+                fontWeight: 700,
+                whiteSpace: "nowrap",
+              }}
+            >
               车辆智能平台
             </Text>
           </div>
@@ -263,11 +279,12 @@ function AppLayout() {
           {/* 导航菜单 */}
           <div
             style={{
+              gridColumn: isMobile ? "1 / -1" : "auto",
               width: "100%",
               overflowX: "auto",
               scrollbarWidth: "none",
               display: "flex",
-              justifyContent: "center",
+              justifyContent: isMobile ? "flex-start" : "center",
             }}
             >
               <Menu
@@ -299,12 +316,13 @@ function AppLayout() {
                   background: "transparent",
                   border: "none",
                   minWidth: "max-content",
+                  width: "max-content",
                 }}
               />
             </div>
 
           {/* 右侧操作区 */}
-          <Space size={16} style={{ justifySelf: "end" }}>
+          <Space size={isMobile ? 8 : 16} style={{ justifySelf: "end" }}>
             <Dropdown
               menu={{ items: userMenuItems }}
               trigger={["click"]}
@@ -312,15 +330,15 @@ function AppLayout() {
             >
               <Button
                 type="text"
-                style={{ height: 42, paddingInline: 10, color: "#e2e8f0" }}
+                style={{ height: 40, paddingInline: isMobile ? 4 : 10, color: "#e2e8f0" }}
               >
                 <Space size={8}>
                   <Avatar
-                    size={30}
+                    size={isMobile ? 28 : 30}
                     style={{ background: "linear-gradient(135deg, #22d3ee, #0ea5e9)" }}
                     icon={<UserOutlined />}
                   />
-                  <span style={{ fontSize: 13 }}>{me?.username || "用户中心"}</span>
+                  {!isMobile && <span style={{ fontSize: 13 }}>{me?.username || "用户中心"}</span>}
                   <DownOutlined style={{ fontSize: 12, color: "#94a3b8" }} />
                 </Space>
               </Button>
@@ -338,7 +356,7 @@ function AppLayout() {
           style={{
             position: "fixed",
             right: 16,
-            top: showTopHeader ? 74 : 12,
+            top: showTopHeader ? headerHeight + 10 : 12,
             zIndex: 1300,
             background: "rgba(13, 52, 94, 0.92)",
             borderColor: "rgba(109, 212, 255, 0.72)",
@@ -354,8 +372,8 @@ function AppLayout() {
         style={{
           background: "#020617",
           padding: 0,
-          marginTop: showTopHeader ? 64 : 0,
-          minHeight: showTopHeader ? "calc(100vh - 64px)" : "100vh",
+          marginTop: showTopHeader ? headerHeight : 0,
+          minHeight: showTopHeader ? `calc(100vh - ${headerHeight}px)` : "100vh",
         }}
       >
         <Outlet />

@@ -44,13 +44,13 @@ export default function ProjectIntroPage() {
   ];
 
   return (
-    <div style={{ margin: "-32px" }}>
+    <div style={{ margin: 0 }}>
       {/* Hero Section */}
       <div
         style={{
           background: "linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)",
-          minHeight: "600px",
-          padding: "80px 48px",
+          minHeight: "max(520px, 64vh)",
+          padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 48px)",
           display: "flex",
           alignItems: "center",
         }}
@@ -75,7 +75,7 @@ export default function ProjectIntroPage() {
                 level={1}
                 style={{
                   color: "white",
-                  fontSize: 56,
+                  fontSize: "clamp(34px, 7vw, 56px)",
                   marginBottom: 24,
                   lineHeight: 1.2,
                 }}
@@ -87,7 +87,7 @@ export default function ProjectIntroPage() {
               <Paragraph
                 style={{
                   color: "#94A3B8",
-                  fontSize: 20,
+                  fontSize: "clamp(16px, 2.6vw, 20px)",
                   marginBottom: 32,
                   lineHeight: 1.8,
                   maxWidth: 600,
@@ -203,7 +203,7 @@ export default function ProjectIntroPage() {
       </div>
 
       {/* Features Section */}
-      <div style={{ background: "#F8FAFC", padding: "80px 48px" }}>
+      <div style={{ background: "#F8FAFC", padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 48px)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
             <Title level={2} style={{ color: "#0F172A", marginBottom: 16 }}>
@@ -244,7 +244,7 @@ export default function ProjectIntroPage() {
       </div>
 
       {/* System Architecture */}
-      <div style={{ background: "white", padding: "80px 48px" }}>
+      <div style={{ background: "white", padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 48px)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <Row align="middle" gutter={[64, 48]}>
             <Col xs={24} md={12}>
@@ -351,7 +351,7 @@ export default function ProjectIntroPage() {
       <div
         style={{
           background: "linear-gradient(135deg, #0EA5E9 0%, #1E3A8A 100%)",
-          padding: "80px 48px",
+          padding: "clamp(40px, 8vw, 80px) clamp(16px, 5vw, 48px)",
           textAlign: "center",
         }}
       >
@@ -405,7 +405,7 @@ export default function ProjectIntroPage() {
       </div>
 
       {/* Footer */}
-      <div style={{ background: "#0F172A", padding: "48px" }}>
+      <div style={{ background: "#0F172A", padding: "clamp(24px, 5vw, 48px)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", textAlign: "center" }}>
           <Paragraph style={{ color: "#64748B", margin: 0 }}>
             © 2026 车辆智能价格预测系统 | 📧 gaoking35@gmail.com

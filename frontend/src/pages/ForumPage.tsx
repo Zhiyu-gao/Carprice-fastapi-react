@@ -159,7 +159,7 @@ export default function ForumPage() {
   const totalComments = Object.values(commentMap).reduce((sum, comments) => sum + comments.length, 0);
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="page-shell">
       {/* 页面标题 */}
       <div style={{ marginBottom: 24 }}>
         <Title level={2} style={{ color: "#f1f5f9", marginBottom: 8 }}>

@@ -53,6 +53,10 @@ body,
   height: 100%;
 }
 
+html {
+  font-size: 16px;
+}
+
 /* 全局背景色 */
 body {
   background-color: var(--background-primary);
@@ -67,6 +71,30 @@ body {
 /* 去掉 Vite 模板默认给 #root 的居中和 padding */
 #root {
   display: block;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-shell {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-shell--lg {
+  max-width: 1200px;
+}
+
+.page-shell--xl {
+  max-width: 1400px;
+}
+
+.page-shell--full {
+  max-width: none;
 }
 
 /* Antd 布局的统一背景 */
@@ -293,6 +321,14 @@ body {
   border-block-end: 1px solid rgba(148, 163, 184, 0.18) !important;
 }
 
+.ant-table-wrapper {
+  overflow-x: auto;
+}
+
+.ant-table-wrapper .ant-table {
+  min-width: 640px;
+}
+
 @keyframes liftIn {
   from {
     opacity: 0;
@@ -314,12 +350,55 @@ body {
 
 /* 响应式调整 */
 @media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .page-shell {
+    padding: 16px;
+  }
+
   .ant-layout-sider {
     width: 100% !important;
     position: relative !important;
   }
-  
+
   .ant-layout-content {
     padding: 16px !important;
+  }
+
+  .landing-page .ant-tabs-nav {
+    margin-bottom: 12px !important;
+  }
+
+  .landing-page .ant-card .ant-card-body {
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-shell {
+    padding: 12px;
+  }
+
+  .ant-modal {
+    max-width: calc(100vw - 20px);
+  }
+
+  .ant-statistic-content {
+    font-size: 22px !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .ant-btn {
+    min-height: 40px;
+  }
+
+  .ant-input,
+  .ant-select-selector,
+  .ant-input-number,
+  .ant-picker {
+    min-height: 40px;
   }
 }

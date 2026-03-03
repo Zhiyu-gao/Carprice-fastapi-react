@@ -227,7 +227,7 @@ const VisualizationPage: React.FC = () => {
   /* ================= 渲染 ================= */
 
   return (
-    <div style={{ padding: "24px 48px", maxWidth: 1400, margin: "0 auto" }}>
+    <div className="page-shell page-shell--xl">
       {contextHolder}
 
       {/* 页面标题 */}

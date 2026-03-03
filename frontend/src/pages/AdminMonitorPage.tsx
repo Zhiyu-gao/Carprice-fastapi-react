@@ -62,7 +62,7 @@ export default function AdminMonitorPage() {
   }, [metrics]);
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="page-shell">
       {/* 页面标题 */}
       <div style={{ marginBottom: 24 }}>
         <Title level={2} style={{ color: "#f1f5f9", marginBottom: 8 }}>

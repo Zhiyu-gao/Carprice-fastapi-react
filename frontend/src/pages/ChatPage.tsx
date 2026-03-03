@@ -12,6 +12,7 @@ import {
   List,
   Modal,
   Select,
+  Grid,
 } from "antd";
 import { api, getErrorMessage } from "../api/client";
 import type { ChatInboxItem, ChatMessage, UserLite, UserProfile } from "../api/types";
@@ -27,6 +28,7 @@ import {
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+const { useBreakpoint } = Grid;
 const cardStyle: React.CSSProperties = {
   background: "rgba(15, 23, 42, 0.6)",
   border: "1px solid rgba(148, 163, 184, 0.1)",
@@ -50,6 +52,8 @@ const roleConfig = (role?: string) => {
 };
 
 export default function ChatPage() {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const { userId } = useParams();
   const navigate = useNavigate();
   const targetId = Number(userId);
@@ -168,7 +172,14 @@ export default function ChatPage() {
   const currentRole = roleConfig(profile?.role);
 
   return (
-    <div style={{ padding: "24px", height: "calc(100vh - 64px)" }}>
+    <div
+      className="page-shell page-shell--full"
+      style={{
+        paddingTop: isMobile ? 12 : 24,
+        paddingBottom: isMobile ? "max(12px, env(safe-area-inset-bottom))" : 24,
+        height: isMobile ? "auto" : "calc(100vh - 64px)",
+      }}
+    >
       {/* 页面标题 */}
       <div style={{ marginBottom: 24 }}>
         <Title level={2} style={{ color: "#f1f5f9", marginBottom: 8 }}>
@@ -180,13 +191,18 @@ export default function ChatPage() {
         </Text>
       </div>
 
-      <Card style={{ ...cardStyle, height: "calc(100% - 80px)" }} bodyStyle={{ padding: 0, height: "100%" }}>
-        <div style={{ display: "flex", height: "100%" }}>
+      <Card
+        style={{ ...cardStyle, height: isMobile ? "calc(100vh - 220px)" : "calc(100% - 80px)" }}
+        bodyStyle={{ padding: 0, height: "100%" }}
+      >
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", height: "100%" }}>
           {/* 左侧聊天列表 */}
           <div
             style={{
-              width: 300,
+              width: isMobile ? "100%" : 300,
+              maxHeight: isMobile ? 240 : "none",
               borderRight: "1px solid rgba(148, 163, 184, 0.1)",
+              borderBottom: isMobile ? "1px solid rgba(148, 163, 184, 0.1)" : "none",
               display: "flex",
               flexDirection: "column",
             }}
@@ -249,7 +265,7 @@ export default function ChatPage() {
                           ellipsis
                           style={{
                             display: "block",
-                            maxWidth: 180,
+                            maxWidth: isMobile ? "100%" : 180,
                             color: "#64748b",
                             fontSize: 12,
                           }}
@@ -265,7 +281,7 @@ export default function ChatPage() {
           </div>
 
           {/* 右侧聊天区域 */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
             {targetId ? (
               <>
                 {/* 聊天头部 */}
@@ -316,7 +332,7 @@ export default function ChatPage() {
                           marginBottom: 16,
                         }}
                       >
-                        <div style={{ display: "flex", gap: 12, alignItems: "flex-end", maxWidth: "70%" }}>
+                        <div style={{ display: "flex", gap: 12, alignItems: "flex-end", maxWidth: isMobile ? "88%" : "70%" }}>
                           {!isMe && renderAvatar(profile?.avatar_path, profile?.username)}
                           <div>
                             <div

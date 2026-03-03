@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Input, Button, Select, Switch, message, Popconfirm, Typography, Space } from "antd";
+import { Input, Button, Select, Switch, message, Popconfirm, Typography, Space, Drawer, Grid } from "antd";
 import {
   ArrowUpOutlined,
   PlusOutlined,
@@ -9,11 +9,13 @@ import {
   FileTextOutlined,
   ThunderboltOutlined,
   DatabaseOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import { getToken } from "../auth/token";
 
 const { TextArea } = Input;
 const { Text, Title } = Typography;
+const { useBreakpoint } = Grid;
 
 const AI_BASE_URL = import.meta.env.VITE_AI_BASE_URL;
 
@@ -74,6 +76,8 @@ const messageBubbleAI: React.CSSProperties = {
 };
 
 export default function AiChatPage() {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -85,6 +89,7 @@ export default function AiChatPage() {
   const [docs, setDocs] = useState<{ id: string; filename: string }[]>([]);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -352,169 +357,177 @@ export default function AiChatPage() {
     { value: "qwen", label: "Qwen", color: "#a78bfa" },
   ];
 
-  return (
-    <div style={{ display: "flex", height: "calc(100vh - 64px)", background: "#020617" }}>
-      {/* 左侧会话列表 */}
-      <div style={sidebarStyle}>
-        {/* 头部 */}
-        <div
+  const renderSidebar = () => (
+    <div style={{ ...sidebarStyle, width: isMobile ? "100%" : 280, height: "100%" }}>
+      <div
+        style={{
+          padding: "20px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <RobotOutlined style={{ color: "#22d3ee", fontSize: 20 }} />
+          <Text strong style={{ color: "white", fontSize: 16 }}>
+            AI 助手
+          </Text>
+        </div>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={createSession}
           style={{
-            padding: "20px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
+            border: "none",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <RobotOutlined style={{ color: "#22d3ee", fontSize: 20 }} />
-            <Text strong style={{ color: "white", fontSize: 16 }}>
-              AI 助手
-            </Text>
-          </div>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={createSession}
+          新建
+        </Button>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
+        {sessions.map((s) => (
+          <div
+            key={s.id}
+            onClick={() => {
+              setActiveSessionId(s.id);
+              if (isMobile) setSidebarOpen(false);
+            }}
             style={{
-              background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
-              border: "none",
+              padding: "12px 16px",
+              cursor: "pointer",
+              background: s.id === activeSessionId ? "rgba(34, 211, 238, 0.15)" : "transparent",
+              borderRadius: 8,
+              marginBottom: 8,
+              border: s.id === activeSessionId ? "1px solid rgba(34, 211, 238, 0.3)" : "1px solid transparent",
+              transition: "all 0.2s",
             }}
           >
-            新建
-          </Button>
-        </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                <MessageOutlined style={{ color: s.id === activeSessionId ? "#22d3ee" : "#64748B", fontSize: 14 }} />
+                <span
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    color: s.id === activeSessionId ? "white" : "#94A3B8",
+                    fontSize: 14,
+                  }}
+                >
+                  {s.title}
+                </span>
+              </div>
+              <Popconfirm
+                title="确定删除该对话？"
+                okText="删除"
+                cancelText="取消"
+                onConfirm={(e) => {
+                  e?.stopPropagation();
+                  deleteSession(s.id);
+                }}
+              >
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<DeleteOutlined style={{ color: "#64748B", fontSize: 12 }} />}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ padding: "0 4px" }}
+                />
+              </Popconfirm>
+            </div>
+          </div>
+        ))}
+      </div>
 
-        {/* 会话列表 */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
-          {sessions.map((s) => (
-            <div
-              key={s.id}
-              onClick={() => setActiveSessionId(s.id)}
-              style={{
-                padding: "12px 16px",
-                cursor: "pointer",
-                background:
-                  s.id === activeSessionId
-                    ? "rgba(34, 211, 238, 0.15)"
-                    : "transparent",
-                borderRadius: 8,
-                marginBottom: 8,
-                border:
-                  s.id === activeSessionId
-                    ? "1px solid rgba(34, 211, 238, 0.3)"
-                    : "1px solid transparent",
-                transition: "all 0.2s",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
-                  <MessageOutlined style={{ color: s.id === activeSessionId ? "#22d3ee" : "#64748B", fontSize: 14 }} />
-                  <span
-                    style={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      color: s.id === activeSessionId ? "white" : "#94A3B8",
-                      fontSize: 14,
-                    }}
-                  >
-                    {s.title}
-                  </span>
-                </div>
+      <div
+        style={{
+          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+          padding: "16px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <FileTextOutlined style={{ color: "#fbbf24", fontSize: 14 }} />
+          <Text strong style={{ color: "white", fontSize: 14 }}>
+            资料库
+          </Text>
+        </div>
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx,.txt,.md"
+          disabled={uploadingDoc}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) uploadDoc(f);
+            e.currentTarget.value = "";
+          }}
+          style={{
+            width: "100%",
+            padding: "8px",
+            background: "rgba(255, 255, 255, 0.05)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: 6,
+            color: "#94A3B8",
+            fontSize: 12,
+          }}
+        />
+        <div style={{ marginTop: 8, fontSize: 12 }}>
+          {docs.length ? (
+            docs.map((d) => (
+              <div
+                key={d.id}
+                style={{
+                  color: "#64748B",
+                  padding: "2px 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                }}
+              >
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  • {d.filename}
+                </span>
                 <Popconfirm
-                  title="确定删除该对话？"
+                  title="删除该文档？"
                   okText="删除"
                   cancelText="取消"
-                  onConfirm={(e) => {
-                    e?.stopPropagation();
-                    deleteSession(s.id);
-                  }}
+                  onConfirm={() => deleteDoc(d.id)}
                 >
                   <Button
                     type="text"
                     size="small"
-                    icon={<DeleteOutlined style={{ color: "#64748B", fontSize: 12 }} />}
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ padding: "0 4px" }}
+                    loading={deletingDocId === d.id}
+                    icon={<DeleteOutlined style={{ color: "#f87171", fontSize: 12 }} />}
+                    style={{ padding: 0, minWidth: 20 }}
                   />
                 </Popconfirm>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 资料库 */}
-        <div
-          style={{
-            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-            padding: "16px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <FileTextOutlined style={{ color: "#fbbf24", fontSize: 14 }} />
-            <Text strong style={{ color: "white", fontSize: 14 }}>
-              资料库
-            </Text>
-          </div>
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx,.txt,.md"
-            disabled={uploadingDoc}
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) uploadDoc(f);
-              e.currentTarget.value = "";
-            }}
-            style={{
-              width: "100%",
-              padding: "8px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: 6,
-              color: "#94A3B8",
-              fontSize: 12,
-            }}
-          />
-          <div style={{ marginTop: 8, fontSize: 12 }}>
-            {docs.length ? (
-              docs.map((d) => (
-                <div
-                  key={d.id}
-                  style={{
-                    color: "#64748B",
-                    padding: "2px 0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 8,
-                  }}
-                >
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    • {d.filename}
-                  </span>
-                  <Popconfirm
-                    title="删除该文档？"
-                    okText="删除"
-                    cancelText="取消"
-                    onConfirm={() => deleteDoc(d.id)}
-                  >
-                    <Button
-                      type="text"
-                      size="small"
-                      loading={deletingDocId === d.id}
-                      icon={<DeleteOutlined style={{ color: "#f87171", fontSize: 12 }} />}
-                      style={{ padding: 0, minWidth: 20 }}
-                    />
-                  </Popconfirm>
-                </div>
-              ))
-            ) : (
-              <Text style={{ color: "#64748B" }}>暂无文档</Text>
-            )}
-          </div>
+            ))
+          ) : (
+            <Text style={{ color: "#64748B" }}>暂无文档</Text>
+          )}
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", height: "calc(100vh - 64px)", minHeight: "calc(100vh - 64px)", background: "#020617" }}>
+      {!isMobile && renderSidebar()}
+      {isMobile && (
+        <Drawer
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          placement="left"
+          width="88vw"
+          styles={{ body: { padding: 0, height: "100%" } }}
+        >
+          {renderSidebar()}
+        </Drawer>
+      )}
 
       {/* 右侧聊天区 */}
       <div style={chatAreaStyle}>
@@ -526,23 +539,30 @@ export default function AiChatPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 32px",
+            padding: isMobile ? "0 12px" : "0 32px",
             borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
             background: "rgba(15, 23, 42, 0.5)",
             backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {isMobile && (
+              <Button
+                type="text"
+                icon={<MenuOutlined style={{ color: "#cbd5e1" }} />}
+                onClick={() => setSidebarOpen(true)}
+              />
+            )}
             <ThunderboltOutlined style={{ color: "#22d3ee", fontSize: 18 }} />
             <Text strong style={{ fontSize: 16, color: "white" }}>
               {providers.find((p) => p.value === provider)?.label} AI 聊天
             </Text>
           </div>
-          <Space size={16}>
+          <Space size={isMobile ? 8 : 16} wrap>
             <Select
               value={provider}
               onChange={(v) => setProvider(v)}
-              style={{ width: 120 }}
+              style={{ width: isMobile ? 100 : 120 }}
               options={providers.map((p) => ({
                 label: (
                   <span style={{ color: p.color }}>{p.label}</span>
@@ -579,7 +599,7 @@ export default function AiChatPage() {
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "32px",
+            padding: isMobile ? "16px 12px" : "32px",
           }}
         >
           <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -603,7 +623,7 @@ export default function AiChatPage() {
                   margin: "16px 0",
                 }}
               >
-                <div style={m.role === "user" ? messageBubbleUser : messageBubbleAI}>
+                <div style={{ ...(m.role === "user" ? messageBubbleUser : messageBubbleAI), maxWidth: isMobile ? "92%" : "70%" }}>
                   {m.content}
                 </div>
               </div>
@@ -616,6 +636,8 @@ export default function AiChatPage() {
         <div
           style={{
             padding: "24px 32px",
+            paddingBottom: isMobile ? "max(16px, env(safe-area-inset-bottom))" : "24px",
+            paddingInline: isMobile ? 12 : 32,
             borderTop: "1px solid rgba(255, 255, 255, 0.08)",
             background: "rgba(15, 23, 42, 0.5)",
             backdropFilter: "blur(12px)",
@@ -630,7 +652,7 @@ export default function AiChatPage() {
                 display: "flex",
                 alignItems: "flex-end",
                 gap: 8,
-                padding: "8px 8px 8px 16px",
+                padding: isMobile ? "8px 8px 8px 12px" : "8px 8px 8px 16px",
               }}
             >
               <TextArea
