@@ -100,6 +100,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/data:/app/data
+      - ./remotion/out:/app/remotion/out:ro
     command: >
       sh -c "
       uv run python create_database.py &&

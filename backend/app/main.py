@@ -30,6 +30,7 @@ from app.services.user_service import change_password, update_profile
 
 app = FastAPI(title="Vehicle Price API")
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+import os
 from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
@@ -51,8 +52,22 @@ app.mount(
 
 @app.get("/public/preview/video")
 def preview_video():
-    video_path = PROJECT_DIR / "remotion" / "out" / "video.mp4"
-    if not video_path.exists():
+    candidates = []
+
+    configured_path = os.getenv("PREVIEW_VIDEO_PATH")
+    if configured_path:
+        candidates.append(Path(configured_path).expanduser())
+
+    candidates.extend(
+        [
+            BASE_DIR / "remotion" / "out" / "video.mp4",
+            PROJECT_DIR / "remotion" / "out" / "video.mp4",
+            Path("/root/Carprice-fastapi-react/remotion/out/video.mp4"),
+        ]
+    )
+
+    video_path = next((path for path in candidates if path.exists()), None)
+    if video_path is None:
         raise HTTPException(status_code=404, detail="预览视频不存在")
     return FileResponse(video_path, media_type="video/mp4")
 
