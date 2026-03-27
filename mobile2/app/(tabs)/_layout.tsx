@@ -7,12 +7,14 @@ import { AppTheme } from '@/constants/app-theme';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuth } from '@/lib/auth-context';
+import { isPreviewMode } from '@/lib/preview';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { token } = useAuth();
+  const previewMode = isPreviewMode();
 
-  if (!token) {
+  if (!token && !previewMode) {
     return <Redirect href="/login" />;
   }
 
@@ -24,14 +26,14 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: '#0a1222',
-          borderTopColor: '#1b2a41',
-          height: 64,
+          backgroundColor: '#08111f',
+          borderTopColor: '#172538',
+          height: 74,
           paddingBottom: 8,
-          paddingTop: 6,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
         },
       }}>
@@ -59,8 +61,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cars"
         options={{
-          title: '车源',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '工作台',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="square.grid.2x2.fill" color={color} />,
         }}
       />
       <Tabs.Screen

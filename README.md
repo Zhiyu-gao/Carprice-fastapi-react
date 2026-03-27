@@ -1,220 +1,291 @@
-# Vehicle Intelligence Platform
+# 二手车智能平台
 
-A full-stack platform for used-car data collection, labeling, prediction, AI analysis, and operational monitoring.
+一个面向二手车业务的全栈项目，覆盖数据采集、标注训练、价格预测、AI 问答、论坛私信、大屏分析，以及网页端和移动端的统一展示。
 
-## Project Overview
+## 项目简介
 
-### Core capabilities
-- Vehicle data crawling and task orchestration
-- Human-in-the-loop price annotation
-- Price prediction and AI explanation
-- User auth, forum, and direct messaging
-- Large-screen analytics dashboard
-- Observability with Prometheus + Grafana
+这个仓库目前包含 4 个核心应用：
 
-### Tech stack
-- `frontend/`: React 19 + Vite + Ant Design + ECharts/Recharts
-- `mobile2/`: Expo Router (web/mobile runtime)
-- `backend/`: FastAPI + SQLAlchemy + Alembic + MySQL + Redis
-- `ai_service/`: FastAPI + multi-LLM routing + RAG (Qdrant)
-- Infra: Nginx, ClickHouse, Prometheus, Grafana, cAdvisor, node_exporter
+- `frontend/`：网页端，负责首页、预测、论坛、管理等主业务页面
+- `mobile2/`：移动端，基于 Expo Router，可跑 Web 预览，也可用于手机端开发
+- `backend/`：主业务后端，基于 FastAPI，负责认证、预测、论坛、私信、训练集等接口
+- `ai_service/`：AI 服务，负责聊天、检索增强、模型路由等能力
 
-## Repository Structure
+同时项目还包含：
+
+- `nginx/`：反向代理、HTTPS、网页端/移动端路由转发
+- `remotion/`：宣传视频与页面演示视频生成
+- `observability/`：Prometheus、Grafana 等观测配置
+- `docker-compose.yml`：整套服务的容器化部署
+
+## 技术栈
+
+- 前端网页：React 19、Vite、Ant Design、ECharts/Recharts
+- 移动端：Expo Router、React Native Web
+- 主后端：FastAPI、SQLAlchemy、Alembic、MySQL、Redis
+- AI 服务：FastAPI、Qdrant、多模型接入
+- 部署与运维：Docker Compose、Nginx、Prometheus、Grafana
+
+## 目录结构
 
 ```text
 .
-├── frontend/               # Web application
-├── mobile2/                # Expo application
-├── backend/                # Main business API service
-├── ai_service/             # AI chat/RAG/analysis service
-├── nginx/                  # Reverse proxy and TLS config
-├── observability/          # Prometheus + Grafana provisioning
-├── scripts/quality/        # Unified quality scripts
-├── docker-compose.yml      # Full-stack deployment
-├── docker-compose.infra.yml# Infra-only deployment
-├── Makefile                # Root quality commands
+├── frontend/                 # 网页端
+├── mobile2/                  # 移动端
+├── backend/                  # 主业务后端
+├── ai_service/               # AI 服务
+├── remotion/                 # 视频生成
+├── nginx/                    # Nginx 配置与证书挂载目录
+├── observability/            # Prometheus / Grafana
+├── docker-compose.yml        # 完整部署
+├── docker-compose.infra.yml  # 仅基础设施
+├── deploy.sh                 # 服务器更新脚本
 └── README.md
 ```
 
-## Installation
+## 环境要求
 
-### Prerequisites
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)
-- Node.js 20+ and npm
-- Docker + Docker Compose (for containerized or infra mode)
+- Node.js 20+
+- npm
+- Docker 与 Docker Compose
 
-### 1) Clone and bootstrap
+## 本地开发
 
-```bash
-git clone <your-repo-url>
-cd Vehicle-Intelligence-Platform
-cp .env.example .env
-```
-
-### 2) Install service dependencies
+### 1. 安装依赖
 
 ```bash
 # backend
-uv sync --project backend --group dev
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
+uv sync --group dev
 
 # ai_service
-uv sync --project ai_service --group dev
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/ai_service
+uv sync --group dev
 
 # frontend
-npm --prefix frontend install
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
+npm install
 
 # mobile2
-npm --prefix mobile2 install
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
+npm install
+
+# remotion
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+npm install
 ```
 
-## Usage
-
-### Option A: Local development (recommended for coding)
-
-1. Start infra dependencies (optional but recommended):
+### 2. 启动基础依赖（可选但推荐）
 
 ```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react
 docker compose -f docker-compose.infra.yml up -d
 ```
 
-2. Start backend:
+### 3. 启动后端
 
 ```bash
-cd backend
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-3. Start AI service:
+### 4. 启动 AI 服务
 
 ```bash
-cd ai_service
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/ai_service
 uv run uvicorn app.main:app --reload --port 8080
 ```
 
-4. Start frontend:
+### 5. 启动网页端
 
 ```bash
-cd frontend
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
 npm run dev
 ```
 
-### Option B: Full Docker deployment
+默认地址一般为：
+
+- 网页端：`http://localhost:5173`
+- 后端：`http://127.0.0.1:8000`
+- AI 服务：`http://127.0.0.1:8080`
+
+### 6. 启动移动端
 
 ```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
+npm start
+```
+
+常用命令：
+
+- Web 预览：`npm run web`
+- iOS 模拟器：`npm run ios`
+- Android：`npm run android`
+
+如果你想让手机或 Expo Web 正常访问后端，请在 `mobile2/.env` 中配置：
+
+```env
+# 线上环境示例
+EXPO_PUBLIC_API_BASE_URL=https://www.nrydawang.shop/api
+EXPO_PUBLIC_AI_BASE_URL=https://www.nrydawang.shop/ai
+```
+
+本地真机调试时，不要写 `127.0.0.1`，应改成你电脑的局域网 IP。
+
+### 7. 启动 Remotion
+
+```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+npm run studio:compat
+```
+
+渲染视频：
+
+```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+npm run render:compat -- VehicleIntroCN out/video.mp4
+```
+
+## Docker 部署
+
+### 本地或服务器整套启动
+
+```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react
 docker compose up -d --build
 ```
 
-For production update on a server, use a single compose file flow:
+### 使用部署脚本
 
 ```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react
 bash deploy.sh
 ```
 
-`deploy.sh` defaults to `docker-compose.yml`. Keep `QDRANT_URL=http://qdrant:6333` in root `.env`.
+`deploy.sh` 默认会使用根目录下的 `docker-compose.yml`。
 
-### Access points
-- Frontend (via Nginx): `http://localhost`
-- Backend API: `http://localhost:8000`
-- AI service: `http://localhost:8080`
-- Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3000` (default `admin/admin`)
+## 域名与 Nginx 说明
 
-## Usage Examples
+当前线上反向代理配置在：
 
-### Check service health
+- `nginx/conf.d/default.conf`
+
+它负责：
+
+- `https://www.nrydawang.shop/` 指向网页端
+- `/api/` 转发到 `backend`
+- `/ai/` 转发到 `ai_service`
+- `/mobile/` 转发到移动端 Web
+- `/public/preview/video` 等公共资源转发到后端
+
+如果你要更换域名或证书，需要同步修改：
+
+- `server_name`
+- 证书路径
+- 对应安全组/防火墙的 `80/443` 端口
+
+## 常用命令
+
+### 质量检查
 
 ```bash
-curl -f http://127.0.0.1:8000/metrics
-curl -f http://127.0.0.1:8080/metrics
-curl -f http://127.0.0.1:9090/-/healthy
-curl -f http://127.0.0.1:3000/api/health
-```
-
-### Run project-wide quality checks
-
-```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react
 make format
 make check
 ```
 
-### Generate crawler cookie JSON (manual login flow)
+### 单独检查前端类型
 
 ```bash
-cd backend
-uv run python -m app.scripts.create_cookie_json
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
+npm run typecheck
 ```
 
-Default output:
-- `backend/data/crawl/cookies/dongchedi_storage_state.json`
-
-## Configuration Guidelines
-
-### Root `.env` (compose-level)
-Key variables include:
-- `SECRET_KEY`, `ALGORITHM`
-- `MYSQL_ROOT_PASSWORD`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DB`
-- `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB`
-- `OSS_ENABLED`, `OSS_AUTH_MODE`, `OSS_BUCKET`, `OSS_ENDPOINT`, `OSS_PREFIX`
-- `BACKEND_API_BASE_URL`, `QDRANT_URL`
-- In docker-compose deployment, root `.env` is the source of truth for shared vars.
-
-### Service env alignment
-- `backend/.env` and `ai_service/.env` must use the same JWT settings:
-  - `SECRET_KEY`
-  - `ALGORITHM`
-- AI provider keys should be configured in `ai_service/.env` (`KIMI_*`, `QWEN_*`, `DEEPSEEK_*`).
-- `backend/.env` and `ai_service/.env` are mainly for service-local settings/overrides in local runs.
-
-### Nginx/TLS notes
-- Active config: `nginx/conf.d/default.conf`
-- If deploying your own domain, update `server_name` and certificate paths in Nginx config.
-
-## Contribution Guidelines
-
-1. Create a branch from `main`.
-2. Keep changes focused and atomic.
-3. Run formatting and checks before opening a PR:
+### 单独检查移动端类型
 
 ```bash
-make format
-make check
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
+npm run typecheck
 ```
 
-4. Add or update tests when behavior changes.
-5. Include migration notes for schema/config changes.
-6. Use clear commit messages and describe verification steps in PR description.
+### 检查后端是否可导入
 
-## Troubleshooting
+```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
+uv run python -c "import app.main; print('backend import ok')"
+```
 
-### 1) `401` between frontend/backend/ai service
-- Verify token exists in frontend storage.
-- Ensure `SECRET_KEY` and `ALGORITHM` match in backend and ai service env files.
+## 已知关键配置
 
-### 2) AI features unavailable
-- Check AI provider keys in `ai_service/.env`.
-- Verify Qdrant is reachable (`QDRANT_URL`).
+### 后端 CORS
 
-### 3) Crawler tasks fail immediately
-- Confirm cookie JSON path exists and file is valid.
-- Verify crawler city code mapping and network reachability.
+后端在 `backend/app/main.py` 中已限制为：
 
-### 4) Nginx HTTPS startup failure
-- Recheck certificate paths mounted under `nginx/cert`.
-- Validate config with `nginx -t` in container.
+- `nrydawang.shop` / `www.nrydawang.shop`
+- 本机开发地址：`localhost`、`127.0.0.1`
+- 常见移动端 Web 端口：`5173`、`8081`、`19006`、`4173`
+- 局域网私网地址段：`10.x.x.x`、`192.168.x.x`、`172.16-31.x.x`
 
-### 5) Database connection errors
-- Confirm MySQL and ClickHouse containers are healthy.
-- Recheck DB credentials in `.env` and service env files.
+这样可以兼顾本地开发、手机调试和线上域名，但不会像之前那样完全放开所有来源。
 
-## Quality and Standards
+### 预览视频
 
-- Formatting and static checks are centralized under `scripts/quality/`.
-- Root commands:
-  - `make format`
-  - `make check`
-  - `make check-python`
-  - `make check-web`
-  - `make check-types`
+后端接口：
 
-For more detail, see [`CODE_QUALITY.md`](./CODE_QUALITY.md).
+- `/public/preview/video`
+
+默认会读取：
+
+- `remotion/out/video.mp4`
+
+如果按钮能点开但视频 404，优先检查这个文件是否存在。
+
+## 常见问题
+
+### 1. 网页能登录，移动端不能登录
+
+优先检查这几项：
+
+- `mobile2/.env` 是否把接口写成了 `https://www.nrydawang.shop/api`
+- 是否误写成了裸域名 `https://www.nrydawang.shop`
+- 本地真机调试时是否用了 `127.0.0.1`
+- 后端是否已重启，让最新 CORS 配置生效
+
+### 2. 启动后端时报 `backend/data does not exist`
+
+项目现在会在启动时自动创建 `backend/data`，如果仍有问题，确认运行的是最新代码。
+
+### 3. HTTPS 打不开
+
+优先检查：
+
+- `nginx/conf.d/default.conf`
+- `nginx/cert` 下证书是否存在
+- Docker 中的 `vehicle_nginx` 是否正常启动
+- 宿主机是否有别的 Nginx 占用了 `80/443`
+
+### 4. Remotion 渲染失败
+
+如果出现 `The service was stopped` 之类的问题，先执行：
+
+```bash
+cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+npm install
+npm run studio:compat
+```
+
+本仓库已经补了兼容脚本，优先使用 `*:compat` 命令。
+
+## 提交与部署建议
+
+推荐流程：
+
+1. 本地完成改动并自测
+2. `git status` 确认提交内容
+3. `git add -A && git commit -m "feat: xxx"`
+4. `git push origin main`
+5. 服务器执行 `git pull && bash deploy.sh`
+
+如果线上使用的是 Docker Compose，这套流程就可以完成大部分发布。

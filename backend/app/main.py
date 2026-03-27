@@ -38,6 +38,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 PROJECT_DIR = BASE_DIR.parent
 
+# StaticFiles 要求目录在挂载时就存在，本地首次启动时自动补齐。
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 # 把 data 目录暴露成 /files
 app.mount(
     "/files",
@@ -76,14 +79,27 @@ app.include_router(oss_files.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://47.83.219.94",
-        "http://www.nrydawang.shop",
+        "https://nrydawang.shop",
         "https://www.nrydawang.shop",
         "http://nrydawang.shop",
-        "https://nrydawang.shop",
+        "http://www.nrydawang.shop",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "http://localhost:19006",
+        "http://127.0.0.1:19006",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
     ],
+    allow_origin_regex=(
+        r"^https?://("
+        r"localhost|127\.0\.0\.1|"
+        r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+        r"192\.168\.\d{1,3}\.\d{1,3}|"
+        r"172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}"
+        r")(:\d+)?$"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

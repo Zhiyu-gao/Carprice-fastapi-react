@@ -46,6 +46,89 @@ export type RegisterPayload = {
   password: string;
 };
 
+export type TrainCar = {
+  id: number;
+  source_car_id: string;
+  brand?: string | null;
+  model?: string | null;
+  year?: number | null;
+  displacement?: number | null;
+  gearbox?: string | null;
+  transfer_count?: number | null;
+  city?: string | null;
+  price_wan: number;
+};
+
+export type CrawlTask = {
+  task_id: string;
+  city_name?: string;
+  status?: string;
+  start_page?: number;
+  end_page?: number;
+  created_at?: string;
+};
+
+export type UserProfile = {
+  id: number;
+  username: string;
+  role: string;
+  email: string;
+  full_name: string | null;
+  avatar_path?: string | null;
+  created_at: string;
+};
+
+export type ForumPost = {
+  id: number;
+  content: string;
+  created_at: string;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_path?: string | null;
+  };
+};
+
+export type ForumComment = {
+  id: number;
+  post_id: number;
+  content: string;
+  created_at: string;
+  user: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_path?: string | null;
+  };
+};
+
+export type ChatMessage = {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  content: string;
+  created_at: string;
+};
+
+export type ChatInboxItem = {
+  user: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_path?: string | null;
+  };
+  last_message: string;
+  last_time: string;
+};
+
+export type UserLite = {
+  id: number;
+  username: string;
+  role: string;
+  avatar_path?: string | null;
+};
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
 const AI_BASE_URL = process.env.EXPO_PUBLIC_AI_BASE_URL || 'http://127.0.0.1:8080';
 
@@ -186,6 +269,62 @@ export function getCrawlCars(
   params: { page: number; page_size: number; keyword?: string }
 ) {
   return request<PageResp<CrawlCar>>(withQuery('/crawl-cars', params), undefined, token);
+}
+
+export function getTrainCars(token: string, params: { page: number; page_size: number }) {
+  return request<PageResp<TrainCar>>(withQuery('/train-cars', params), undefined, token);
+}
+
+export function getCrawlTasks() {
+  return request<CrawlTask[]>('/crawl-tasks');
+}
+
+export function forumListPosts(token: string) {
+  return request<ForumPost[]>('/forum/posts', undefined, token);
+}
+
+export function forumCreatePost(token: string, content: string) {
+  return request<{ ok: boolean; id: number }>(
+    '/forum/posts',
+    { method: 'POST', body: JSON.stringify({ content }) },
+    token
+  );
+}
+
+export function forumListComments(token: string, postId: number) {
+  return request<ForumComment[]>(`/forum/posts/${postId}/comments`, undefined, token);
+}
+
+export function forumCreateComment(token: string, postId: number, content: string) {
+  return request<{ ok: boolean; id: number }>(
+    `/forum/posts/${postId}/comments`,
+    { method: 'POST', body: JSON.stringify({ content }) },
+    token
+  );
+}
+
+export function listUsers(token: string) {
+  return request<UserLite[]>('/users', undefined, token);
+}
+
+export function getUserProfile(token: string, userId: number) {
+  return request<UserProfile>(`/users/${userId}`, undefined, token);
+}
+
+export function getChatInbox(token: string) {
+  return request<ChatInboxItem[]>('/chat/inbox', undefined, token);
+}
+
+export function getChatMessages(token: string, userId: number) {
+  return request<ChatMessage[]>(`/chat/${userId}`, undefined, token);
+}
+
+export function sendChatMessage(token: string, userId: number, content: string) {
+  return request<{ ok: boolean; id: number }>(
+    `/chat/${userId}`,
+    { method: 'POST', body: JSON.stringify({ content }) },
+    token
+  );
 }
 
 export function aiListSessions(token: string) {

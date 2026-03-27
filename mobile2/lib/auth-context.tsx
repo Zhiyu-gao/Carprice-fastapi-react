@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
 import { UserMe, getMe, login } from '@/lib/api';
+import { previewMe } from '@/lib/mock-data';
+import { isPreviewMode } from '@/lib/preview';
 
 type AuthState = {
   token: string | null;
@@ -15,6 +17,7 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const previewMode = isPreviewMode();
   const [token, setToken] = useState<string | null>(null);
   const [me, setMe] = useState<UserMe | null>(null);
   const [loading, setLoading] = useState(false);
@@ -60,9 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
   };
 
+  const effectiveToken = previewMode ? token ?? 'preview-token' : token;
+  const effectiveMe = previewMode ? me ?? previewMe : me;
+
   const value = useMemo(
-    () => ({ token, me, loading, error, signIn, refreshMe, signOut }),
-    [token, me, loading, error]
+    () => ({ token: effectiveToken, me: effectiveMe, loading, error, signIn, refreshMe, signOut }),
+    [effectiveMe, effectiveToken, loading, error]
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

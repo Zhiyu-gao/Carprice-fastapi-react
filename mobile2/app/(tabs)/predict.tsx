@@ -1,6 +1,15 @@
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import {
+  ActionButton,
+  HeroCard,
+  Panel,
+  Pill,
+  ScreenScroll,
+  SectionTitle,
+  StatCard,
+} from '@/components/mobile-kit';
 import { AppTheme } from '@/constants/app-theme';
 import { predict } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -15,20 +24,25 @@ type Form = {
 };
 
 const initial: Form = {
-  brand: '传祺',
+  brand: '特斯拉',
   age_years: '2',
-  engine: '2.0',
-  gearbox: '自动',
-  transfer_cnt: '1',
-  price_new: '25',
+  engine: '0',
+  gearbox: '电动车单速',
+  transfer_cnt: '0',
+  price_new: '26.8',
 };
 
 export default function PredictScreen() {
   const { token } = useAuth();
   const [form, setForm] = useState<Form>(initial);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState('');
+
+  const priceGap = useMemo(() => {
+    if (result === null) return null;
+    return Number(form.price_new) - result;
+  }, [form.price_new, result]);
 
   const setField = (k: keyof Form, v: string) => {
     setForm((p) => ({ ...p, [k]: v }));
@@ -37,7 +51,6 @@ export default function PredictScreen() {
   const submit = async () => {
     if (!token) return;
     setError('');
-    setResult('');
     setLoading(true);
     try {
       const resp = await predict(
@@ -51,7 +64,7 @@ export default function PredictScreen() {
         },
         token
       );
-      setResult(`${resp.predicted_price} ${resp.price_unit}`);
+      setResult(Number(resp.predicted_price));
     } catch (e: any) {
       setError(e?.message || '预测失败');
     } finally {
@@ -60,39 +73,58 @@ export default function PredictScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.hero}>
-        <Text style={styles.title}>车辆价格预测</Text>
-        <Text style={styles.sub}>输入关键特征，实时获取估值</Text>
-      </View>
-
-      <Field label="品牌" value={form.brand} onChangeText={(v) => setField('brand', v)} />
-      <Field label="车龄(年)" value={form.age_years} onChangeText={(v) => setField('age_years', v)} />
-      <Field label="排量(L)" value={form.engine} onChangeText={(v) => setField('engine', v)} />
-      <Field label="变速箱" value={form.gearbox} onChangeText={(v) => setField('gearbox', v)} />
-      <Field
-        label="过户次数"
-        value={form.transfer_cnt}
-        onChangeText={(v) => setField('transfer_cnt', v)}
-      />
-      <Field
-        label="新车指导价(万)"
-        value={form.price_new}
-        onChangeText={(v) => setField('price_new', v)}
+    <ScreenScroll>
+      <HeroCard
+        eyebrow="Pricing Engine"
+        title="移动端价格预测"
+        subtitle="把网页端的核心表单压缩成更适合手机录入的决策流，同时保留估值结果的解释空间。"
+        right={<Pill text="ML + AI" tone="orange" />}
       />
 
-      {!!error && <Text style={styles.error}>{error}</Text>}
-      {!!result && (
-        <View style={styles.resultCard}>
-          <Text style={styles.resultLabel}>预测结果</Text>
-          <Text style={styles.result}>{result}</Text>
+      <Panel>
+        <SectionTitle title="车辆信息" subtitle="先输入会显著影响价格的关键特征。" />
+        <Field label="品牌" value={form.brand} onChangeText={(v) => setField('brand', v)} />
+        <View style={styles.row}>
+          <Field label="车龄(年)" value={form.age_years} onChangeText={(v) => setField('age_years', v)} compact />
+          <Field label="过户次数" value={form.transfer_cnt} onChangeText={(v) => setField('transfer_cnt', v)} compact />
         </View>
-      )}
+        <View style={styles.row}>
+          <Field label="排量(L)" value={form.engine} onChangeText={(v) => setField('engine', v)} compact />
+          <Field label="变速箱" value={form.gearbox} onChangeText={(v) => setField('gearbox', v)} compact />
+        </View>
+        <Field label="新车指导价(万)" value={form.price_new} onChangeText={(v) => setField('price_new', v)} />
 
-      <Pressable onPress={submit} style={styles.btn} disabled={loading}>
-        {loading ? <ActivityIndicator color="#0b1220" /> : <Text style={styles.btnText}>开始预测</Text>}
-      </Pressable>
-    </ScrollView>
+        <ActionButton label={loading ? '预测中...' : '开始估值'} onPress={submit} disabled={loading} />
+        {loading ? <ActivityIndicator color={AppTheme.cyan} /> : null}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+      </Panel>
+
+      {result !== null ? (
+        <>
+          <View style={styles.row}>
+            <StatCard label="预测成交价" value={`${result.toFixed(2)} 万`} tone="green" />
+            <StatCard
+              label="相对新车"
+              value={`${(priceGap || 0).toFixed(2)} 万`}
+              tone="blue"
+              caption={(priceGap || 0) >= 0 ? '与新车存在价差' : '高于新车指导价'}
+            />
+          </View>
+
+          <Panel>
+            <SectionTitle title="估值提示" subtitle="把数字结果转换成更容易判断的手机端提示。" />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              <Pill text={Number(form.age_years) <= 2 ? '低车龄' : '成熟车龄'} tone="cyan" />
+              <Pill text={Number(form.transfer_cnt) === 0 ? '一手车优势' : `已过户 ${form.transfer_cnt} 次`} tone="orange" />
+              <Pill text={Number(form.price_new) > result ? '二手性价比更高' : '建议复核配置'} tone="green" />
+            </View>
+            <Text style={styles.resultNote}>
+              当前移动端把网页端的预测能力重做成“输入少量关键项，先快速出价，再继续去 AI 和工作台深挖”的链路。
+            </Text>
+          </Panel>
+        </>
+      ) : null}
+    </ScreenScroll>
   );
 }
 
@@ -100,90 +132,48 @@ function Field({
   label,
   value,
   onChangeText,
+  compact,
 }: {
   label: string;
   value: string;
   onChangeText: (v: string) => void;
+  compact?: boolean;
 }) {
   return (
-    <View style={{ gap: 6 }}>
+    <View style={[styles.field, compact ? { flex: 1 } : null]}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput style={styles.input} value={value} onChangeText={onChangeText} />
+      <TextInput style={styles.input} value={value} onChangeText={onChangeText} placeholderTextColor={AppTheme.textMuted} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppTheme.bg,
-  },
-  content: {
-    padding: 16,
+  row: {
+    flexDirection: 'row',
     gap: 12,
   },
-  hero: {
-    backgroundColor: AppTheme.card,
-    borderColor: AppTheme.border,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 14,
-    gap: 4,
-  },
-  title: {
-    color: AppTheme.text,
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  sub: {
-    color: AppTheme.textMuted,
+  field: {
+    gap: 6,
   },
   label: {
     color: AppTheme.textMuted,
     fontSize: 13,
+    fontWeight: '700',
   },
   input: {
-    backgroundColor: AppTheme.bgSoft,
-    borderColor: AppTheme.border,
+    backgroundColor: '#0a1222',
     borderWidth: 1,
-    borderRadius: 12,
+    borderColor: 'rgba(148, 163, 184, 0.16)',
+    borderRadius: 16,
     color: AppTheme.text,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
-  btn: {
-    marginTop: 8,
-    backgroundColor: AppTheme.cyan,
-    borderRadius: 12,
-    alignItems: 'center',
-    paddingVertical: 13,
-  },
-  btnText: {
-    color: AppTheme.bg,
-    fontWeight: '700',
-    fontSize: 15,
-  },
   error: {
     color: AppTheme.red,
   },
-  resultCard: {
-    backgroundColor: '#062625',
-    borderWidth: 1,
-    borderColor: '#0d4f45',
-    borderRadius: 12,
-    padding: 12,
-    gap: 4,
-  },
-  resultLabel: {
-    color: '#7eead4',
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    fontWeight: '700',
-  },
-  result: {
-    color: AppTheme.emerald,
-    fontWeight: '700',
-    fontSize: 20,
+  resultNote: {
+    color: AppTheme.textMuted,
+    lineHeight: 20,
   },
 });

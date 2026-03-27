@@ -1,7 +1,16 @@
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import {
+  ActionButton,
+  HeroCard,
+  Panel,
+  Pill,
+  ScreenScroll,
+  SectionTitle,
+  StatCard,
+} from '@/components/mobile-kit';
 import { AppTheme } from '@/constants/app-theme';
 import { useAuth } from '@/lib/auth-context';
 
@@ -19,69 +28,69 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.hero}>
-        <Text style={styles.title}>我的账号</Text>
-        <Text style={styles.sub}>统一账号体系：与网页端共享登录身份</Text>
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.item}>用户名：{me?.username || '-'}</Text>
-        <Text style={styles.item}>邮箱：{me?.email || '-'}</Text>
-        <Text style={styles.item}>角色：{me?.role || '-'}</Text>
+    <ScreenScroll>
+      <HeroCard
+        eyebrow="Account Center"
+        title={me?.username || '我的账号'}
+        subtitle="移动端把网页端个人中心压缩为更直接的资料与状态面板。"
+        right={<Pill text={me?.role || '-'} tone="blue" />}
+      />
+
+      <View style={styles.row}>
+        <StatCard label="用户名" value={me?.username || '-'} tone="cyan" />
+        <StatCard label="角色" value={me?.role || '-'} tone="orange" />
       </View>
 
-      <Pressable onPress={onSignOut} style={styles.btn}>
-        <Text style={styles.btnText}>退出登录</Text>
-      </Pressable>
+      <Panel>
+        <SectionTitle title="资料概览" subtitle="与网页端共享同一账号体系和权限。" />
+        <InfoRow label="邮箱" value={me?.email || '-'} />
+        <InfoRow label="姓名" value={me?.full_name || '-'} />
+        <InfoRow label="创建时间" value={me?.created_at || '-'} />
+      </Panel>
+
+      <Panel>
+        <SectionTitle title="移动端定位" subtitle="不是完整复刻网页排版，而是把高频动作前置。" />
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Pill text="查看资料" tone="blue" />
+          <Pill text="退出登录" tone="muted" />
+          <Pill text="工作台入口" tone="green" />
+          <Pill text="AI 问答入口" tone="pink" />
+        </View>
+      </Panel>
+
+      <ActionButton label="退出登录" tone="danger" onPress={onSignOut} />
+    </ScreenScroll>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppTheme.bg,
-    padding: 16,
+  row: {
+    flexDirection: 'row',
     gap: 12,
   },
-  hero: {
-    backgroundColor: AppTheme.card,
-    borderColor: AppTheme.border,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 14,
+  infoRow: {
     gap: 4,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(148, 163, 184, 0.16)',
   },
-  title: {
-    color: AppTheme.text,
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  sub: {
+  infoLabel: {
     color: AppTheme.textMuted,
-  },
-  card: {
-    backgroundColor: AppTheme.cardStrong,
-    borderColor: AppTheme.border,
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 14,
-    gap: 10,
-  },
-  item: {
-    color: AppTheme.text,
-    fontSize: 15,
-  },
-  btn: {
-    marginTop: 8,
-    backgroundColor: AppTheme.red,
-    borderRadius: 12,
-    alignItems: 'center',
-    paddingVertical: 13,
-  },
-  btnText: {
-    color: 'white',
+    fontSize: 12,
     fontWeight: '700',
-    fontSize: 15,
+  },
+  infoValue: {
+    color: AppTheme.text,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

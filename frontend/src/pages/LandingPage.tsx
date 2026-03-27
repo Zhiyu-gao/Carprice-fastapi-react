@@ -72,6 +72,7 @@ const LandingPage: React.FC = () => {
   const [registerSendingCode, setRegisterSendingCode] = useState(false);
   const [registerCountdown, setRegisterCountdown] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewLoadError, setPreviewLoadError] = useState(false);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
   const isTablet = screens.md && !screens.xl;
@@ -255,6 +256,11 @@ const LandingPage: React.FC = () => {
 
   const previewVideoUrl = `${import.meta.env.VITE_API_BASE_URL}/public/preview/video`;
 
+  const openPreview = () => {
+    setPreviewLoadError(false);
+    setPreviewOpen(true);
+  };
+
   return (
     <div
       className="landing-page"
@@ -299,7 +305,7 @@ const LandingPage: React.FC = () => {
         <Space size={isMobile ? 8 : 12}>
           <Button
             ghost
-            onClick={() => setPreviewOpen(true)}
+            onClick={openPreview}
             style={{
               borderColor: "rgba(34,211,238,0.5)",
               color: "#67e8f9",
@@ -775,18 +781,39 @@ const LandingPage: React.FC = () => {
       <Modal
         title="系统2分钟快速预览"
         open={previewOpen}
-        onCancel={() => setPreviewOpen(false)}
+        onCancel={() => {
+          setPreviewOpen(false);
+          setPreviewLoadError(false);
+        }}
         footer={null}
         width={isMobile ? "94%" : 960}
         destroyOnClose
       >
-        <video
-          key={previewVideoUrl}
-          src={previewVideoUrl}
-          controls
-          preload="metadata"
-          style={{ width: "100%", borderRadius: 8, background: "#000" }}
-        />
+        {previewLoadError ? (
+          <div
+            style={{
+              padding: 24,
+              borderRadius: 8,
+              background: "#111827",
+              color: "#e5e7eb",
+              textAlign: "center",
+            }}
+          >
+            预览视频暂未部署，请稍后再试。
+          </div>
+        ) : (
+          <video
+            key={previewVideoUrl}
+            src={previewVideoUrl}
+            controls
+            preload="metadata"
+            onError={() => {
+              setPreviewLoadError(true);
+              message.warning("预览视频暂未部署");
+            }}
+            style={{ width: "100%", borderRadius: 8, background: "#000" }}
+          />
+        )}
       </Modal>
     </div>
   );
