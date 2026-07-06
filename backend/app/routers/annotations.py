@@ -42,15 +42,12 @@ def create_annotation(
     db: Session = Depends(get_db),
 ):
     """
-    标注一个车辆（车价）：
-    - 幂等：同一个 source_car_id 只能标注一次
+    标注一个车辆：
+    - 同一个 source_car_id 已存在时更新，方便人工继续修正特征
     - 写入 train_cars 表（作为训练数据）
     """
 
     exists = db.query(TrainCar).filter(TrainCar.source_car_id == data.source_car_id).first()
-    if exists:
-        raise HTTPException(status_code=400, detail="该车辆已标注")
-
     crawl = db.query(CrawlCar).filter(CrawlCar.source_car_id == data.source_car_id).first()
     info = crawl.info if crawl and isinstance(crawl.info, dict) else None
 
@@ -65,20 +62,32 @@ def create_annotation(
     model = model or "未知"
     year = year or 0
 
-    car = TrainCar(
-        source_car_id=data.source_car_id,
-        price_wan=data.price_wan,
-        # 可选字段（先跑通）
-        brand=brand,
-        model=model,
-        year=year,
-        displacement=data.displacement,
-        gearbox=data.gearbox,
-        transfer_count=data.transfer_count,
-        city=data.city,
-    )
+    payload = {
+        "source_car_id": data.source_car_id,
+        "price_wan": data.price_wan,
+        "brand": brand,
+        "brand_confidence": data.brand_confidence,
+        "brand_source": data.brand_source,
+        "model": model,
+        "year": year,
+        "mileage_km": data.mileage_km,
+        "displacement": data.displacement,
+        "gearbox": data.gearbox,
+        "transfer_count": data.transfer_count,
+        "city": data.city,
+    }
+    if data.brand_confidence is None and data.brand and data.brand.strip() and data.brand.strip() != "未知":
+        payload["brand_confidence"] = 1.0
+        payload["brand_source"] = "manual"
 
-    db.add(car)
+    if exists:
+        for key, value in payload.items():
+            setattr(exists, key, value)
+        car = exists
+    else:
+        car = TrainCar(**payload)
+        db.add(car)
+
     db.commit()
     db.refresh(car)
 
@@ -97,3 +106,28 @@ def get_annotated_source_ids(
             q = q.filter(TrainCar.source_car_id.in_(ids))
     rows = q.all()
     return [r[0] for r in rows]
+
+
+@router.get("/{source_car_id}")
+def get_annotation(
+    source_car_id: str,
+    db: Session = Depends(get_db),
+):
+    car = db.query(TrainCar).filter(TrainCar.source_car_id == source_car_id).first()
+    if not car:
+        raise HTTPException(status_code=404, detail="该车辆尚未标注")
+    return {
+        "id": car.id,
+        "source_car_id": car.source_car_id,
+        "brand": car.brand,
+        "brand_confidence": car.brand_confidence,
+        "brand_source": car.brand_source,
+        "model": car.model,
+        "year": car.year,
+        "mileage_km": car.mileage_km,
+        "displacement": car.displacement,
+        "gearbox": car.gearbox,
+        "transfer_count": car.transfer_count,
+        "city": car.city,
+        "price_wan": car.price_wan,
+    }

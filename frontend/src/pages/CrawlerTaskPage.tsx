@@ -1,5 +1,5 @@
 import { Card, Table, Tag, Button, Space, message, Modal, Form, Input, Typography, Row, Col, Statistic, Switch, Checkbox } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, getErrorMessage } from "../api/client";
 import {
   PlayCircleOutlined,
@@ -29,6 +29,17 @@ interface CrawlerTask {
   headless?: boolean;
   use_cookie_pool?: boolean;
   cookie_pool_dir?: string;
+}
+
+interface CookiePoolStats {
+  pool_dir: string;
+  active_count: number;
+  expired_count: number;
+  total_count: number;
+  invalid_count: number;
+  active_files?: string[];
+  expired_files?: string[];
+  invalid_files?: string[];
 }
 
 type CityOption = { label: string; value: string };
@@ -89,6 +100,8 @@ const gradientButtonStyle: React.CSSProperties = {
 export default function CrawlerTaskPage() {
   const [tasks, setTasks] = useState<CrawlerTask[]>([]);
   const [loading, setLoading] = useState(false);
+  const [cookieStatsLoading, setCookieStatsLoading] = useState(false);
+  const [cookiePoolStats, setCookiePoolStats] = useState<CookiePoolStats | null>(null);
   const [logModalOpen, setLogModalOpen] = useState(false);
   const [logText, setLogText] = useState("");
   const [logTitle, setLogTitle] = useState("");
@@ -111,22 +124,7 @@ export default function CrawlerTaskPage() {
     canceled: { color: "#f59e0b", icon: <PauseCircleOutlined />, text: "已取消" },
   };
 
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  const waitTaskFinished = async (taskId: string, timeoutMs = 1000 * 60 * 30) => {
-    const start = Date.now();
-    while (Date.now() - start < timeoutMs) {
-      const res = await api.get(`/crawl-tasks/${taskId}`);
-      const status = res.data?.status as string | undefined;
-      if (status && status !== "running" && status !== "pending") {
-        return status;
-      }
-      await sleep(2000);
-    }
-    return "timeout";
-  };
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.get("/crawl-tasks");
@@ -136,11 +134,40 @@ export default function CrawlerTaskPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const fetchCookiePoolStats = useCallback(async () => {
+    setCookieStatsLoading(true);
+    try {
+      const res = await api.get("/crawl-tasks/cookie-pool/status");
+      setCookiePoolStats(res.data || null);
+    } catch (e: unknown) {
+      message.error(getErrorMessage(e, "获取 Cookie 池状态失败"));
+    } finally {
+      setCookieStatsLoading(false);
+    }
+  }, []);
+
+  const refreshAll = useCallback(() => {
+    void fetchTasks();
+    void fetchCookiePoolStats();
+  }, [fetchCookiePoolStats, fetchTasks]);
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    refreshAll();
+  }, [refreshAll]);
+
+  useEffect(() => {
+    const hasActiveTask = tasks.some((task) =>
+      task.status === "running" || task.status === "pending"
+    );
+    if (!hasActiveTask) return;
+
+    const timer = window.setInterval(() => {
+      refreshAll();
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, [refreshAll, tasks]);
 
   useEffect(() => {
     const normalizeName = (name: string) =>
@@ -254,7 +281,7 @@ export default function CrawlerTaskPage() {
     try {
       await api.post(`/crawl-tasks/${task.id}/cancel`);
       message.success("任务已取消");
-      fetchTasks();
+      refreshAll();
     } catch (e: unknown) {
       message.error(getErrorMessage(e, "取消失败"));
     }
@@ -264,7 +291,7 @@ export default function CrawlerTaskPage() {
     try {
       await api.delete(`/crawl-tasks/${task.id}`);
       message.success("任务已删除");
-      fetchTasks();
+      refreshAll();
     } catch (e: unknown) {
       message.error(getErrorMessage(e, "删除失败"));
     }
@@ -404,30 +431,25 @@ export default function CrawlerTaskPage() {
             continue;
           }
 
-          const finalStatus = await waitTaskFinished(taskId);
-          if (finalStatus === "success") {
-            successCount += 1;
-          } else {
-            failedCities.push(`${city.label}(${finalStatus || "unknown"})`);
-          }
-
-          fetchTasks();
+          successCount += 1;
+          setTasks((prev) => [startRes.data as CrawlerTask, ...prev.filter((t) => t.id !== taskId)]);
+          refreshAll();
         } catch {
           failedCities.push(city.label);
         }
       }
 
       if (successCount > 0 && failedCities.length === 0) {
-        message.success(`已按顺序启动 ${successCount} 个城市任务`);
+        message.success(`已启动 ${successCount} 个城市任务`);
       } else if (successCount > 0) {
-        message.warning(`成功 ${successCount} 个，失败 ${failedCities.length} 个：${failedCities.join("、")}`);
+        message.warning(`已启动 ${successCount} 个，失败 ${failedCities.length} 个：${failedCities.join("、")}`);
       } else {
         message.error("任务启动失败");
       }
 
       setStartModalOpen(false);
       form.resetFields();
-      fetchTasks();
+      refreshAll();
     } catch (e: unknown) {
       message.error(getErrorMessage(e, "启动失败"));
     }
@@ -484,7 +506,50 @@ export default function CrawlerTaskPage() {
             />
           </Card>
         </Col>
+        <Col xs={12} sm={6}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }} loading={cookieStatsLoading}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>Cookie 总数</Text>}
+              value={cookiePoolStats?.total_count || 0}
+              valueStyle={{ color: "#f1f5f9", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }} loading={cookieStatsLoading}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>可用 Cookie</Text>}
+              value={cookiePoolStats?.active_count || 0}
+              valueStyle={{ color: "#10b981", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }} loading={cookieStatsLoading}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>已过期 Cookie</Text>}
+              value={cookiePoolStats?.expired_count || 0}
+              valueStyle={{ color: "#f59e0b", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card style={cardStyle} bodyStyle={{ padding: 20 }} loading={cookieStatsLoading}>
+            <Statistic
+              title={<Text style={{ color: "#94a3b8" }}>无效 Cookie 文件</Text>}
+              value={cookiePoolStats?.invalid_count || 0}
+              valueStyle={{ color: "#ef4444", fontSize: 28, fontWeight: 700 }}
+            />
+          </Card>
+        </Col>
       </Row>
+      {cookiePoolStats?.pool_dir && (
+        <div style={{ marginTop: -12, marginBottom: 24 }}>
+          <Text style={{ color: "#64748b", fontSize: 12 }}>
+            Cookie 池目录：{cookiePoolStats.pool_dir}
+          </Text>
+        </div>
+      )}
 
       {/* 任务列表 */}
       <Card
@@ -494,7 +559,7 @@ export default function CrawlerTaskPage() {
           <Space>
             <Button
               icon={<ReloadOutlined />}
-              onClick={fetchTasks}
+              onClick={refreshAll}
               style={{
                 background: "rgba(148, 163, 184, 0.1)",
                 border: "1px solid rgba(148, 163, 184, 0.2)",

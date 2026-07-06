@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from app.services.cookie_pool_service import get_cookie_pool_stats
 from app.services.crawl_task_service import (
     cancel_task,
     delete_task,
@@ -51,6 +52,11 @@ def start_crawl_task(payload: StartTaskIn):
         use_cookie_json=payload.use_cookie_json,
         cookie_json_path=payload.cookie_json_path,
     )
+
+
+@router.get("/cookie-pool/status")
+def get_cookie_pool_status(cookie_pool_dir: str | None = Query(default=None)):
+    return get_cookie_pool_stats(cookie_pool_dir)
 
 
 @router.get("/{task_id}")

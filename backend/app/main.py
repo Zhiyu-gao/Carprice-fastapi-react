@@ -20,6 +20,7 @@ from app.routers import (
     crawl_task,
     crawl_vehicle,
     forum,
+    model_training,
     oss_files,
     predict,
     train_car,
@@ -81,6 +82,7 @@ app.include_router(annotations.router)
 app.include_router(crawl_vehicle.router)
 app.include_router(crawl_task.router)
 app.include_router(predict.router)
+app.include_router(model_training.router)
 app.include_router(admin.router)
 app.include_router(train_car.router)
 app.include_router(buyer.router)

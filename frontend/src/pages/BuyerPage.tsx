@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Table, Typography, message, Row, Col, Statistic, Tag } from "antd";
+import { Button, Card, Table, Typography, message, Row, Col, Statistic, Tag, Space, Modal, Descriptions, Divider, Spin } from "antd";
 import { api, getErrorMessage } from "../api/client";
-import type { TrainCar } from "../api/types";
+import type { CrawlCar, TrainCar } from "../api/types";
+import { resolveFileUrl } from "../utils/fileUrl";
 import {
   ShoppingOutlined,
   DatabaseOutlined,
   CarOutlined,
   DollarOutlined,
   EnvironmentOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -19,12 +23,23 @@ const cardStyle: React.CSSProperties = {
   backdropFilter: "blur(12px)",
 };
 
+const LOW_BRAND_CONFIDENCE = 0.85;
+
+function isLowBrandConfidence(record: TrainCar) {
+  const brand = (record.brand || "").trim();
+  return !brand || brand === "未知" || record.brand_confidence == null || record.brand_confidence < LOW_BRAND_CONFIDENCE;
+}
+
 export default function BuyerPage() {
   const [items, setItems] = useState<TrainCar[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [purchasingIds, setPurchasingIds] = useState<Set<number>>(new Set());
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [selectedTrainCar, setSelectedTrainCar] = useState<TrainCar | null>(null);
+  const [detailCar, setDetailCar] = useState<CrawlCar | null>(null);
 
   const fetchData = async (pageNo: number) => {
     try {
@@ -65,13 +80,27 @@ export default function BuyerPage() {
     }
   };
 
+  const openDetails = async (car: TrainCar) => {
+    setSelectedTrainCar(car);
+    setDetailCar(null);
+    setDetailOpen(true);
+    if (!car.source_car_id) return;
+
+    try {
+      setDetailLoading(true);
+      const res = await api.get<CrawlCar>(`/crawl-cars/${car.source_car_id}`);
+      setDetailCar(res.data);
+    } catch (e: unknown) {
+      message.error(getErrorMessage(e, "获取车辆详细数据失败"));
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   // 统计数据
-  const avgPrice = items.length > 0
-    ? (items.reduce((sum, item) => sum + (item.price_wan || 0), 0) / items.length).toFixed(2)
-    : "0";
-  
   const uniqueBrands = new Set(items.map(item => item.brand)).size;
   const uniqueCities = new Set(items.map(item => item.city)).size;
+  const lowConfidenceCount = items.filter(isLowBrandConfidence).length;
 
   const columns = [
     {
@@ -84,11 +113,37 @@ export default function BuyerPage() {
       title: "品牌",
       dataIndex: "brand",
       width: 120,
-      render: (text: string) => (
-        <Tag style={{ background: "rgba(34, 211, 238, 0.1)", color: "#22d3ee", border: "1px solid rgba(34, 211, 238, 0.3)" }}>
-          {text}
+      render: (text: string, record: TrainCar) => (
+        <Tag
+          color={isLowBrandConfidence(record) ? "warning" : undefined}
+          style={isLowBrandConfidence(record)
+            ? {}
+            : { background: "rgba(34, 211, 238, 0.1)", color: "#22d3ee", border: "1px solid rgba(34, 211, 238, 0.3)" }}
+        >
+          {text || "未知"}
+          {isLowBrandConfidence(record) ? " · 待复核" : ""}
         </Tag>
       ),
+    },
+    {
+      title: "品牌置信度",
+      dataIndex: "brand_confidence",
+      width: 130,
+      render: (value: number | null | undefined, record: TrainCar) => {
+        const low = isLowBrandConfidence(record);
+        return (
+          <Space direction="vertical" size={2}>
+            <Tag color={low ? "error" : "success"}>
+              {value == null ? "未评估" : `${Math.round(value * 100)}%`}
+            </Tag>
+            {record.brand_source && (
+              <Text style={{ color: low ? "#f59e0b" : "#94a3b8", fontSize: 12 }}>
+                {record.brand_source}
+              </Text>
+            )}
+          </Space>
+        );
+      },
     },
     {
       title: "车型",
@@ -145,24 +200,32 @@ export default function BuyerPage() {
     {
       title: "操作",
       key: "action",
-      width: 140,
+      width: 230,
       fixed: "right" as const,
       render: (_: unknown, record: TrainCar) => (
-        <Button
-          type="primary"
-          icon={<ShoppingOutlined />}
-          loading={purchasingIds.has(record.id)}
-          onClick={() => handlePurchase(record)}
-          style={{
-            background: "linear-gradient(135deg, #10b981, #059669)",
-            border: "none",
-          }}
-        >
-          购买意向
-        </Button>
+        <Space>
+          <Button icon={<InfoCircleOutlined />} onClick={() => openDetails(record)}>
+            详细数据
+          </Button>
+          <Button
+            type="primary"
+            icon={<ShoppingOutlined />}
+            loading={purchasingIds.has(record.id)}
+            onClick={() => handlePurchase(record)}
+            style={{
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              border: "none",
+            }}
+          >
+            购买意向
+          </Button>
+        </Space>
       ),
     },
   ];
+
+  const detailImage = resolveFileUrl(detailCar?.image_path) || resolveFileUrl(detailCar?.image_url);
+  const paramSections = detailCar?.vehicle_params?.sections || [];
 
   return (
     <div className="page-shell">
@@ -212,10 +275,9 @@ export default function BuyerPage() {
         <Col xs={12} sm={6}>
           <Card style={cardStyle} bodyStyle={{ padding: 20 }}>
             <Statistic
-              title={<Text style={{ color: "#94a3b8" }}>平均价格</Text>}
-              value={avgPrice}
-              suffix="万"
-              prefix={<DollarOutlined style={{ color: "#a78bfa" }} />}
+              title={<Text style={{ color: "#94a3b8" }}>低置信品牌</Text>}
+              value={lowConfidenceCount}
+              prefix={<ExclamationCircleOutlined style={{ color: "#a78bfa" }} />}
               valueStyle={{ color: "#a78bfa", fontSize: 28, fontWeight: 700 }}
             />
           </Card>
@@ -223,7 +285,10 @@ export default function BuyerPage() {
       </Row>
 
       {/* 数据表格 */}
-      <Card style={cardStyle}>
+      <Card
+        style={cardStyle}
+        title={<Text style={{ color: "#f1f5f9", fontSize: 16, fontWeight: 600 }}>车辆列表</Text>}
+      >
         <Table
           rowKey="id"
           loading={loading}
@@ -237,9 +302,119 @@ export default function BuyerPage() {
             style: { marginTop: 16 },
           }}
           columns={columns}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1320 }}
         />
       </Card>
+
+      <Modal
+        open={detailOpen}
+        title={<Text style={{ color: "#f1f5f9" }}>车辆详细数据</Text>}
+        onCancel={() => setDetailOpen(false)}
+        footer={null}
+        width={980}
+        styles={{
+          header: { background: "#0f172a" },
+          body: { background: "#0f172a", maxHeight: "72vh", overflow: "auto" },
+        }}
+      >
+        <Spin spinning={detailLoading}>
+          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+            <Descriptions
+              size="small"
+              column={2}
+              bordered
+              styles={{
+                label: { background: "rgba(15, 23, 42, 0.85)", color: "#94a3b8" },
+                content: { background: "rgba(15, 23, 42, 0.5)", color: "#e2e8f0" },
+              }}
+            >
+              <Descriptions.Item label="品牌">{selectedTrainCar?.brand || "-"}</Descriptions.Item>
+              <Descriptions.Item label="车型">{selectedTrainCar?.model || "-"}</Descriptions.Item>
+              <Descriptions.Item label="价格">{selectedTrainCar?.price_wan ?? "-"} 万</Descriptions.Item>
+              <Descriptions.Item label="车源ID">{selectedTrainCar?.source_car_id || "-"}</Descriptions.Item>
+              <Descriptions.Item label="品牌置信度">
+                {selectedTrainCar?.brand_confidence == null
+                  ? "未评估"
+                  : `${Math.round(selectedTrainCar.brand_confidence * 100)}%`}
+                {selectedTrainCar?.brand_source ? ` · ${selectedTrainCar.brand_source}` : ""}
+              </Descriptions.Item>
+              <Descriptions.Item label="源头网址">
+                {detailCar?.source_url ? (
+                  <a href={detailCar.source_url} target="_blank" rel="noreferrer">
+                    <LinkOutlined /> 打开
+                  </a>
+                ) : "-"}
+              </Descriptions.Item>
+            </Descriptions>
+
+            {detailImage && (
+              <img
+                src={detailImage}
+                alt="car"
+                style={{
+                  width: "100%",
+                  maxHeight: 320,
+                  objectFit: "contain",
+                  borderRadius: 8,
+                  background: "rgba(2, 6, 23, 0.55)",
+                }}
+              />
+            )}
+
+            <div>
+              <Text strong style={{ color: "#e2e8f0" }}>爬虫基础字段</Text>
+              <Descriptions
+                size="small"
+                column={1}
+                bordered
+                style={{ marginTop: 8 }}
+                styles={{
+                  label: { background: "rgba(15, 23, 42, 0.85)", color: "#94a3b8", width: 160 },
+                  content: { background: "rgba(15, 23, 42, 0.5)", color: "#e2e8f0" },
+                }}
+              >
+                {Object.entries(detailCar?.info || {}).map(([key, value]) => (
+                  <Descriptions.Item key={key} label={key}>
+                    {value == null ? "-" : String(value)}
+                  </Descriptions.Item>
+                ))}
+              </Descriptions>
+            </div>
+
+            {paramSections.length > 0 && (
+              <div>
+                <Divider style={{ borderColor: "rgba(148, 163, 184, 0.12)" }} />
+                <Text strong style={{ color: "#e2e8f0" }}>MongoDB 详细参数</Text>
+                <Space direction="vertical" size={12} style={{ width: "100%", marginTop: 8 }}>
+                  {paramSections.map((section, index) => (
+                    <div key={`${section.title || "section"}-${index}`}>
+                      <Text style={{ color: "#7dd3fc", fontWeight: 600 }}>
+                        {section.title || "未分组"}
+                      </Text>
+                      <Descriptions
+                        size="small"
+                        column={1}
+                        bordered
+                        style={{ marginTop: 6 }}
+                        styles={{
+                          label: { background: "rgba(15, 23, 42, 0.85)", color: "#94a3b8", width: 180 },
+                          content: { background: "rgba(15, 23, 42, 0.5)", color: "#e2e8f0" },
+                        }}
+                      >
+                        {(section.items || []).map((item, itemIndex) => (
+                          <Descriptions.Item key={`${item.name || "item"}-${itemIndex}`} label={item.name || "-"}>
+                            {item.value == null ? "-" : String(item.value)}
+                          </Descriptions.Item>
+                        ))}
+                      </Descriptions>
+                    </div>
+                  ))}
+                </Space>
+              </div>
+            )}
+          </Space>
+        </Spin>
+      </Modal>
     </div>
   );
 }

@@ -29,6 +29,8 @@ dependencies = [
     "scikit-learn>=1.7.2",
     "sqlalchemy>=2.0.44",
     "uvicorn[standard]>=0.38.0",
+    "lightgbm>=4.6.0",
+    "xgboost>=3.3.0",
 ]
 
 [dependency-groups]

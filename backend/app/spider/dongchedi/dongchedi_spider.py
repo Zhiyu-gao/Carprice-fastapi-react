@@ -27,6 +27,12 @@ from playwright.sync_api import sync_playwright
 
 from app.db import get_session_by_target
 from app.services.crawl_car_service import save_crawl_car
+from app.services.cookie_pool_service import (
+    DEFAULT_COOKIE_POOL_DIR,
+    choose_cookie_from_pool,
+    get_cookie_pool_stats,
+    mark_cookie_expired,
+)
 from app.storage.local import save_image_local
 
 # =========================
@@ -59,7 +65,6 @@ CRAWL_DIR = DATA_DIR / "crawl"
 JSON_DIR = CRAWL_DIR / "json"
 IMG_DIR = CRAWL_DIR / "images"
 DEFAULT_COOKIE_JSON = CRAWL_DIR / "cookies" / "dongchedi_storage_state.json"
-DEFAULT_COOKIE_POOL_DIR = CRAWL_DIR / "cookie_pool"
 
 JSON_DIR.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -427,29 +432,6 @@ def _is_crawl_json_complete(path: Path) -> bool:
     )
 
 
-def _is_cookie_state_file(path: Path) -> bool:
-    try:
-        raw = _load_json(path)
-    except Exception:
-        return False
-    if isinstance(raw, dict) and isinstance(raw.get("cookies"), list):
-        return True
-    return isinstance(raw, list) and len(raw) > 0
-
-
-def _choose_cookie_from_pool(pool_dir: Path) -> Path | None:
-    if not pool_dir.exists():
-        return None
-    candidates = [
-        path
-        for path in pool_dir.glob("*.json")
-        if path.is_file() and _is_cookie_state_file(path)
-    ]
-    if not candidates:
-        return None
-    return random.choice(sorted(candidates))
-
-
 def _new_context_with_cookie_file(browser, user_agent: str, cookie_path: Path, log):
     raw_state = _load_json(cookie_path)
     if isinstance(raw_state, dict) and isinstance(raw_state.get("cookies"), list):
@@ -468,6 +450,32 @@ def _new_context_with_cookie_file(browser, user_agent: str, cookie_path: Path, l
         context.add_cookies(cookies)
         log(f"[COOKIE] 已加载 cookies: {cookie_path}")
     return context
+
+
+def _page_looks_blocked(page) -> bool:
+    try:
+        current_url = page.url.lower()
+    except Exception:
+        current_url = ""
+    try:
+        body_text = page.locator("body").inner_text(timeout=3000).strip()
+    except Exception:
+        body_text = ""
+
+    text = f"{current_url}\n{body_text[:3000]}".lower()
+    blocked_keywords = [
+        "login-required",
+        "captcha",
+        "verify",
+        "security",
+        "访问过于频繁",
+        "安全验证",
+        "请登录",
+        "登录后",
+        "验证",
+        "滑块",
+    ]
+    return any(keyword.lower() in text for keyword in blocked_keywords)
 
 
 # =========================
@@ -516,40 +524,87 @@ def run(
                 Path(cookie_json_path).expanduser() if cookie_json_path else DEFAULT_COOKIE_JSON
             )
             pool_dir = Path(cookie_pool_dir).expanduser() if cookie_pool_dir else DEFAULT_COOKIE_POOL_DIR
+            expired_cookie_names: set[str] = set()
 
             selected_cookie_path = None
             if use_cookie_pool:
-                selected_cookie_path = _choose_cookie_from_pool(pool_dir)
+                stats = get_cookie_pool_stats(str(pool_dir))
+                log(
+                    "[COOKIE_POOL] "
+                    f"active={stats['active_count']} expired={stats['expired_count']} "
+                    f"total={stats['total_count']} dir={stats['pool_dir']}"
+                )
+                selected_cookie_path = choose_cookie_from_pool(pool_dir)
                 if selected_cookie_path:
                     log(f"[COOKIE_POOL] 已选择 cookie: {selected_cookie_path.name}")
                 else:
                     log(f"[COOKIE_POOL] 已启用，但目录中没有可用 cookie: {pool_dir}")
 
-            if selected_cookie_path:
-                try:
-                    context = _new_context_with_cookie_file(
-                        browser,
-                        user_agent,
-                        selected_cookie_path,
-                        log,
-                    )
-                except Exception as e:
-                    log(f"[COOKIE_POOL] 读取失败，按无 cookie 继续: {selected_cookie_path} ({e})")
-                    context = browser.new_context(user_agent=user_agent)
-            elif use_cookie_json and cookie_path.exists():
-                try:
-                    context = _new_context_with_cookie_file(browser, user_agent, cookie_path, log)
-                except Exception as e:
-                    log(f"[COOKIE] 读取失败，按无 cookie 继续: {cookie_path} ({e})")
-                    context = browser.new_context(user_agent=user_agent)
-            else:
+            def _create_context_with_current_cookie():
+                if selected_cookie_path:
+                    try:
+                        return _new_context_with_cookie_file(
+                            browser,
+                            user_agent,
+                            selected_cookie_path,
+                            log,
+                        )
+                    except Exception as e:
+                        log(f"[COOKIE_POOL] 读取失败，按无 cookie 继续: {selected_cookie_path} ({e})")
+                        return browser.new_context(user_agent=user_agent)
+
+                if use_cookie_json and cookie_path.exists():
+                    try:
+                        return _new_context_with_cookie_file(browser, user_agent, cookie_path, log)
+                    except Exception as e:
+                        log(f"[COOKIE] 读取失败，按无 cookie 继续: {cookie_path} ({e})")
+                        return browser.new_context(user_agent=user_agent)
+
                 if use_cookie_json:
                     log(f"[COOKIE] 开关已开启，但文件不存在: {cookie_path}")
-                context = browser.new_context(user_agent=user_agent)
+                return browser.new_context(user_agent=user_agent)
 
+            context = _create_context_with_current_cookie()
             page = context.new_page()
 
-            for page_no in range(start_page, end_page + 1):
+            def _switch_to_next_cookie(reason: str) -> bool:
+                nonlocal context, page, selected_cookie_path
+                if not use_cookie_pool or not selected_cookie_path:
+                    return False
+
+                expired_cookie_names.add(selected_cookie_path.name)
+                expired_path = mark_cookie_expired(selected_cookie_path, reason)
+                log(
+                    f"[COOKIE_POOL] 当前 cookie 疑似失效，已标记过期: "
+                    f"{selected_cookie_path.name} -> {expired_path or 'unknown'} ({reason})"
+                )
+
+                next_cookie = choose_cookie_from_pool(pool_dir, exclude_names=expired_cookie_names)
+                try:
+                    page.close()
+                except Exception:
+                    pass
+                try:
+                    context.close()
+                except Exception:
+                    pass
+
+                if not next_cookie:
+                    selected_cookie_path = None
+                    context = browser.new_context(user_agent=user_agent)
+                    page = context.new_page()
+                    log("[COOKIE_POOL] 没有下一个可用 cookie，按无 cookie 继续")
+                    return False
+
+                selected_cookie_path = next_cookie
+                log(f"[COOKIE_POOL] 切换到下一个 cookie: {selected_cookie_path.name}")
+                context = _create_context_with_current_cookie()
+                page = context.new_page()
+                return True
+
+            page_no = start_page
+            while page_no <= end_page:
+                retry_same_page = False
                 if should_stop and should_stop():
                     log("[TASK] canceled before page start")
                     break
@@ -562,6 +617,13 @@ def run(
 
                 cards = page.locator("a.usedcar-card_card__3vUrx")
                 total = cards.count()
+                while total == 0 and _page_looks_blocked(page):
+                    if not _switch_to_next_cookie("列表页疑似触发反爬/登录验证"):
+                        break
+                    page.goto(list_url, timeout=30000, wait_until="domcontentloaded")
+                    time.sleep(random.uniform(*SLEEP_PER_PAGE))
+                    cards = page.locator("a.usedcar-card_card__3vUrx")
+                    total = cards.count()
                 log(f"[INFO] 本页发现卡片 {total}")
 
                 scraped = 0
@@ -623,6 +685,22 @@ def run(
                     if params_url:
                         log(f"[PARAM] {car_id} -> {params_url}")
                         vehicle_params = parse_vehicle_params_page(context, params_url, car_id, log)
+                        if vehicle_params is None and _switch_to_next_cookie(
+                            "参数页需要有效 Cookie 或内容为空"
+                        ):
+                            retry_same_page = True
+                            page.goto(detail_url, timeout=30000, wait_until="domcontentloaded")
+                            page.wait_for_load_state("domcontentloaded")
+                            time.sleep(random.uniform(0.8, 1.4))
+                            params_url = extract_params_url(page)
+                            if params_url:
+                                log(f"[PARAM RETRY] {car_id} -> {params_url}")
+                                vehicle_params = parse_vehicle_params_page(
+                                    context,
+                                    params_url,
+                                    car_id,
+                                    log,
+                                )
                         if vehicle_params:
                             param_car_id = vehicle_params.get("param_car_id")
 
@@ -690,6 +768,10 @@ def run(
                     scraped += 1
                     log(f"[OK] {car_id} | {title}")
 
+                    if retry_same_page:
+                        log("[COOKIE_POOL] cookie 已切换，重新扫描当前页以避免漏数据")
+                        break
+
                     # 回到列表页（重要）
                     page.go_back(wait_until="domcontentloaded")
                     page.wait_for_load_state("domcontentloaded")
@@ -699,6 +781,9 @@ def run(
                     db.commit()
 
                 log(f"[SUMMARY] page={page_no} scraped={scraped} skipped={skipped}")
+                if retry_same_page:
+                    continue
+                page_no += 1
 
             log("\n[DONE] 全部完成")
             browser.close()

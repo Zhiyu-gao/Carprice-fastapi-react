@@ -13,6 +13,8 @@ export type TrainCar = {
   id: number;
   source_car_id: string;
   brand?: string | null;
+  brand_confidence?: number | null;
+  brand_source?: string | null;
   model?: string | null;
   year?: number | null;
   displacement?: number | null;
@@ -64,6 +66,19 @@ export type CrawlCar = {
   info?: Record<string, string | number | null>;
   image_path?: string;
   image_url?: string;
+  source_url?: string;
+  params_url?: string | null;
+  param_car_id?: string | null;
+  vehicle_params?: {
+    sections?: Array<{
+      title?: string;
+      items?: Array<{ name?: string; value?: string | number | null }>;
+    }>;
+    raw_lines?: string[];
+    raw_text?: string;
+    [key: string]: unknown;
+  } | null;
+  raw_data?: Record<string, unknown> | null;
   crawl_time?: string;
 };
 

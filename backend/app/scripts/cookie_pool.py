@@ -12,7 +12,7 @@ sys.path.append(str(BASE_DIR))
 
 load_dotenv()
 
-from app.spider.dongchedi.dongchedi_spider import DEFAULT_COOKIE_POOL_DIR
+from app.services.cookie_pool_service import DEFAULT_COOKIE_POOL_DIR, EXPIRED_DIR_NAME, get_cookie_pool_stats
 
 DEFAULT_LOGIN_URL = "https://www.dongchedi.com/"
 
@@ -57,26 +57,47 @@ def add_cookie(args: argparse.Namespace) -> None:
 
 def list_cookies(args: argparse.Namespace) -> None:
     pool_dir = _pool_dir(args.pool_dir)
+    stats = get_cookie_pool_stats(str(pool_dir))
     files = sorted(pool_dir.glob("*.json"))
-    if not files:
+    expired_files = sorted((pool_dir / EXPIRED_DIR_NAME).glob("*.json"))
+    if not files and not expired_files:
         print(f"cookie 池为空: {pool_dir}")
         return
 
     print(f"cookie 池目录: {pool_dir}")
+    print(
+        "统计: "
+        f"总数 {stats['total_count']} | 可用 {stats['active_count']} | "
+        f"已过期 {stats['expired_count']} | 无效 {stats['invalid_count']}"
+    )
     for path in files:
         stat = path.stat()
         updated = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-        print(f"- {path.name} | {stat.st_size} bytes | updated {updated}")
+        print(f"- 可用 {path.name} | {stat.st_size} bytes | updated {updated}")
+    for path in expired_files:
+        if path.name.endswith(".expired.json"):
+            continue
+        stat = path.stat()
+        updated = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+        print(f"- 过期 {path.name} | {stat.st_size} bytes | updated {updated}")
 
 
 def delete_cookie(args: argparse.Namespace) -> None:
     pool_dir = _pool_dir(args.pool_dir)
     target = pool_dir / f"{_safe_name(args.name)}.json"
-    if not target.exists():
-        print(f"未找到 cookie: {target}")
+    expired_target = pool_dir / EXPIRED_DIR_NAME / f"{_safe_name(args.name)}.json"
+    if target.exists():
+        target.unlink()
+        print(f"已删除 cookie: {target}")
         return
-    target.unlink()
-    print(f"已删除 cookie: {target}")
+    if expired_target.exists():
+        expired_target.unlink()
+        meta_path = expired_target.with_suffix(expired_target.suffix + ".expired.json")
+        if meta_path.exists():
+            meta_path.unlink()
+        print(f"已删除过期 cookie: {expired_target}")
+        return
+    print(f"未找到 cookie: {target} 或 {expired_target}")
 
 
 def main() -> None:

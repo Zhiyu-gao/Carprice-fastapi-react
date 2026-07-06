@@ -234,7 +234,7 @@ const LandingPage: React.FC = () => {
     {
       icon: <BarChartOutlined style={{ fontSize: 24, color: "#f97316" }} />,
       title: "智能价格预测",
-      desc: "LightGBM + XGBoost 双模型融合，精准预测车辆价格",
+      desc: "LightGBM + XGBoost + Linear 加权融合，预测车辆价格",
     },
     {
       icon: <RobotOutlined style={{ fontSize: 24, color: "#a78bfa" }} />,
@@ -250,6 +250,7 @@ const LandingPage: React.FC = () => {
     { name: "Redis", color: "#f472b6" },
     { name: "LightGBM", color: "#34d399" },
     { name: "XGBoost", color: "#60a5fa" },
+    { name: "Linear baseline", color: "#f97316" },
     { name: "Scrapy", color: "#fbbf24" },
     { name: "Kimi AI", color: "#c084fc" },
   ];
@@ -364,7 +365,7 @@ const LandingPage: React.FC = () => {
                 marginBottom: 32,
               }}
             >
-              融合 LightGBM、XGBoost 等先进算法，结合 Kimi、Qwen、DeepSeek
+              融合 LightGBM、XGBoost 与线性 baseline，结合 Kimi、Qwen、DeepSeek
               等大模型能力，为您提供精准的车辆估价和深度分析报告。
             </Paragraph>
 
