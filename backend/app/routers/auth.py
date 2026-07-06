@@ -27,7 +27,6 @@ from app.services.auth_service import register_user as register_user_svc
 from app.utils.aliyun_email import send_email_code
 from app.utils.email_store import generate_and_store_code, verify_code
 
-print("🔐 BACKEND SECRET_KEY =", SECRET_KEY)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # 用于从 Authorization 头里抽 token

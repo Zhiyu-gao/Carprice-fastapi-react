@@ -17,7 +17,8 @@ const { TextArea } = Input;
 const { Text, Title } = Typography;
 const { useBreakpoint } = Grid;
 
-const AI_BASE_URL = import.meta.env.VITE_AI_BASE_URL;
+const AI_BASE_URL =
+  import.meta.env.VITE_AI_BASE_URL || "http://127.0.0.1:8080";
 
 type Message = {
   role: "user" | "ai";
@@ -289,7 +290,14 @@ export default function AiChatPage() {
       });
       if (!res.ok || !res.body) {
         setLoading(false);
-        message.error("聊天请求失败");
+        let detail = "聊天请求失败";
+        try {
+          const err = await res.json();
+          detail = err.detail || err.message || detail;
+        } catch {
+          // keep fallback message
+        }
+        message.error(detail);
         return;
       }
 

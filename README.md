@@ -1,29 +1,24 @@
 # 二手车智能平台
 
-一个面向二手车业务的全栈项目，覆盖数据采集、标注训练、价格预测、AI 问答、论坛私信、大屏分析，以及网页端和移动端的统一展示。
+一个面向二手车业务的全栈项目，覆盖懂车帝二手车数据采集、车辆价格标注、价格预测、AI 问答、购买意向、论坛私信、后台管理和大屏展示。
 
-## 项目简介
+## 项目组成
 
-这个仓库目前包含 4 个核心应用：
-
-- `frontend/`：网页端，负责首页、预测、论坛、管理等主业务页面
-- `mobile2/`：移动端，基于 Expo Router，可跑 Web 预览，也可用于手机端开发
-- `backend/`：主业务后端，基于 FastAPI，负责认证、预测、论坛、私信、训练集等接口
-- `ai_service/`：AI 服务，负责聊天、检索增强、模型路由等能力
-
-同时项目还包含：
-
-- `nginx/`：反向代理、HTTPS、网页端/移动端路由转发
-- `remotion/`：宣传视频与页面演示视频生成
-- `observability/`：Prometheus、Grafana 等观测配置
-- `docker-compose.yml`：整套服务的容器化部署
+- `frontend/`：React + Vite 网页端，包含预测、AI 助手、爬虫任务、价格标注、买车、论坛和管理后台。
+- `backend/`：FastAPI 主业务后端，负责认证、车辆数据、标注训练、爬虫任务、文件访问、购买意向等接口。
+- `ai_service/`：FastAPI AI 服务，负责聊天、价格分析、MCP 工具调用和数据库问答。
+- `mobile2/`：Expo Router 移动端。
+- `remotion/`：宣传视频与页面演示视频生成。
+- `nginx/`：线上反向代理、HTTPS、网页端/移动端路由转发。
+- `observability/`：Prometheus、Grafana 等观测配置。
 
 ## 技术栈
 
-- 前端网页：React 19、Vite、Ant Design、ECharts/Recharts
+- 网页端：React 19、Vite、Ant Design、ECharts/Recharts
 - 移动端：Expo Router、React Native Web
-- 主后端：FastAPI、SQLAlchemy、Alembic、MySQL、Redis
-- AI 服务：FastAPI、Qdrant、多模型接入
+- 主后端：FastAPI、SQLAlchemy、Alembic、MySQL、MongoDB、Redis
+- 爬虫：Playwright、Cookie 池、可切换有头/无头浏览器
+- AI 服务：FastAPI、OpenAI 兼容接口、MCP 工具
 - 部署与运维：Docker Compose、Nginx、Prometheus、Grafana
 
 ## 目录结构
@@ -38,7 +33,7 @@
 ├── nginx/                    # Nginx 配置与证书挂载目录
 ├── observability/            # Prometheus / Grafana
 ├── docker-compose.yml        # 完整部署
-├── docker-compose.infra.yml  # 仅基础设施
+├── docker-compose.infra.yml  # 仅基础设施：MySQL / Redis / MongoDB / Qdrant 等
 ├── deploy.sh                 # 服务器更新脚本
 └── README.md
 ```
@@ -50,71 +45,253 @@
 - Node.js 20+
 - npm
 - Docker 与 Docker Compose
+- Playwright Chromium
 
-## 本地开发
+## 本地快速启动
+
+以下命令默认在仓库根目录执行。当前本地开发常用地址：
+
+- 网页端：`http://127.0.0.1:5173`
+- 后端：`http://127.0.0.1:8000`
+- AI 服务：`http://127.0.0.1:8080`
 
 ### 1. 安装依赖
 
 ```bash
-# backend
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
+cd backend
+uv sync --group dev
+uv run playwright install chromium
+
+cd ../ai_service
 uv sync --group dev
 
-# ai_service
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/ai_service
-uv sync --group dev
-
-# frontend
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
-npm install
-
-# mobile2
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
-npm install
-
-# remotion
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+cd ../frontend
 npm install
 ```
 
-### 2. 启动基础依赖（可选但推荐）
+移动端和 Remotion 需要时再安装：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react
+cd mobile2
+npm install
+
+cd ../remotion
+npm install
+```
+
+### 2. 启动基础设施
+
+推荐使用 Docker 启动 MySQL、Redis、MongoDB、Qdrant 等基础服务：
+
+```bash
 docker compose -f docker-compose.infra.yml up -d
 ```
+
+如果本机已经单独安装 MySQL、Redis 或 MongoDB，也可以直接使用本机服务。后端默认读取 `backend/.env`，可以参考 `backend/.env.example`。
 
 ### 3. 启动后端
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
-uv run uvicorn app.main:app --reload --port 8000
+cd backend
+uv run python create_database.py
+uv run alembic upgrade head
+uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+开发时想自动重载可以使用：
+
+```bash
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ### 4. 启动 AI 服务
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/ai_service
-uv run uvicorn app.main:app --reload --port 8080
+cd ai_service
+uv run uvicorn app.main:app --host 127.0.0.1 --port 8080
 ```
 
 ### 5. 启动网页端
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
+cd frontend
 npm run dev
 ```
 
-默认地址一般为：
+## 数据库说明
 
-- 网页端：`http://localhost:5173`
-- 后端：`http://127.0.0.1:8000`
-- AI 服务：`http://127.0.0.1:8080`
+项目现在同时使用 MySQL、MongoDB 和 Redis：
 
-### 6. 启动移动端
+- MySQL：存用户、车辆主数据、标注、论坛、私信、爬虫任务等结构化业务表。
+- MongoDB：存购买意向、爬虫原始数据、懂车帝参数页这类字段不固定的数据。
+- Redis：用于分布式锁，避免并发买车或并发爬同一辆车时重复写入。
+
+### DBeaver 连接
+
+MySQL 默认配置：
+
+- Host：`127.0.0.1`
+- Port：`3306`
+- Database：`vehicle_intelligence_db`
+- Username：看 `backend/.env` 中的 `DB_USER`
+- Password：看 `backend/.env` 中的 `DB_PASSWORD`
+
+MongoDB 默认配置：
+
+- Host：`127.0.0.1`
+- Port：`27017`
+- Database：`vehicle_intelligence`
+- URL：`mongodb://127.0.0.1:27017`
+
+MongoDB 常用集合：
+
+- `purchase_intents`：买车意向
+- `crawl_raw_cars`：爬虫原始车辆数据
+- `vehicle_params`：懂车帝参数页动态字段
+
+## 爬虫功能
+
+网页端进入“爬虫任务”页面即可创建任务。当前支持：
+
+- 城市、起始页、结束页配置
+- 写入数据库目标配置
+- 有头/无头浏览器开关，对应 Playwright 的 `headless=false/true`
+- Cookie 池开关
+- 任务日志、取消任务、查看任务状态
+
+### 图片抓取
+
+爬虫会从列表页和详情页尽量提取真实图片地址，支持：
+
+- `src`
+- `srcset`
+- `data-src`
+- `data-original`
+- 字节跳动签名图片 URL
+
+图片会先下载到本地：
+
+```text
+backend/data/crawl/images/
+```
+
+数据库中的 `image_path` 会保存为相对路径，例如：
+
+```text
+crawl/images/23029159.jpg
+```
+
+前端标注页会通过后端 `/files/...` 访问本地图片。如果本地图片打不开，会尝试回退到原始 `image_url`。
+
+### 参数页抓取
+
+懂车帝详情页中类似：
+
+```html
+<a href="/auto/params-carIds-40149">查看更多参数</a>
+```
+
+会被爬虫识别并访问，例如：
+
+```text
+https://www.dongchedi.com/auto/params-carIds-40149
+```
+
+因为参数页字段不固定，不会强行写进 MySQL 固定列，而是写入 MongoDB 的 `vehicle_params` 集合。文档中会保存：
+
+- `car_id`
+- `param_car_id`
+- `params_url`
+- `sections`
+- `rows`
+- `raw_lines`
+- `raw_text`
+- `fetched_at`
+
+如果没有有效 Cookie，参数页可能跳到登录页或只返回空内容。爬虫会识别这种情况并跳过写入，避免把登录页当成车辆参数保存。
+
+### 断点续爬与补数据
+
+爬虫会把每辆车的 JSON 保存到：
+
+```text
+backend/data/crawl/json/
+```
+
+旧逻辑只要 JSON 存在就跳过。现在改为：
+
+- 如果 JSON 已有本地图片并且已有 `vehicle_params`，才跳过。
+- 如果旧数据缺图片或缺参数页，会重新抓取并补齐。
+- 如果 MySQL 里车辆已存在，重抓时会更新图片路径、图片 URL、车辆信息等字段。
+
+## Cookie 池维护
+
+Cookie 池目录默认是：
+
+```text
+backend/data/crawl/cookie_pool/
+```
+
+手动新增一份 Cookie：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
+cd backend
+uv run python app/scripts/cookie_pool.py add --name account1
+```
+
+命令会打开浏览器，你手动登录懂车帝后回到终端确认保存。
+
+查看 Cookie 池：
+
+```bash
+uv run python app/scripts/cookie_pool.py list
+```
+
+删除过期 Cookie：
+
+```bash
+uv run python app/scripts/cookie_pool.py delete --name account1
+```
+
+建议维护方式：
+
+- 每个账号保存成一个名字，例如 `account1`、`account2`。
+- 发现任务日志里频繁出现参数页需要 Cookie、登录页或空内容时，重新导入 Cookie。
+- 过期 Cookie 用 `delete` 删除，不要直接手改 JSON。
+
+## 买车意向与分布式锁
+
+买车入口会把用户意向写入 MongoDB 的 `purchase_intents` 集合。创建意向时使用 Redis 分布式锁，避免同一用户对同一车辆短时间重复提交。
+
+爬虫保存车辆时也使用 Redis 锁，锁 key 形如：
+
+```text
+lock:crawl:car:{car_id}
+```
+
+这样多个任务同时跑到同一辆车时，不会重复写 MongoDB/MySQL。
+
+## AI 助手与 MCP
+
+AI 服务支持 OpenAI 兼容 API Key 配置，并带有 MCP 风格工具调用能力。当前数据库问答工具可以查询车辆价格、车辆字段和统计信息。
+
+示例问题：
+
+```text
+数据库中特斯拉价格介绍一下
+```
+
+如果 AI 助手不通，优先检查：
+
+- `ai_service/.env` 中 API Key 是否存在
+- `ai_service` 是否启动在 `127.0.0.1:8080`
+- `frontend` 环境变量中的 AI 服务地址是否正确
+- 后端、AI 服务和数据库是否同时运行
+
+## 移动端
+
+```bash
+cd mobile2
 npm start
 ```
 
@@ -124,53 +301,44 @@ npm start
 - iOS 模拟器：`npm run ios`
 - Android：`npm run android`
 
-如果你想让手机或 Expo Web 正常访问后端，请在 `mobile2/.env` 中配置：
+如果真机调试需要访问本机后端，不要写 `127.0.0.1`，应改成电脑的局域网 IP。
 
-```env
-# 线上环境示例
-EXPO_PUBLIC_API_BASE_URL=https://www.nrydawang.shop/api
-EXPO_PUBLIC_AI_BASE_URL=https://www.nrydawang.shop/ai
-```
-
-本地真机调试时，不要写 `127.0.0.1`，应改成你电脑的局域网 IP。
-
-### 7. 启动 Remotion
+## Remotion
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
+cd remotion
 npm run studio:compat
 ```
 
 渲染视频：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
 npm run render:compat -- VehicleIntroCN out/video.mp4
 ```
 
 ## Docker 部署
 
-### 本地或服务器整套启动
+本地或服务器整套启动：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react
 docker compose up -d --build
 ```
 
-### 使用部署脚本
+使用部署脚本：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react
 bash deploy.sh
 ```
 
 `deploy.sh` 默认会使用根目录下的 `docker-compose.yml`。
 
-## 域名与 Nginx 说明
+## Nginx 与线上域名
 
 当前线上反向代理配置在：
 
-- `nginx/conf.d/default.conf`
+```text
+nginx/conf.d/default.conf
+```
 
 它负责：
 
@@ -180,84 +348,66 @@ bash deploy.sh
 - `/mobile/` 转发到移动端 Web
 - `/public/preview/video` 等公共资源转发到后端
 
-如果你要更换域名或证书，需要同步修改：
+更换域名或证书时，需要同步修改：
 
 - `server_name`
 - 证书路径
-- 对应安全组/防火墙的 `80/443` 端口
+- 安全组/防火墙的 `80/443` 端口
 
-## 常用命令
+## 常用检查命令
 
-### 质量检查
+后端检查：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react
-make format
-make check
+cd backend
+uv run ruff check app
+uv run python -c "from app.main import app; print('backend import ok')"
 ```
 
-### 单独检查前端类型
+前端检查：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/frontend
+cd frontend
 npm run typecheck
+npm run lint
 ```
 
-### 单独检查移动端类型
+查看后端接口文档：
 
 ```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/mobile2
-npm run typecheck
+curl http://127.0.0.1:8000/openapi.json
 ```
-
-### 检查后端是否可导入
-
-```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/backend
-uv run python -c "import app.main; print('backend import ok')"
-```
-
-## 已知关键配置
-
-### 后端 CORS
-
-后端在 `backend/app/main.py` 中已限制为：
-
-- `nrydawang.shop` / `www.nrydawang.shop`
-- 本机开发地址：`localhost`、`127.0.0.1`
-- 常见移动端 Web 端口：`5173`、`8081`、`19006`、`4173`
-- 局域网私网地址段：`10.x.x.x`、`192.168.x.x`、`172.16-31.x.x`
-
-这样可以兼顾本地开发、手机调试和线上域名，但不会像之前那样完全放开所有来源。
-
-### 预览视频
-
-后端接口：
-
-- `/public/preview/video`
-
-默认会读取：
-
-- `remotion/out/video.mp4`
-
-如果按钮能点开但视频 404，优先检查这个文件是否存在。
 
 ## 常见问题
 
-### 1. 网页能登录，移动端不能登录
+### 网页端图片不显示
 
-优先检查这几项：
+优先检查：
 
-- `mobile2/.env` 是否把接口写成了 `https://www.nrydawang.shop/api`
-- 是否误写成了裸域名 `https://www.nrydawang.shop`
+- `backend/data/crawl/images/` 下是否真的存在图片文件
+- 数据库里的 `image_path` 是否是 `crawl/images/xxx.jpg` 这种相对路径
+- 后端是否正常提供 `/files/...`
+- 如果是旧数据，重新跑一次爬虫补齐图片
+
+### 参数页没有写入 MongoDB
+
+优先检查：
+
+- Cookie 池是否启用
+- Cookie 是否过期
+- 任务日志是否出现“参数页需要有效 Cookie 或内容为空”
+- MongoDB 是否正常运行
+
+### 网页能登录，移动端不能登录
+
+优先检查：
+
+- `mobile2/.env` 是否把接口写成了正确后端地址
+- 是否误写成裸域名或错误路径
 - 本地真机调试时是否用了 `127.0.0.1`
 - 后端是否已重启，让最新 CORS 配置生效
 
-### 2. 启动后端时报 `backend/data does not exist`
-
-项目现在会在启动时自动创建 `backend/data`，如果仍有问题，确认运行的是最新代码。
-
-### 3. HTTPS 打不开
+### HTTPS 打不开
 
 优先检查：
 
@@ -266,26 +416,20 @@ uv run python -c "import app.main; print('backend import ok')"
 - Docker 中的 `vehicle_nginx` 是否正常启动
 - 宿主机是否有别的 Nginx 占用了 `80/443`
 
-### 4. Remotion 渲染失败
-
-如果出现 `The service was stopped` 之类的问题，先执行：
-
-```bash
-cd /Users/zhiyu/Documents/Carprice-fastapi-react/remotion
-npm install
-npm run studio:compat
-```
-
-本仓库已经补了兼容脚本，优先使用 `*:compat` 命令。
-
 ## 提交与部署建议
 
 推荐流程：
 
-1. 本地完成改动并自测
-2. `git status` 确认提交内容
-3. `git add -A && git commit -m "feat: xxx"`
-4. `git push origin main`
-5. 服务器执行 `git pull && bash deploy.sh`
+```bash
+git status
+git add -A
+git commit -m "feat: update vehicle crawler and ai workflow"
+git push origin main
+```
 
-如果线上使用的是 Docker Compose，这套流程就可以完成大部分发布。
+服务器部署：
+
+```bash
+git pull
+bash deploy.sh
+```

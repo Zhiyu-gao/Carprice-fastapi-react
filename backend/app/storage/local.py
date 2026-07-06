@@ -31,13 +31,21 @@ def _resolve_storage_ref(relative_path: str) -> str:
     return relative_path
 
 
-def save_image_local(image_bytes: bytes, filename: str) -> str:
+def save_image_local(
+    image_bytes: bytes,
+    filename: str,
+    *,
+    force_relative: bool = False,
+    content_type: str = "image/jpeg",
+) -> str:
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     path = IMAGE_DIR / filename
     path.write_bytes(image_bytes)
     rel = str(path.relative_to(DATA_DIR))
-    upload_bytes(rel, image_bytes, content_type="image/jpeg")
+    upload_bytes(rel, image_bytes, content_type=content_type)
 
+    if force_relative:
+        return rel
     return _resolve_storage_ref(rel)
 
 

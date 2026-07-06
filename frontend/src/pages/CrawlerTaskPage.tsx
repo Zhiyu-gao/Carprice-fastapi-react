@@ -26,8 +26,9 @@ interface CrawlerTask {
   log_url?: string;
   write_local_db?: boolean;
   write_cloud_db?: boolean;
-  use_cookie_json?: boolean;
-  cookie_json_path?: string;
+  headless?: boolean;
+  use_cookie_pool?: boolean;
+  cookie_pool_dir?: string;
 }
 
 type CityOption = { label: string; value: string };
@@ -39,8 +40,9 @@ type StartCrawlerFormValues = {
   end_page?: number;
   write_local_db?: boolean;
   write_cloud_db?: boolean;
-  use_cookie_json?: boolean;
-  cookie_json_path?: string;
+  headless?: boolean;
+  use_cookie_pool?: boolean;
+  cookie_pool_dir?: string;
 };
 
 const CITY_GROUPS: CityGroup[] = [
@@ -392,8 +394,9 @@ export default function CrawlerTaskPage() {
             end_page: Number(values.end_page || 1),
             write_local_db: Boolean(values.write_local_db),
             write_cloud_db: Boolean(values.write_cloud_db),
-            use_cookie_json: Boolean(values.use_cookie_json),
-            cookie_json_path: values.cookie_json_path?.trim() || null,
+            headless: Boolean(values.headless),
+            use_cookie_pool: Boolean(values.use_cookie_pool),
+            cookie_pool_dir: values.cookie_pool_dir?.trim() || null,
           });
           const taskId = startRes.data?.id as string | undefined;
           if (!taskId) {
@@ -544,8 +547,9 @@ export default function CrawlerTaskPage() {
             end_page: 1,
             write_local_db: true,
             write_cloud_db: false,
-            use_cookie_json: false,
-            cookie_json_path: "",
+            headless: false,
+            use_cookie_pool: false,
+            cookie_pool_dir: "",
             city_names: [],
           }}
         >
@@ -654,23 +658,32 @@ export default function CrawlerTaskPage() {
           </Form.Item>
 
           <Form.Item
-            name="use_cookie_json"
-            label={<Text style={{ color: "#94a3b8" }}>启用 JSON Cookie 文件</Text>}
+            name="headless"
+            label={<Text style={{ color: "#94a3b8" }}>无头模式</Text>}
             valuePropName="checked"
+          >
+            <Switch checkedChildren="无头" unCheckedChildren="有头" />
+          </Form.Item>
+
+          <Form.Item
+            name="use_cookie_pool"
+            label={<Text style={{ color: "#94a3b8" }}>启用 Cookie 池</Text>}
+            valuePropName="checked"
+            tooltip="从后端 cookie 池目录随机选择一个可用 JSON 状态文件。"
           >
             <Switch checkedChildren="开" unCheckedChildren="关" />
           </Form.Item>
 
-          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.use_cookie_json !== cur.use_cookie_json}>
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.use_cookie_pool !== cur.use_cookie_pool}>
             {({ getFieldValue }) =>
-              getFieldValue("use_cookie_json") ? (
+              getFieldValue("use_cookie_pool") ? (
                 <Form.Item
-                  name="cookie_json_path"
-                  label={<Text style={{ color: "#94a3b8" }}>Cookie JSON 路径（可选）</Text>}
-                  tooltip="留空则使用后端默认路径 data/crawl/cookies/dongchedi_storage_state.json"
+                  name="cookie_pool_dir"
+                  label={<Text style={{ color: "#94a3b8" }}>Cookie 池目录（可选）</Text>}
+                  tooltip="留空则使用后端默认目录 data/crawl/cookie_pool"
                 >
                   <Input
-                    placeholder="例如: data/crawl/cookies/dongchedi_storage_state.json"
+                    placeholder="例如: data/crawl/cookie_pool"
                     style={{ background: "rgba(15, 23, 42, 0.6)" }}
                   />
                 </Form.Item>

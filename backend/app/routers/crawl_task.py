@@ -20,6 +20,9 @@ class StartTaskIn(BaseModel):
     end_page: int = 1
     write_local_db: bool = True
     write_cloud_db: bool = False
+    headless: bool = False
+    use_cookie_pool: bool = False
+    cookie_pool_dir: str | None = None
     use_cookie_json: bool = False
     cookie_json_path: str | None = None
 
@@ -42,6 +45,9 @@ def start_crawl_task(payload: StartTaskIn):
         end_page=payload.end_page,
         write_local_db=payload.write_local_db,
         write_cloud_db=payload.write_cloud_db,
+        headless=payload.headless,
+        use_cookie_pool=payload.use_cookie_pool,
+        cookie_pool_dir=payload.cookie_pool_dir,
         use_cookie_json=payload.use_cookie_json,
         cookie_json_path=payload.cookie_json_path,
     )

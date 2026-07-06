@@ -80,6 +80,9 @@ def start_task(
     end_page: int,
     write_local_db: bool = True,
     write_cloud_db: bool = False,
+    headless: bool = False,
+    use_cookie_pool: bool = False,
+    cookie_pool_dir: str | None = None,
     use_cookie_json: bool = False,
     cookie_json_path: str | None = None,
 ) -> dict[str, Any]:
@@ -100,6 +103,9 @@ def start_task(
         "end_page": end_page,
         "write_local_db": write_local_db,
         "write_cloud_db": write_cloud_db,
+        "headless": headless,
+        "use_cookie_pool": use_cookie_pool,
+        "cookie_pool_dir": cookie_pool_dir,
         "use_cookie_json": use_cookie_json,
         "cookie_json_path": cookie_json_path,
         "db_targets": db_targets,
@@ -123,6 +129,8 @@ def start_task(
     def _runner():
         log("[TASK] start")
         log(f"[TASK] db_targets={db_targets or ['none']}")
+        log(f"[TASK] headless={headless}")
+        log(f"[TASK] use_cookie_pool={use_cookie_pool} dir={cookie_pool_dir or 'default'}")
         log(f"[TASK] use_cookie_json={use_cookie_json} path={cookie_json_path or 'default'}")
         try:
             run_spider(
@@ -132,6 +140,9 @@ def start_task(
                 log_fn=log,
                 save_to_db=bool(db_targets),
                 db_targets=db_targets,
+                headless=headless,
+                use_cookie_pool=use_cookie_pool,
+                cookie_pool_dir=cookie_pool_dir,
                 use_cookie_json=use_cookie_json,
                 cookie_json_path=cookie_json_path,
                 should_stop=cancel_event.is_set,

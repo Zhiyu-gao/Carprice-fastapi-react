@@ -1,19 +1,17 @@
+import sys
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from pathlib import Path
 
 from alembic import context
-
-import os
-import sys
-from pathlib import Path
+from sqlalchemy import engine_from_config, pool
 
 # 把项目根目录加到 sys.path，方便导入 app 包
 BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
+from app import models  # noqa: F401  # type: ignore
 from app.db import SQLALCHEMY_DATABASE_URL, Base  # type: ignore
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -74,13 +72,10 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
-    print("🔥 Alembic DATABASE_URL =", connectable.url)
 
 
 

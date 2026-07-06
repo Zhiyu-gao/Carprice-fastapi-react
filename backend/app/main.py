@@ -15,6 +15,7 @@ from app.routers import (
     admin,
     annotations,
     auth,
+    buyer,
     chat,
     crawl_task,
     crawl_vehicle,
@@ -82,6 +83,7 @@ app.include_router(crawl_task.router)
 app.include_router(predict.router)
 app.include_router(admin.router)
 app.include_router(train_car.router)
+app.include_router(buyer.router)
 app.include_router(forum.router)
 app.include_router(user_profile.router)
 app.include_router(chat.router)

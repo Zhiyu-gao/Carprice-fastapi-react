@@ -63,6 +63,7 @@ export type CrawlCar = {
   tags?: string[];
   info?: Record<string, string | number | null>;
   image_path?: string;
+  image_url?: string;
   crawl_time?: string;
 };
 

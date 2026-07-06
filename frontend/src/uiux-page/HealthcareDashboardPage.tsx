@@ -36,7 +36,11 @@ export default function HealthcareDashboardPage() {
   const screens = useBreakpoint();
   const isMobile = !screens.md;
   const tableColumns = isMobile
-    ? columns.map(({ width: _width, ...rest }) => rest)
+    ? columns.map((column) => {
+        const mobileColumn = { ...column };
+        delete mobileColumn.width;
+        return mobileColumn;
+      })
     : columns;
 
   return (

@@ -1,12 +1,14 @@
 import os
 import re
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
 BACKEND_API_BASE = os.getenv("BACKEND_API_BASE_URL", "http://127.0.0.1:8000")
 TIMEOUT_SECONDS = 10
 MAX_QUERY_SIZE = 200
+SUGGESTION_SIZE = 200
 
 COMMON_BRANDS = [
     "特斯拉",
@@ -34,6 +36,39 @@ def _get(url: str) -> Any:
         return resp.json()
 
 
+def _crawl_cars_url(keyword: str | None = None, page_size: int = MAX_QUERY_SIZE) -> str:
+    url = f"{BACKEND_API_BASE}/crawl-cars?page=1&page_size={page_size}"
+    if keyword:
+        url += f"&keyword={quote(keyword)}"
+    return url
+
+
+def _available_brand_hint() -> str:
+    try:
+        data = _get(_crawl_cars_url(page_size=SUGGESTION_SIZE))
+    except httpx.HTTPError:
+        return ""
+
+    items = data.get("items") or []
+    counts: dict[str, int] = {}
+    for car in items:
+        title = str(car.get("title") or "").strip()
+        if not title:
+            continue
+        brand = title.split(" ", 1)[0].strip()
+        if brand:
+            counts[brand] = counts.get(brand, 0) + 1
+
+    if not counts:
+        return ""
+
+    examples = sorted(counts.items(), key=lambda item: item[1], reverse=True)[:10]
+    example_text = "、".join(f"{brand}({count})" for brand, count in examples)
+    total = data.get("total")
+    total_text = f"当前 crawl_cars 表约有 {total} 条记录。" if total is not None else ""
+    return f"{total_text} 可尝试查询这些品牌/车系：{example_text}。"
+
+
 def tool_latest_tasks() -> str:
     try:
         data = _get(f"{BACKEND_API_BASE}/crawl-tasks")
@@ -52,16 +87,20 @@ def tool_latest_tasks() -> str:
 
 def tool_find_cars(keyword: str) -> str:
     try:
-        data = _get(f"{BACKEND_API_BASE}/crawl-cars?page=1&page_size={MAX_QUERY_SIZE}&keyword={keyword}")
+        data = _get(_crawl_cars_url(keyword))
     except httpx.HTTPError as exc:
         return f"查询车辆失败: {exc}"
 
     items = data.get("items") or []
     matches = [car for car in items if keyword in (car.get("title") or "")]
     if not matches:
-        return f"未找到包含 '{keyword}' 的车辆。"
+        hint = _available_brand_hint()
+        return f"未找到包含 '{keyword}' 的车辆。" + (f"\n{hint}" if hint else "")
 
-    lines = [f"- {car.get('car_id')}: {car.get('title')}" for car in matches[:8]]
+    lines = [
+        f"- {car.get('car_id') or car.get('source_car_id')}: {car.get('title')}"
+        for car in matches[:8]
+    ]
     return f"数据库匹配车辆（关键词: {keyword}）：\n" + "\n".join(lines)
 
 
@@ -118,14 +157,15 @@ def _extract_keyword(question: str) -> str:
 
 def tool_car_price_summary(keyword: str) -> str:
     try:
-        data = _get(f"{BACKEND_API_BASE}/crawl-cars?page=1&page_size={MAX_QUERY_SIZE}&keyword={keyword}")
+        data = _get(_crawl_cars_url(keyword))
     except httpx.HTTPError as exc:
         return f"查询车辆价格失败: {exc}"
 
     items = data.get("items") or []
     matches = [car for car in items if keyword in (car.get("title") or "")]
     if not matches:
-        return f"未找到包含 '{keyword}' 的车辆。"
+        hint = _available_brand_hint()
+        return f"未找到包含 '{keyword}' 的车辆。" + (f"\n{hint}" if hint else "")
 
     priced: list[tuple[str, str, float]] = []
     for car in matches:
@@ -133,7 +173,8 @@ def tool_car_price_summary(keyword: str) -> str:
         price_wan = _parse_price_wan(info)
         if price_wan is None:
             continue
-        priced.append((str(car.get("car_id") or ""), str(car.get("title") or ""), price_wan))
+        car_id = str(car.get("car_id") or car.get("source_car_id") or "")
+        priced.append((car_id, str(car.get("title") or ""), price_wan))
 
     if not priced:
         return f"找到 {len(matches)} 条 '{keyword}' 车辆，但没有可解析的“当前售价”字段。"

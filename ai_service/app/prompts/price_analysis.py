@@ -18,11 +18,14 @@ def build_price_analysis_user_prompt(
     return f"""
 以下是某辆车的基础信息：
 
-- 内部空间面积：{features.get("area_sqm")} ㎡
-- 座位数：{features.get("bedrooms")} 个
-- 使用年限：{features.get("age_years")} 年
+- 品牌：{features.get("brand")}
+- 车龄：{features.get("age_years")} 年
+- 排量：{features.get("engine")} L
+- 变速箱：{features.get("gearbox")}
+- 过户次数：{features.get("transfer_cnt")} 次
+- 新车指导价：{features.get("price_new")} 万元
 
-已有机器学习模型预测该车辆总价约为：{round(predicted_price):,} 元。
+已有机器学习模型预测该二手车价格约为：{predicted_price:.2f} 万元。
 
 请你从以下几个方面进行分析，并用 Markdown 结构化输出：
 
@@ -31,9 +34,12 @@ def build_price_analysis_user_prompt(
 
 ## 2. 各特征对价格的影响
 - 分别说明下面这些因素对价格的影响方向与大致强度：
-  - 内部空间面积
-  - 座位数
-  - 使用年限
+  - 品牌
+  - 车龄
+  - 排量
+  - 变速箱
+  - 过户次数
+  - 新车指导价
 
 ## 3. 风险提示
 - 列出需要注意的风险点（如使用年限过长、维护成本、未来流通性等）

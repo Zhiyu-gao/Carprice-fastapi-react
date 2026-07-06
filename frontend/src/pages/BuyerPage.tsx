@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Table, Typography, message, Row, Col, Statistic, Tag } from "antd";
+import { Button, Card, Table, Typography, message, Row, Col, Statistic, Tag } from "antd";
 import { api, getErrorMessage } from "../api/client";
 import type { TrainCar } from "../api/types";
 import {
@@ -24,6 +24,7 @@ export default function BuyerPage() {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [purchasingIds, setPurchasingIds] = useState<Set<number>>(new Set());
 
   const fetchData = async (pageNo: number) => {
     try {
@@ -45,6 +46,24 @@ export default function BuyerPage() {
   useEffect(() => {
     fetchData(1);
   }, []);
+
+  const handlePurchase = async (car: TrainCar) => {
+    setPurchasingIds((prev) => new Set(prev).add(car.id));
+    try {
+      await api.post("/buyer/purchase-intents", {
+        train_car_id: car.id,
+      });
+      message.success("购买意向已提交，销售人员会尽快联系你");
+    } catch (e: unknown) {
+      message.error(getErrorMessage(e, "提交购买意向失败"));
+    } finally {
+      setPurchasingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(car.id);
+        return next;
+      });
+    }
+  };
 
   // 统计数据
   const avgPrice = items.length > 0
@@ -121,6 +140,26 @@ export default function BuyerPage() {
           <DollarOutlined style={{ marginRight: 4 }} />
           {text}
         </Text>
+      ),
+    },
+    {
+      title: "操作",
+      key: "action",
+      width: 140,
+      fixed: "right" as const,
+      render: (_: unknown, record: TrainCar) => (
+        <Button
+          type="primary"
+          icon={<ShoppingOutlined />}
+          loading={purchasingIds.has(record.id)}
+          onClick={() => handlePurchase(record)}
+          style={{
+            background: "linear-gradient(135deg, #10b981, #059669)",
+            border: "none",
+          }}
+        >
+          购买意向
+        </Button>
       ),
     },
   ];

@@ -84,6 +84,7 @@ const CarAnnotationPage: React.FC = () => {
 
   const [selected, setSelected] = useState<CrawlCar | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   const [form] = Form.useForm<AnnotationForm>();
   const [messageApi, contextHolder] = message.useMessage();
@@ -150,6 +151,7 @@ const CarAnnotationPage: React.FC = () => {
 
   const openAnnotate = (car: CrawlCar) => {
     setSelected(car);
+    setImageFailed(false);
     setDrawerOpen(true);
 
     const suggested = getSuggestedPrice(car.info);
@@ -198,6 +200,11 @@ const CarAnnotationPage: React.FC = () => {
     const carId = car.car_id ?? car.source_car_id ?? "";
     return carId ? annotatedIds.has(carId) : false;
   }).length;
+  const selectedLocalImageSrc = resolveFileUrl(selected?.image_path);
+  const selectedRemoteImageSrc = resolveFileUrl(selected?.image_url);
+  const selectedImageSrc = imageFailed && selectedRemoteImageSrc
+    ? selectedRemoteImageSrc
+    : selectedLocalImageSrc || selectedRemoteImageSrc;
 
   return (
     <div className="page-shell">
@@ -375,12 +382,21 @@ const CarAnnotationPage: React.FC = () => {
             <Card style={{ ...cardStyle, marginBottom: 16 }}>
               <Title level={5} style={{ color: "#f1f5f9" }}>{selected.title}</Title>
 
-              {selected.image_path && (
+              {selectedImageSrc && (
                 <>
                   <Divider style={{ borderColor: "rgba(148, 163, 184, 0.1)" }} />
                   <img
-                    src={resolveFileUrl(selected.image_path)}
+                    src={selectedImageSrc}
                     alt="car"
+                    onError={() => {
+                      if (
+                        !imageFailed &&
+                        selectedRemoteImageSrc &&
+                        selectedRemoteImageSrc !== selectedImageSrc
+                      ) {
+                        setImageFailed(true);
+                      }
+                    }}
                     style={{
                       width: "100%",
                       maxHeight: 320,

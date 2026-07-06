@@ -23,9 +23,12 @@ def analyze_price_with_ai(
     """Return markdown analysis for the predicted vehicle price."""
     user_prompt = build_price_analysis_user_prompt(
         features={
-            "area_sqm": features.area_sqm,
-            "bedrooms": features.bedrooms,
+            "brand": features.brand,
             "age_years": features.age_years,
+            "engine": features.engine,
+            "gearbox": features.gearbox,
+            "transfer_cnt": features.transfer_cnt,
+            "price_new": features.price_new,
         },
         predicted_price=predicted_price,
     )

@@ -108,7 +108,7 @@ def _rewrite_mcp_reply(question: str, mcp_context: str) -> str:
 
     # 无结果类输出统一规范，不允许“查不了数据库”
     if "未找到" in ctx or "没有可解析" in ctx:
-        return f"已查询数据库，未查到与“{q or '该条件'}”匹配的有效价格数据。"
+        return f"已查询数据库，未查到与“{q or '该条件'}”匹配的有效价格数据。\n{ctx}"
 
     return f"已查询数据库，结果如下：\n{ctx}"
 

@@ -4,9 +4,12 @@ from pydantic import BaseModel
 
 
 class VehicleFeatures(BaseModel):
-    area_sqm: float
-    bedrooms: int
-    age_years: int
+    brand: str
+    age_years: float
+    engine: float
+    gearbox: str
+    transfer_cnt: int
+    price_new: float
 
 
 class AiProvider(str, Enum):
